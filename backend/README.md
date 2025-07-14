@@ -1,4 +1,3 @@
-Sure Fraol! Here's the **clean, copy-paste ready `README.md` section** formatted in Markdown:
 
 ---
 
