@@ -7,6 +7,22 @@
 
 ---
 
+### 🛠️ Install Poetry (If Not Installed)
+
+Make sure you have [Poetry](https://python-poetry.org/) installed.
+Follow the official installation guide here:
+👉 [https://python-poetry.org/docs/#installation](https://python-poetry.org/docs/#installation)
+
+---
+
+### 📁 Go to the Directory
+
+```bash
+cd backend
+```
+
+---
+
 ### 📥 1. Install Dependencies
 
 ```bash
@@ -31,7 +47,7 @@ poetry shell
 ### 🚀 3. Run the Server
 
 ```bash
-uvicorn main:app --reload
+uvicorn src.main:app --reload
 ```
 
 Visit:
