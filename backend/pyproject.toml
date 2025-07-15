@@ -2,9 +2,7 @@
 name = "backend"
 version = "0.1.0"
 description = ""
-authors = [
-    {name = "Fraol Megersa",email = "fraolbacha111@gmail.com"}
-]
+
 readme = "README.md"
 requires-python = ">=3.12,<4.0"
 dependencies = [
@@ -22,7 +20,14 @@ dependencies = [
 ]
 
 [tool.poetry]
-packages = [{include = "backend", from = "src"}]
+packages = [   
+    { include = "auth", from = "src" },
+    { include = "core", from = "src" },
+    { include = "db", from ="src"},
+    {include = "models", from = "src"},
+    {include = "routes", from = "src"}
+    
+]
 
 
 [tool.poetry.group.dev.dependencies]
