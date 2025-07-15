@@ -18,6 +18,7 @@ dependencies = [
     "owslib (>=0.34.1,<0.35.0)",
     "rasterio (>=1.4.3,<2.0.0)",
     "pyproj (>=3.7.1,<4.0.0)",
+    "kindwise-api-client (>=0.6.0,<0.7.0)",
 ]
 
 [tool.poetry]
