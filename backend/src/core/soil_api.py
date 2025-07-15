@@ -1,44 +1,33 @@
-import requests
-import os
-from dotenv import load_dotenv
+# core/soil_api.py
+from owslib.wcs import WebCoverageService
+from rasterio.io import MemoryFile
 
-# Load environment variables
-load_dotenv()
+def get_soil_data(lat: float, lon: float):
+    # Define bbox around point in degrees (approx ~1km square)
+    bbox = (lon - 0.01, lat - 0.01, lon + 0.01, lat + 0.01)
+    crs = 'http://www.opengis.net/def/crs/EPSG/0/4326'
+    
+    wcs_url = 'https://maps.isric.org/mapserv?map=/map/nitrogen.map'
+    wcs = WebCoverageService(wcs_url, version='2.0.1')
 
-# Constants
-TOKEN_URL = "https://account.soilhive.ag/oauth/token"
-DATASETS_URL = "https://api.soilhive.ag/datasets"
+    # ✅ Hardcoded valid identifier
+    coverage_id = 'nitrogen_0-5cm_Q0.5'
 
-# Credentials
-CLIENT_ID = os.getenv("SOILHIVE_CLIENT_ID")
-CLIENT_SECRET = os.getenv("SOILHIVE_CLIENT_SECRET")
+    # Get coverage
+    
+    print("Sending coverage_id:", coverage_id)
 
-def get_soilhive_token() -> str:
-    data = {
-        "grant_type": "client_credentials",
-        "client_id": CLIENT_ID,
-        "client_secret": CLIENT_SECRET,
-    }
+    response = wcs.getCoverage(
+        identifier=coverage_id,
+        format='image/tiff',
+        bbox=bbox,
+        crs=crs,
+        resx=0.001,
+        resy=0.001
+    )
 
-    headers = {
-        "Content-Type": "application/x-www-form-urlencoded"
-    }
-
-    response = requests.post(TOKEN_URL, data=data, headers=headers)
-
-    if response.status_code != 200:
-        raise Exception(f"Token error: {response.status_code} - {response.text}")
-
-    return response.json()["access_token"]
-
-def get_soilhive_datasets(token: str) -> dict:
-    headers = {
-        "Authorization": f"Bearer {token}"
-    }
-
-    response = requests.get(DATASETS_URL, headers=headers)
-
-    if response.status_code != 200:
-        raise Exception(f"Data fetch error: {response.status_code} - {response.text}")
-
-    return response.json()
+    with MemoryFile(response.read()) as memfile:
+        with memfile.open() as dataset:
+            band = dataset.read(1)
+            center_value = band[band.shape[0] // 2, band.shape[1] // 2]
+            return float(center_value)

@@ -15,6 +15,9 @@ dependencies = [
     "requests (>=2.32.4,<3.0.0)",
     "openepi-client (>=1.0.1,<2.0.0)",
     "python-multipart (>=0.0.20,<0.0.21)",
+    "owslib (>=0.34.1,<0.35.0)",
+    "rasterio (>=1.4.3,<2.0.0)",
+    "pyproj (>=3.7.1,<4.0.0)",
 ]
 
 [tool.poetry]

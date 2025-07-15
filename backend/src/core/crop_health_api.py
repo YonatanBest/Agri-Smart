@@ -13,3 +13,5 @@ def predict_crop_health(image_path: str, model_type: str = "binary"):
         return CropHealthClient.get_multiHLT_prediction(image_data)
     else:
         raise ValueError("Invalid model type. Choose 'binary', 'single', or 'multi'")
+
+

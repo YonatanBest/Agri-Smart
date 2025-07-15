@@ -1,13 +1,18 @@
-from fastapi import APIRouter, HTTPException
-from src.core.soil_api import get_soilhive_token, get_soilhive_datasets
+# routes/soil.py
+from fastapi import APIRouter, Query
+from src.core.soil_api import get_soil_data
 
-router = APIRouter(prefix="/api/soil", tags=["SoilHive"])
+router = APIRouter()
 
-@router.get("/datasets")
-def list_soil_datasets():
+@router.get("/soil-info")
+def soil_info(lat: float = Query(...), lon: float = Query(...)):
     try:
-        token = get_soilhive_token()
-        data = get_soilhive_datasets(token)
-        return {"status": "success", "data": data}
+        nitrogen = get_soil_data(lat, lon)
+        return {
+            "latitude": lat,
+            "longitude": lon,
+            "soil_property": "nitrogen_0-5cm_Q0.5",
+            "value": nitrogen
+        }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        return {"error": str(e)}
