@@ -1,5 +1,5 @@
 from fastapi import APIRouter, UploadFile, File, Form
-from src.core.crop_health_api import predict_crop_health, identify_plant
+from src.ext_apis.crop_health_api import predict_crop_health
 import tempfile
 
 router = APIRouter(prefix="/api/crop-health", tags=["Crop Health"])
@@ -13,4 +13,4 @@ async def analyze_crop_health(image: UploadFile = File(...), model: str = "binar
         tmp_path = tmp.name
 
     result = predict_crop_health(tmp_path, model)
-    return {"prediction": result}
+    return result

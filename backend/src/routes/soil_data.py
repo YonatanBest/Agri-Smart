@@ -1,6 +1,6 @@
 # routes/soil.py
 from fastapi import APIRouter, Query
-from src.core.soil_api import get_soil_data
+from src.ext_apis.soil_api import get_soil_data
 
 router = APIRouter()
 
