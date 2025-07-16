@@ -1,9 +1,6 @@
 
 ---
 
-```md
----
-
 ## ⚙️ Backend Setup (FastAPI + Poetry)
 
 > *For backend contributors only*
@@ -31,10 +28,16 @@ Backend code and dependencies live in the `backend/` folder.
 
 ### 1. Install Poetry (if needed)
 
+```bash
+pip install poetry 
+````
+If it is not successful installed, follow this guide
+
 Install Poetry following the official guide:  
 [https://python-poetry.org/docs/#installation](https://python-poetry.org/docs/#installation)
 
 Verify:
+
 
 ```bash
 poetry --version
@@ -81,6 +84,6 @@ Visit: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
 
 * Add a dependency: `poetry add package-name`
 * Run a script: `poetry run python script.py`
-* Exit shell: `exit`
+* Exit from venv: `exit`
 
 ---
