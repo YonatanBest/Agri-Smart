@@ -121,7 +121,7 @@ def kindwise_api(
 
 def predict_crop_health(
     image_path: str,
-    model_type: str = "multi",
+    model_type: str = "binary",
     latitude: str = 49.5,
     longitude: str = 45,
     similar_images: bool = True,
