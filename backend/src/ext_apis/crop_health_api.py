@@ -55,16 +55,10 @@ def simplify_prediction_result(prediction: dict) -> dict:
     }
 
 
-def openEPI_api(image_data: object, model_type: str = "multi") -> dict:
+def openEPI_api(image_data: object, model_type: str = "binary") -> dict:
     openEPI_result = {}
 
-    endpoint_map = {
-        "binary": "https://api.openepi.io/crop-health/predictions/binary",
-        "single": "https://api.openepi.io/crop-health/predictions/single-HLT",
-        "multi": "https://api.openepi.io/crop-health/predictions/multi-HLT",
-    }
-
-    url = endpoint_map.get(model_type)
+    url = "https://api.openepi.io/crop-health/predictions/binary"
     if not url:
         raise ValueError(
             "Invalid model type. Choose 'binary', 'single', or 'multi' for the openEPI api"
@@ -79,10 +73,12 @@ def openEPI_api(image_data: object, model_type: str = "multi") -> dict:
     except requests.exceptions.HTTPError as e:
         print(f"HTTP error occurred: {e}")
         print(f"Response content: {response.content}")
-        openEPI_result = {"error": str(e), "response": response.content.decode()}
+        raise RuntimeError(
+            f"OpenEPI API error: {str(e)} | Response: {response.content.decode()}"
+        )
     except Exception as e:
         print(f"Unknown Error occurred: {e}")
-        openEPI_result = {"error": str(e)}
+        raise RuntimeError(f"OpenEPI API unknown error: {str(e)}")
 
     return openEPI_result
 
@@ -112,10 +108,13 @@ def kindwise_api(
         kindwise_result = kindwise_res.json()
     except requests.exceptions.RequestException as e:
         print(f"HTTP error occurred: {e}")
-        kindwise_result = {"error": str(e)}
+        raise RuntimeError(f"Kindwise API error: {str(e)}")
     except Exception as e:
         print(f"Unknown Error occurred: {e}")
-        kindwise_result = {"error": str(e)}
+        raise RuntimeError(f"Kindwise API unknown error: {str(e)}")
+
+    if isinstance(kindwise_result, dict) and "error" in kindwise_result:
+        raise RuntimeError(f"Kindwise API error: {kindwise_result['error']}")
 
     return kindwise_result
 
