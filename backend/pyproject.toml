@@ -22,7 +22,7 @@ dependencies = [
 [tool.poetry]
 packages = [   
     { include = "auth", from = "src" },
-    { include = "core", from = "src" },
+    { include = "ext_apis", from = "src" },
     { include = "db", from ="src"},
     {include = "models", from = "src"},
     {include = "routes", from = "src"}

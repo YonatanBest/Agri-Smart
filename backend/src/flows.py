@@ -3,7 +3,7 @@ from src.ext_apis.crop_health_api import predict_crop_health
 import os
 
 
-def diagnosis_flow(
+async def diagnosis_flow(
     image_path: str,
 ) -> dict:
     """
@@ -14,7 +14,7 @@ def diagnosis_flow(
     - Returns both the LLM's insight and the raw API results.
     """
 
-    combined_result = predict_crop_health(image_path)
+    combined_result = await predict_crop_health(image_path)
     prompt = (
         "You are an expert agricultural advisor for smallholder farmers.\n"
         "You will receive crop health diagnosis results from different api's.\n"
