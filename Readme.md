@@ -1,4 +1,9 @@
 
+---
+
+```md
+---
+
 ## ⚙️ Backend Setup (FastAPI + Poetry)
 
 > *For backend contributors only*
@@ -45,12 +50,19 @@ Navigate to backend:
 cd backend
 ```
 
-**Option A: Let Poetry manage the virtual environment automatically**
+**Option B: Create and activate a virtual environment manually**
 
 ```bash
+python -m venv .venv
+# Activate it:
+# Windows (PowerShell):
+.venv\Scripts\Activate
+# macOS/Linux:
+source .venv/bin/activate
+
 poetry install
-poetry shell
 ```
+
 ---
 
 ### 3. Run the Server
@@ -72,7 +84,3 @@ Visit: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
 * Exit shell: `exit`
 
 ---
-
-You're ready to start contributing!
-
-```
