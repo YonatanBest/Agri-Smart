@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Query, HTTPException
-from src.core.weather_api import fetch_weather_forecast
+from src.ext_apis.weather_api import fetch_weather_forecast
 
 router = APIRouter(prefix="/api/weather", tags=["Weather"])
 

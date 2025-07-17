@@ -7,65 +7,83 @@
 
 ---
 
-### 🛠️ Install Poetry (If Not Installed)
+### 📂 Project Structure
 
-Make sure you have [Poetry](https://python-poetry.org/) installed.
-Follow the official installation guide here:
-👉 [https://python-poetry.org/docs/#installation](https://python-poetry.org/docs/#installation)
+```
+
+root/
+├── frontend/
+├── backend/
+│   ├── src/
+│   ├── tests/
+│   ├── pyproject.toml
+│   ├── poetry.lock
+├── README.md
+
+````
+
+Backend code and dependencies live in the `backend/` folder.
 
 ---
 
-### 📁 Go to the Directory
+### 1. Install Poetry (if needed)
+
+```bash
+pip install poetry 
+````
+If it is not successful installed, follow this guide
+
+Install Poetry following the official guide:  
+[https://python-poetry.org/docs/#installation](https://python-poetry.org/docs/#installation)
+
+Verify:
+
+
+```bash
+poetry --version
+````
+
+---
+
+### 2. Setup Virtual Environment & Install Dependencies
+
+Navigate to backend:
 
 ```bash
 cd backend
 ```
 
----
-
-### 📥 1. Install Dependencies
+**Option B: Create and activate a virtual environment manually**
 
 ```bash
+python -m venv .venv
+# Activate it:
+# Windows (PowerShell):
+.venv\Scripts\Activate
+# macOS/Linux:
+source .venv/bin/activate
+
 poetry install
 ```
 
-This will:
-
-* Create a virtual environment
-* Install everything from `pyproject.toml`
-
 ---
 
-### 🧪 2. Activate the Environment
+### 3. Run the Server
 
-```bash
-poetry shell
-```
-
----
-
-### 🚀 3. Run the Server
+With the environment active, run:
 
 ```bash
 uvicorn src.main:app --reload
 ```
 
-Visit:
-
-* Docs: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
+Visit: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
 
 ---
 
-### 💡 Quick Tips
+### Quick Tips
 
-* Add a dependency:
-  `poetry add package-name`
-
-* Run a script:
-  `poetry run python your_script.py`
-
-* Exit the shell:
-  `exit`
+* Add a dependency: `poetry add package-name`
+* Run a script: `poetry run python script.py`
+* Exit from venv: `exit`
 
 ---
-
