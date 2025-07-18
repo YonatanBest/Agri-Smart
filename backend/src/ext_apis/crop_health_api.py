@@ -4,6 +4,7 @@ import tempfile
 from PIL import Image
 import httpx
 import asyncio
+import time
 
 load_dotenv()
 
@@ -188,6 +189,9 @@ async def predict_crop_health(image_path: str, model_type: str = "binary", latit
             image_data = f.read()
     except FileNotFoundError:
         raise RuntimeError("Image file not found")
+    
+    
+    begin_time = time.time()
 
     async with httpx.AsyncClient() as client:
         tasks = [
@@ -233,6 +237,9 @@ async def predict_crop_health(image_path: str, model_type: str = "binary", latit
             "openEPI_result": openEPI_result,
             "deepl_result": deepl_result
         })
+        
+        
+        print("total time it takes",  time.time() - begin_time)
         # print()
         # print()
         
