@@ -148,6 +148,23 @@ files = [
 ]
 
 [[package]]
+name = "cdsapi"
+version = "0.7.6"
+description = "Climate Data Store API"
+optional = false
+python-versions = ">=3.8"
+groups = ["main"]
+files = [
+    {file = "cdsapi-0.7.6-py2.py3-none-any.whl", hash = "sha256:d4e813509930d1a948929fda829e635cb2c4dd6457ea90e41c5cf9c7788e4e0c"},
+    {file = "cdsapi-0.7.6.tar.gz", hash = "sha256:f85ab5b34269fed30240d9fb99b513e01eb91010eb9d981039f2a2bfab35f375"},
+]
+
+[package.dependencies]
+ecmwf-datastores-client = "*"
+requests = ">=2.5.0"
+tqdm = "*"
+
+[[package]]
 name = "certifi"
 version = "2025.7.14"
 description = "Python package for providing Mozilla's CA Bundle."
@@ -500,6 +517,27 @@ gmpy = ["gmpy"]
 gmpy2 = ["gmpy2"]
 
 [[package]]
+name = "ecmwf-datastores-client"
+version = "0.2.0"
+description = "ECMWF Data Stores Service (DSS) API Python client"
+optional = false
+python-versions = ">=3.8"
+groups = ["main"]
+files = [
+    {file = "ecmwf_datastores_client-0.2.0-py3-none-any.whl", hash = "sha256:db914e61fbd98c79314fc90f336a3ae484d8951bcb1deca8d075d3af9ab4ec95"},
+    {file = "ecmwf_datastores_client-0.2.0.tar.gz", hash = "sha256:143ac5eddfe66c338d907a3f35c703c6332a18b729754688dcf565a26a56acf4"},
+]
+
+[package.dependencies]
+attrs = "*"
+multiurl = ">=0.3.2"
+requests = "*"
+typing-extensions = "*"
+
+[package.extras]
+legacy = ["cdsapi (>=0.7.6)"]
+
+[[package]]
 name = "fastapi"
 version = "0.116.1"
 description = "FastAPI framework, high performance, easy to learn, fast to code, ready for production"
@@ -825,6 +863,24 @@ cssselect = ["cssselect (>=0.7)"]
 html-clean = ["lxml_html_clean"]
 html5 = ["html5lib"]
 htmlsoup = ["BeautifulSoup4"]
+
+[[package]]
+name = "multiurl"
+version = "0.3.6"
+description = "A package to download several URL as one, as well as supporting multi-part URLs"
+optional = false
+python-versions = "*"
+groups = ["main"]
+files = [
+    {file = "multiurl-0.3.6-py3-none-any.whl", hash = "sha256:7ce0666dcf9b9a39bf5ebf916fb7a90fbd249abb2e74c36d30f0184eee858115"},
+    {file = "multiurl-0.3.6.tar.gz", hash = "sha256:6bf6630f87f96ce18e2004f231b1457acd0d65beb90777dcb3e6564d96ee65c8"},
+]
+
+[package.dependencies]
+python-dateutil = "*"
+pytz = "*"
+requests = "*"
+tqdm = "*"
 
 [[package]]
 name = "numpy"
@@ -1228,6 +1284,18 @@ files = [
 ]
 
 [[package]]
+name = "pytz"
+version = "2025.2"
+description = "World timezone definitions, modern and historical"
+optional = false
+python-versions = "*"
+groups = ["main"]
+files = [
+    {file = "pytz-2025.2-py2.py3-none-any.whl", hash = "sha256:5ddf76296dd8c44c26eb8f4b6f35488f3ccbf6fbbd7adee0b7262d43f0ec2f00"},
+    {file = "pytz-2025.2.tar.gz", hash = "sha256:360b9e3dbb49a209c21ad61809c7fb453643e048b38924c765813546746e81c3"},
+]
+
+[[package]]
 name = "pyyaml"
 version = "6.0.2"
 description = "YAML parser and emitter for Python"
@@ -1532,6 +1600,28 @@ doc = ["reno", "sphinx"]
 test = ["pytest", "tornado (>=4.5)", "typeguard"]
 
 [[package]]
+name = "tqdm"
+version = "4.67.1"
+description = "Fast, Extensible Progress Meter"
+optional = false
+python-versions = ">=3.7"
+groups = ["main"]
+files = [
+    {file = "tqdm-4.67.1-py3-none-any.whl", hash = "sha256:26445eca388f82e72884e0d580d5464cd801a3ea01e63e5601bdff9ba6a48de2"},
+    {file = "tqdm-4.67.1.tar.gz", hash = "sha256:f8aef9c52c08c13a65f30ea34f4e5aac3fd1a34959879d7e59e63027286627f2"},
+]
+
+[package.dependencies]
+colorama = {version = "*", markers = "platform_system == \"Windows\""}
+
+[package.extras]
+dev = ["nbval", "pytest (>=6)", "pytest-asyncio (>=0.24)", "pytest-cov", "pytest-timeout"]
+discord = ["requests"]
+notebook = ["ipywidgets (>=6)"]
+slack = ["slack-sdk"]
+telegram = ["requests"]
+
+[[package]]
 name = "typing-extensions"
 version = "4.14.1"
 description = "Backported and Experimental Type Hints for Python 3.9+"
@@ -1677,4 +1767,4 @@ files = [
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.12,<4.0"
-content-hash = "d5277f596a4ae023490a53999bf71194a7d96128fa77d93821c5f88ca6cfc4a3"
+content-hash = "fc06ebdf12ba2b7eddbbe97c0ad937fe38bb1db84a38b557796ff851f50bd7b5"
