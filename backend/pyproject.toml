@@ -17,6 +17,7 @@ dependencies = [
     "pyproj (>=3.7.1,<4.0.0)",
     "google-genai (>=1.25.0,<2.0.0)",
     "dotenv (>=0.9.9,<0.10.0)",
+    "cdsapi (>=0.7.6,<0.8.0)",
 ]
 
 [tool.poetry]
