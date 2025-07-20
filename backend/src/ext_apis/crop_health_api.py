@@ -8,7 +8,6 @@ import time
 
 load_dotenv()
 
-
 def simplify_prediction_result(prediction: dict) -> dict:
     kindwise = prediction.get("kindwise_result", {})
     openepi_raw = prediction.get("openEPI_result", {})

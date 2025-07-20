@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Query, HTTPException
-from src.ext_apis.weather_api import fetch_combined_weather
+from src.ext_apis.weather_api import fetch_weather_summary, simplify_weather_response
 
 router = APIRouter(prefix="/api/weather", tags=["Weather"])
 
@@ -11,7 +11,7 @@ async def get_weather_forecast(
     months: int = Query(4, ge=1, le=12, description="Number of months to forecast")
 ):
     try:
-        result = await fetch_combined_weather(lat, lon, altitude, months)
+        result = await fetch_weather_summary(lat, lon, altitude, months)
         return result
     except RuntimeError as e:
         raise HTTPException(status_code=500, detail=str(e))
