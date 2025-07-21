@@ -96,3 +96,62 @@ async def recommend_crops_flow(
         "soil_summary": soil_summary,
         "weather_summary": weather_summary,
     }
+
+async def recommend_fertilizer_flow(
+    lat: float,
+    lon: float,
+    target_crop: str,
+    depth: str = "0-20",
+    top_k: int = 5,
+    past_days: int = 30,
+    forecast_days: int = 0,
+) -> dict:
+    """
+    Orchestrates the fertilizer recommendation flow:
+    - Gets simplified soil and weather summaries.
+    - Builds a prompt for the LLM.
+    - Returns the fertilizer recommendation and the input data.
+    """
+
+    # Fetch soil and weather summaries in parallel
+    soil_task = get_soil_summary_async(lat, lon, depth, top_k)
+    weather_task = fetch_weather_summary(lat, lon, past_days, forecast_days)
+    soil_summary, weather_raw = await asyncio.gather(soil_task, weather_task)
+    weather_summary = simplify_weather_response(weather_raw)
+
+    # Build LLM prompt
+    prompt = (
+        "You are a professional agronomist helping smallholder farmers apply the right fertilizer.\n"
+        f"Crop to be grown: {target_crop}\n\n"
+        "Here is the soil and weather information for a farmer's field:\n"
+        f"📍 Soil:\n"
+        f"- Soil type: {soil_summary.get('soil_type')}\n"
+        f"- Texture: {soil_summary.get('texture_class')}\n"
+        f"- pH: {soil_summary.get('ph')}\n"
+        f"- Nitrogen: {soil_summary.get('nitrogen_total_g_per_kg')} g/kg\n"
+        f"- Phosphorous: {soil_summary.get('phosphorous_extractable_ppm')} ppm\n"
+        f"- Potassium: {soil_summary.get('potassium_extractable_ppm')} ppm\n"
+        f"- Cation Exchange Capacity: {soil_summary.get('cation_exchange_capacity_cmol_per_kg')} cmol(+)/kg\n"
+        f"- Organic Carbon: {soil_summary.get('carbon_organic_g_per_kg')} g/kg\n"
+        f"\n🌤️ Weather (last {past_days} days):\n"
+        f"- Avg max temperature: {weather_summary.get('avg_temperature_max')}°C\n"
+        f"- Avg min temperature: {weather_summary.get('avg_temperature_min')}°C\n"
+        f"- Total rainfall: {weather_summary.get('total_rainfall_mm')} mm\n"
+        f"- Avg sunshine hours: {weather_summary.get('avg_sunshine_hours')} hrs\n"
+        f"- Avg wind speed: {weather_summary.get('avg_wind_speed_kph')} kph\n"
+        f"- Avg evapotranspiration: {weather_summary.get('avg_evapotranspiration')}\n"
+        "\n🎯 Task:\n"
+        "Recommend the best fertilizer plan for this field based on the soil and weather conditions.\n"
+        "Mention the nutrient(s) that are lacking or need support.\n"
+        "Suggest both organic and chemical options if possible.\n"
+        "Give specific dosages per hectare, and explain when and how to apply.\n"
+        "Use practical, farmer-friendly language. Keep it short and actionable."
+    )
+
+    llm = LLMService()
+    llm_response = llm.send_message(prompt)  # Use 'await' if this is an async method
+
+    return {
+        "recommendation": llm_response.get("response"),
+
+    }
