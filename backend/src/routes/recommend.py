@@ -32,10 +32,12 @@ async def recommend_fertilizer(
     top_k: int = Query(5, description="Number of top probable soil types to retrieve"),
     past_days: int = Query(30, description="Number of past days for weather summary"),
     forecast_days: int = Query(0, description="Number of forecast days for weather summary"),
+    previous_crop: str = Query(None, description="Previous crop grown on this plot (for rotation history)"),
+    growth_stage: str = Query(None, description="Current crop growth stage (e.g., germination, vegetative, flowering, fruiting)"),
 ):
     try:
         result = await recommend_fertilizer_flow(
-            lat, lon, target_crop, depth,top_k, past_days, forecast_days
+            lat, lon, target_crop, depth, top_k, past_days, forecast_days, previous_crop, growth_stage
         )
         return {"status": "success", **result}
     except Exception as e:
