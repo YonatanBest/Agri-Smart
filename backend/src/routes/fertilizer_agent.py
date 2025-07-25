@@ -2,6 +2,9 @@ from fastapi import APIRouter, Query, HTTPException
 from datetime import datetime
 import os
 from src.agent_flows.fertilizer_agent_flow import fertilizer_agent_flow
+from dotenv import load_dotenv
+
+load_dotenv()  # This will load variables from .env in the same directory
 
 router = APIRouter(prefix="/api/fertilizer", tags=["Fertilizer_Agent"])
 
@@ -19,6 +22,8 @@ async def fertilizer_agent(
         else:
             dt_obj = datetime.utcnow()
         gemini_api_key = os.getenv("GOOGLE_API_KEY")
+        
+        print("test here", gemini_api_key)
         result = await fertilizer_agent_flow(
             lat=lat,
             lon=lon,
@@ -29,4 +34,7 @@ async def fertilizer_agent(
         )
         return {"status": "success", **result}
     except Exception as e:
+        import traceback
+        traceback.print_exc()
+        print("Fertilizer agent error:", repr(e))
         raise HTTPException(status_code=500, detail=str(e)) 

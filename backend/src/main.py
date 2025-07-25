@@ -5,6 +5,9 @@ from src.routes.weather_forecast import router as weather_router
 from src.routes.recommend import router as recommend_router
 from src.routes.fertilizer_agent import router as fertilizer_agent_router
 
+from dotenv import load_dotenv
+load_dotenv()
+
 
 app = FastAPI()
 

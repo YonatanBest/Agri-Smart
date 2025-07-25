@@ -3,8 +3,10 @@ from datetime import datetime
 from src.ext_apis.soil_api import openepi_soil_type
 from src.ext_apis.weather_api import fetch_weather_summary
 from src.services.web_search_service import search_web
-from src.services.gemini_service import query_gemini
+from src.services.gemini_service import query_gemini, gemini_suggest_search
 from src.services.confidence_scorer import score_confidence
+import re
+import json
 
 async def fertilizer_agent_flow(lat: float, lon: float, area: float, crop_type: str, dt: datetime, gemini_api_key: str):
     agent_trace = []
@@ -14,16 +16,11 @@ async def fertilizer_agent_flow(lat: float, lon: float, area: float, crop_type: 
     agent_trace.append("Fetched soil data using openepi_soil_type API.")
     weather = await fetch_weather_summary(lat, lon)
     agent_trace.append("Fetched weather data using fetch_weather_summary API.")
-    # 2. Break down the problem into sub-questions
-    sub_questions = [
-        f"Current and forecasted weather for {lat},{lon} as of {dt.strftime('%Y-%m-%d')}",
-        f"Best fertilizers for {soil} soil and {crop_type} crop",
-        f"Regional/local fertilizer guidelines for {crop_type} in {lat},{lon}",
-        f"Application rate best practices for {crop_type} in {area} hectares"
-    ]
-    agent_trace.append("Agent broke down the problem into sub-questions.")
-    # 3. Autonomous web search for each sub-question
-    web_results_nested = await asyncio.gather(*(search_web(q) for q in sub_questions))
+    # 2. Let Gemini suggest search queries
+    search_queries = await gemini_suggest_search(soil, weather, area, crop_type)
+    agent_trace.append(f"Gemini suggested search queries: {search_queries}")
+    # 3. Autonomous web search for each Gemini-suggested query
+    web_results_nested = await asyncio.gather(*(search_web(q) for q in search_queries))
     # 4. Summarize and deduplicate evidence
     all_evidence = []
     seen_urls = set()
