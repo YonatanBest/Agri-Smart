@@ -3,10 +3,7 @@ from typing import Any, Dict, Optional
 from google import genai
 from pathlib import Path
 from dotenv import load_dotenv
-
-BASE_DIR = Path(__file__).resolve().parent.parent  
-
-load_dotenv(dotenv_path=BASE_DIR / '.env')
+load_dotenv()
 
 
 class LLMService:
@@ -14,7 +11,7 @@ class LLMService:
     def __init__(self, model_name: str = "gemini-2.0-flash-001"):
         api_key = os.getenv("GOOGLE_API_KEY")
         if not api_key:
-            raise ValueError("GOOGLE_GEMINI_API_KEY environment variable not set.")
+            raise ValueError("GOOGLE_API_KEY environment variable not set.")
         self.client = genai.Client(api_key=api_key)
         self.model_name = model_name
         self.chat = self.client.chats.create(model=self.model_name)
@@ -37,3 +34,6 @@ class LLMService:
         except Exception as e:
             print(f"Error in LLMService.send_message: {e}")
             return {"response": None, "error": str(e)}
+
+
+llm_service = LLMService()

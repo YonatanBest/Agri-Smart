@@ -3,7 +3,7 @@ from src.ext_apis.crop_health_api import predict_crop_health
 from src.ext_apis.soil_api import get_soil_summary_async
 from src.ext_apis.weather_api import fetch_weather_summary, simplify_weather_response
 import asyncio
-import os
+from src.services.llm_service import llm_service
 from typing import Optional
 
 
@@ -41,8 +41,7 @@ async def diagnosis_flow(
         "\nPlease provide your advice in a way that is easy for a farmer to understand."
     )
 
-    llm = LLMService()
-    llm_response = llm.send_message(prompt)
+    llm_response = llm_service.send_message(prompt)
 
     return {"insight": llm_response.get("response"), "raw_results": combined_result}
 
@@ -89,8 +88,7 @@ async def recommend_crops_flow(
         "\nBased on this information, recommend the 2-3 most suitable crops to plant now. For each crop, explain why it is suitable, and give 1-2 practical tips for success. Be specific, practical, and use simple language for a smallholder farmer."
     )
 
-    llm = LLMService()
-    llm_response = llm.send_message(prompt)
+    llm_response = llm_service.send_message(prompt)
 
     return {
         "recommendation": llm_response.get("response"),
@@ -205,8 +203,7 @@ async def recommend_fertilizer_flow(
         f"\n"
     )
 
-    llm = LLMService()
-    llm_response = llm.send_message(prompt)
+    llm_response = llm_service.send_message(prompt)
 
     return {
         "recommendation": llm_response.get("response"),
