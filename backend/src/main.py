@@ -5,6 +5,7 @@ from src.routes.weather_forecast import router as weather_router
 from src.routes.recommend import router as recommend_router
 from src.routes.fertilizer_agent import router as fertilizer_agent_router
 from src.routes.chat import router as chat_router
+from src.routes.user import router as user_router
 
 from dotenv import load_dotenv
 
@@ -19,3 +20,4 @@ app.include_router(weather_router)
 app.include_router(recommend_router)
 app.include_router(fertilizer_agent_router)
 app.include_router(chat_router)
+app.include_router(user_router)

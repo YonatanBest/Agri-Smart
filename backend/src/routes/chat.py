@@ -1,9 +1,10 @@
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, Depends
 from pydantic import BaseModel
 from typing import Optional
 from src.services.chat_service import chat_session_manager
 from src.services.transalation_service import translation_service
-from src.services.llm_service import LLMService
+from src.services.llm_service import llm_service
+from src.auth.auth_utils import get_current_user
 
 router = APIRouter(prefix="/api/chat", tags=["Chat"])
 
@@ -18,13 +19,13 @@ class SendMessageRequest(BaseModel):
 
 
 @router.post("/start-session")
-def start_session(req: StartSessionRequest):
+def start_session(req: StartSessionRequest, current_user=Depends(get_current_user)):
     session = chat_session_manager.start_session(user_id=req.user_id)
     return {"session_id": session.session_id, "created_at": session.created_at}
 
 
 @router.post("/send-message")
-async def send_message(req: SendMessageRequest):
+async def send_message(req: SendMessageRequest, current_user=Depends(get_current_user)):
     session = chat_session_manager.get_session(req.session_id)
     if not session:
         raise HTTPException(status_code=404, detail="Session not found")
@@ -62,8 +63,7 @@ Respond as the agricultural assistant:""".format(
         messages=messages_formatted, current_message=message_for_llm
     )
 
-    llm = LLMService()
-    llm_response = llm.send_message(prompt)
+    llm_response = llm_service.send_message(prompt)
     llm_text = llm_response.get("response", "")
 
     chat_session_manager.add_message(req.session_id, sender="llm", message=llm_text)
@@ -75,7 +75,7 @@ Respond as the agricultural assistant:""".format(
 
 
 @router.get("/history")
-def get_history(session_id: str = Query(...)):
+def get_history(session_id: str = Query(...), current_user=Depends(get_current_user)):
     history = chat_session_manager.get_history(session_id)
     if history is None:
         raise HTTPException(status_code=404, detail="Session not found")
