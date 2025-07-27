@@ -2,7 +2,10 @@ from fastapi import APIRouter, HTTPException, Query, Depends
 from pydantic import BaseModel
 from typing import Optional
 from src.services.chat_service import chat_session_manager
-from src.services.transalation_service import translation_service
+from src.services.transalation_service import (
+    translation_service,
+    translation_fallback_service,
+)
 from src.services.llm_service import llm_service
 from src.auth.auth_utils import get_current_user
 
@@ -30,12 +33,20 @@ async def send_message(req: SendMessageRequest, current_user=Depends(get_current
     if not session:
         raise HTTPException(status_code=404, detail="Session not found")
 
-    # Detect language
-    user_lang = translation_service.detect_language(req.message)
+    # Detect language using main service, fallback if error
+    try:
+        user_lang = translation_service.detect_language(req.message)
+    except Exception:
+        user_lang = translation_fallback_service.detect_language(req.message)
     message_for_llm = req.message
     needs_translation = user_lang != "en"
     if needs_translation:
-        message_for_llm = translation_service.translate_to_english(req.message)
+        try:
+            message_for_llm = translation_service.translate_to_english(req.message)
+        except Exception:
+            message_for_llm = translation_fallback_service.translate_to_english(
+                req.message
+            )
 
     # Add user message
     chat_session_manager.add_message(
@@ -46,7 +57,6 @@ async def send_message(req: SendMessageRequest, current_user=Depends(get_current
         [f"{m.sender}: {m.message}" for m in session.messages[-10:]]
     )
 
-    print("messages", messages_formatted)
 
     prompt = """You are an agricultural assistant AI helping farmers with their questions.
 Respond directly to the user's query with helpful agricultural information.
@@ -69,7 +79,12 @@ Respond as the agricultural assistant:""".format(
     chat_session_manager.add_message(req.session_id, sender="llm", message=llm_text)
     # Translate LLM response back if needed
     if needs_translation and llm_text:
-        llm_text = translation_service.translate_from_english(llm_text, user_lang)
+        try:
+            llm_text = translation_service.translate_from_english(llm_text, user_lang)
+        except Exception:
+            llm_text = translation_fallback_service.translate_from_english(
+                llm_text, user_lang
+            )
 
     return {"response": llm_text}
 
