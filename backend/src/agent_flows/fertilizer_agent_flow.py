@@ -1,6 +1,6 @@
 import asyncio
 from datetime import datetime
-from src.ext_apis.soil_api import openepi_soil_type
+from src.ext_apis.soil_api import get_soil_summary_async
 from src.ext_apis.weather_api import fetch_weather_summary
 from src.services.web_search_service import search_web
 from src.services.gemini_service import query_gemini, gemini_suggest_search
@@ -12,7 +12,7 @@ async def fertilizer_agent_flow(lat: float, lon: float, area: float, crop_type: 
     agent_trace = []
     alerts = []
     # 1. Fetch soil and weather data from APIs
-    soil = await openepi_soil_type(lat, lon)
+    soil = await get_soil_summary_async(lat, lon, depth="0-20", top_k=5)
     agent_trace.append("Fetched soil data using openepi_soil_type API.")
     weather = await fetch_weather_summary(lat, lon)
     agent_trace.append("Fetched weather data using fetch_weather_summary API.")

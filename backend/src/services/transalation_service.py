@@ -3,6 +3,9 @@ from deep_translator import GoogleTranslator, single_detection
 from dotenv import load_dotenv
 import os
 
+
+key_path = os.path.join(os.path.dirname(__file__), '..', 'gcp_key.json')
+key_path = os.path.abspath(key_path)
 load_dotenv()
 
 
@@ -15,7 +18,7 @@ class TranslationServiceFallBack:
 
     def translate_to_english(self, text: str) -> str:
         return GoogleTranslator(source="auto", target="en").translate(text)
-
+    
     def translate_from_english(self, text: str, dest_lang: str) -> str:
         return GoogleTranslator(source="en", target=dest_lang).translate(text)
 
@@ -26,7 +29,7 @@ translation_fallback_service = TranslationServiceFallBack()
 class GoogleCloudTranslate:
     def __init__(self):
         self.translate_client = translate.Client.from_service_account_json(
-            "gcp_key.json"
+            key_path
         )
 
     def detect_language(self, text: str) -> str:
