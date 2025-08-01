@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { Send, Bot, User, Wifi, WifiOff, Mic, Paperclip, MoreVertical } from "lucide-react"
+import { Send, Bot, User, Wifi, WifiOff, Mic, Paperclip, MoreVertical, Lightbulb, Clock, Leaf, Droplets, Bug, Thermometer } from "lucide-react"
 
 export default function ChatPage() {
   const [isOnline, setIsOnline] = useState(true)
@@ -72,38 +72,56 @@ export default function ChatPage() {
   }
 
   const quickQuestions = [
-    "What fertilizer should I use for wheat?",
-    "When is the best time to plant rice?",
-    "How to control pests naturally?",
-    "Soil pH testing methods",
-    "Irrigation scheduling tips",
-    "Crop rotation benefits",
+    {
+      text: "What fertilizer for wheat?",
+      icon: <Leaf className="h-3 w-3" />,
+      question: "What fertilizer should I use for wheat crops?"
+    },
+    {
+      text: "Best time to plant rice",
+      icon: <Clock className="h-3 w-3" />,
+      question: "When is the best time to plant rice in my region?"
+    },
+    {
+      text: "Natural pest control",
+      icon: <Bug className="h-3 w-3" />,
+      question: "How can I control pests naturally without chemicals?"
+    },
+    {
+      text: "Soil pH testing",
+      icon: <Thermometer className="h-3 w-3" />,
+      question: "What are the best methods for testing soil pH?"
+    },
+    {
+      text: "Irrigation tips",
+      icon: <Droplets className="h-3 w-3" />,
+      question: "What are the best irrigation scheduling tips for my crops?"
+    },
+    {
+      text: "Crop rotation",
+      icon: <Leaf className="h-3 w-3" />,
+      question: "What are the benefits of crop rotation and how should I plan it?"
+    },
+    {
+      text: "Disease prevention",
+      icon: <Bug className="h-3 w-3" />,
+      question: "How can I prevent common crop diseases?"
+    },
+    {
+      text: "Weather impact",
+      icon: <Thermometer className="h-3 w-3" />,
+      question: "How does weather affect my crop growth and what should I do?"
+    }
   ]
+
+  const handleQuickQuestion = (question: string) => {
+    setMessage(question)
+  }
 
   return (
     <>
       {/* Mobile Layout */}
       <div className="md:hidden p-4 space-y-4 h-[calc(100vh-140px)] flex flex-col">
-        {/* Mobile Header */}
-        <div className="bg-gradient-to-r from-green-500 to-green-600 p-4 text-white">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-lg font-bold mb-1">💬 AI Farm Expert Assistant</h2>
-              <p className="text-green-100 text-sm">Get instant farming advice</p>
-            </div>
-            <div className="flex items-center gap-2">
-              <Button
-                variant={isOnline ? "default" : "secondary"}
-                size="sm"
-                onClick={() => setIsOnline(!isOnline)}
-                className={`rounded-full text-xs ${isOnline ? "bg-green-700 hover:bg-green-800" : "bg-gray-500 hover:bg-gray-600"}`}
-              >
-                {isOnline ? <Wifi className="h-3 w-3 mr-1" /> : <WifiOff className="h-3 w-3 mr-1" />}
-                {isOnline ? "Online" : "Offline"}
-              </Button>
-            </div>
-          </div>
-        </div>
 
         {/* Mobile Chat Messages */}
         <Card className="flex-1 rounded-2xl border-2 border-green-100 shadow-lg overflow-hidden">
@@ -132,83 +150,70 @@ export default function ChatPage() {
             </div>
 
             {/* Mobile Message Input */}
-            <div className="flex gap-2">
-              <Input
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                placeholder={isOnline ? "Type your farming question..." : "You're offline"}
-                disabled={!isOnline}
-                onKeyPress={(e) => e.key === "Enter" && sendMessage()}
-                className="flex-1 rounded-xl"
-              />
-              <Button
-                onClick={sendMessage}
-                disabled={!isOnline || !message.trim()}
-                className="bg-green-500 hover:bg-green-600 rounded-xl"
-              >
-                <Send className="h-4 w-4" />
-              </Button>
+            <div className="space-y-3">
+              <div className="flex gap-2">
+                <Input
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  placeholder={isOnline ? "Type your farming question..." : "You're offline"}
+                  disabled={!isOnline}
+                  onKeyPress={(e) => e.key === "Enter" && sendMessage()}
+                  className="flex-1 rounded-xl"
+                />
+                <Button
+                  onClick={sendMessage}
+                  disabled={!isOnline || !message.trim()}
+                  className="bg-green-500 hover:bg-green-600 rounded-xl"
+                >
+                  <Send className="h-4 w-4" />
+                </Button>
+              </div>
+
+              {/* Mobile Quick Questions */}
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 text-xs text-green-600">
+                  <Lightbulb className="h-3 w-3" />
+                  <span className="font-medium">Quick Questions:</span>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {quickQuestions.slice(0, 4).map((item, index) => (
+                    <Badge
+                      key={index}
+                      variant="outline"
+                      className="cursor-pointer hover:bg-green-50 text-green-600 border-green-200 text-xs px-2 py-1"
+                      onClick={() => handleQuickQuestion(item.question)}
+                    >
+                      {item.icon}
+                      <span className="ml-1">{item.text}</span>
+                    </Badge>
+                  ))}
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {quickQuestions.slice(4, 8).map((item, index) => (
+                    <Badge
+                      key={index + 4}
+                      variant="outline"
+                      className="cursor-pointer hover:bg-green-50 text-green-600 border-green-200 text-xs px-2 py-1"
+                      onClick={() => handleQuickQuestion(item.question)}
+                    >
+                      {item.icon}
+                      <span className="ml-1">{item.text}</span>
+                    </Badge>
+                  ))}
+                </div>
+              </div>
             </div>
           </CardContent>
         </Card>
-
-        {/* Mobile Quick Questions */}
-        <div className="flex flex-wrap gap-2">
-          <Badge
-            variant="outline"
-            className="cursor-pointer hover:bg-green-50 text-green-600 border-green-200"
-            onClick={() => setMessage("What fertilizer should I use for wheat?")}
-          >
-            Fertilizer advice
-          </Badge>
-          <Badge
-            variant="outline"
-            className="cursor-pointer hover:bg-green-50 text-green-600 border-green-200"
-            onClick={() => setMessage("When is the best time to plant rice?")}
-          >
-            Planting schedule
-          </Badge>
-          <Badge
-            variant="outline"
-            className="cursor-pointer hover:bg-green-50 text-green-600 border-green-200"
-            onClick={() => setMessage("How to control pests naturally?")}
-          >
-            Pest control
-          </Badge>
-        </div>
       </div>
 
       {/* Desktop Layout */}
       <div className="hidden md:block p-4 lg:p-6 h-[calc(100vh-120px)] flex flex-col gap-6">
-        {/* Desktop Header */}
-        <div className="bg-gradient-to-r from-green-500 to-green-600 p-6 text-white">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-xl lg:text-2xl font-bold mb-2">💬 AI Farm Expert Assistant</h2>
-              <p className="text-green-100">Get instant farming advice and solutions</p>
-            </div>
-            <div className="flex items-center gap-4">
-              <div className="hidden lg:block text-right">
-                <p className="text-green-100 text-sm">Response time</p>
-                <p className="text-white font-semibold">~2 seconds</p>
-              </div>
-              <Button
-                variant={isOnline ? "default" : "secondary"}
-                size="sm"
-                onClick={() => setIsOnline(!isOnline)}
-                className={`rounded-full ${isOnline ? "bg-green-700 hover:bg-green-800" : "bg-gray-500 hover:bg-gray-600"}`}
-              >
-                {isOnline ? <Wifi className="h-4 w-4 mr-1" /> : <WifiOff className="h-4 w-4 mr-1" />}
-                {isOnline ? "Online" : "Offline"}
-              </Button>
-            </div>
-          </div>
-        </div>
 
-        <div className="flex-1 grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <div className="flex-1 grid grid-cols-1 lg:grid-cols-1 gap-6">
           {/* Desktop Chat Messages */}
           <Card className="lg:col-span-3 rounded-2xl border-2 border-green-100 shadow-lg overflow-hidden flex flex-col">
-            <CardHeader className="border-b bg-gradient-to-r from-green-50 to-green-100">
+            <CardHeader className="border-b ">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-green-700 flex items-center gap-2">
                   <Bot className="h-5 w-5" />
@@ -255,64 +260,50 @@ export default function ChatPage() {
 
               {/* Desktop Message Input */}
               <div className="border-t p-4 bg-green-50">
-                <div className="flex gap-3">
-                  <Button variant="outline" size="sm" className="rounded-xl bg-transparent">
-                    <Paperclip className="h-4 w-4" />
-                  </Button>
-                  <Input
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                    placeholder={isOnline ? "Type your farming question..." : "You're offline"}
-                    disabled={!isOnline}
-                    onKeyPress={(e) => e.key === "Enter" && sendMessage()}
-                    className="flex-1 rounded-xl border-2"
-                  />
-                  <Button variant="outline" size="sm" className="rounded-xl bg-transparent">
-                    <Mic className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    onClick={sendMessage}
-                    disabled={!isOnline || !message.trim()}
-                    className="bg-green-500 hover:bg-green-600 rounded-xl px-6"
-                  >
-                    <Send className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Desktop Quick Questions Sidebar */}
-          <Card className="rounded-2xl border-2 border-green-100 shadow-lg">
-            <CardHeader>
-              <CardTitle className="text-green-700 text-lg">💡 Quick Questions</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {quickQuestions.map((question, index) => (
-                <Badge
-                  key={index}
-                  variant="outline"
-                  className="w-full cursor-pointer hover:bg-green-50 text-green-600 border-green-200 p-3 h-auto text-left justify-start text-wrap"
-                  onClick={() => setMessage(question)}
-                >
-                  {question}
-                </Badge>
-              ))}
-
-              <div className="pt-4 border-t">
-                <h4 className="font-semibold text-green-700 mb-3">Chat Stats</h4>
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-green-600">Messages today</span>
-                    <span className="font-medium">12</span>
+                <div className="space-y-3">
+                  <div className="flex gap-3">
+                    <Button variant="outline" size="sm" className="rounded-xl bg-transparent">
+                      <Paperclip className="h-4 w-4" />
+                    </Button>
+                    <Input
+                      value={message}
+                      onChange={(e) => setMessage(e.target.value)}
+                      placeholder={isOnline ? "Type your farming question..." : "You're offline"}
+                      disabled={!isOnline}
+                      onKeyPress={(e) => e.key === "Enter" && sendMessage()}
+                      className="flex-1 rounded-xl border-2"
+                    />
+                    <Button variant="outline" size="sm" className="rounded-xl bg-transparent">
+                      <Mic className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      onClick={sendMessage}
+                      disabled={!isOnline || !message.trim()}
+                      className="bg-green-500 hover:bg-green-600 rounded-xl px-6"
+                    >
+                      <Send className="h-4 w-4" />
+                    </Button>
                   </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-green-600">Avg response</span>
-                    <span className="font-medium text-green-600">2.1s</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-green-600">Satisfaction</span>
-                    <span className="font-medium text-green-600">98%</span>
+
+                  {/* Desktop Quick Questions */}
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 text-sm text-green-600">
+                      <Lightbulb className="h-4 w-4" />
+                      <span className="font-medium">Quick Questions:</span>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {quickQuestions.map((item, index) => (
+                        <Badge
+                          key={index}
+                          variant="outline"
+                          className="cursor-pointer hover:bg-green-50 text-green-600 border-green-200 text-sm px-3 py-1.5 transition-colors"
+                          onClick={() => handleQuickQuestion(item.question)}
+                        >
+                          {item.icon}
+                          <span className="ml-1.5">{item.text}</span>
+                        </Badge>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>

@@ -111,7 +111,7 @@ const HeroSectionTwo: React.FC = () => {
       {/* Hero Section */}
       <section
             className="w-full py-12 sm:py-15 md:py-20 lg:py-32 xl:py-48 bg-cover bg-center bg-no-repeat relative"
-            style={{ backgroundImage: "url('/img-4.webp')" }}
+            style={{ backgroundImage: "url('/img-4.jpg')" }}
           >
             {/* Overlay for darkening the background image */}
             <div className="absolute inset-0 bg-black/30 pointer-events-none z-0" />

@@ -17,24 +17,6 @@ export default function ProfilePage() {
 
   return (
     <div className="p-4 lg:p-6 space-y-6">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-3xl p-6 text-white">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-          <div>
-            <h2 className="text-xl lg:text-2xl font-bold mb-2">👤 Profile & Settings</h2>
-            <p className="text-green-100">Manage your account and preferences</p>
-          </div>
-          <div className="flex items-center gap-4">
-            <div className="text-right">
-              <p className="text-green-100 text-sm">Profile completion</p>
-              <p className="text-white font-bold text-2xl">85%</p>
-            </div>
-            <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center">
-              <User className="h-8 w-8" />
-            </div>
-          </div>
-        </div>
-      </div>
 
       <Tabs defaultValue="profile" className="space-y-6">
         <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4 bg-white rounded-2xl p-1 shadow-sm">

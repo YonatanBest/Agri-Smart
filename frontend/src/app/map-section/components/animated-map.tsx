@@ -73,7 +73,7 @@ export default function AnimatedMap() {
       } else {
         setIsAnimating(false)
         startTimeRef.current = null // Reset start time
-        router.push("/main-page") // Redirect to home page
+        router.push("/language-selection") // Redirect to language selection page
       }
     },
     [router],

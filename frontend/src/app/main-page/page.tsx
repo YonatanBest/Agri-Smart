@@ -1,7 +1,7 @@
 "use client"
 
-import { useState } from "react"
-import { Home, Activity, MessageCircle, Calendar, User, Sprout, Bell, Leaf } from "lucide-react"
+import { useState, useEffect } from "react"
+import { Home, Activity, MessageCircle, Calendar, User, Sprout, Bell, Leaf, X, AlertTriangle } from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
@@ -30,6 +30,8 @@ import Link from "next/link"
 
 export default function AgriApp() {
   const [currentPage, setCurrentPage] = useState("home")
+  const [showAlert, setShowAlert] = useState(true)
+  const [alertMessage, setAlertMessage] = useState("🚨 AI detected potential pest activity in Field A. Schedule inspection today!")
 
   const pages = {
     home: <HomePage />,
@@ -52,6 +54,26 @@ export default function AgriApp() {
       <div className="md:hidden min-h-screen bg-gradient-to-br from-green-50 to-green-100">
         {/* Mobile Header */}
         <header className="bg-white border-b border-green-100 shadow-sm">
+          {/* Alert Banner */}
+          {showAlert && (
+            <div className="bg-orange-50 border-b border-orange-200 px-4 py-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <AlertTriangle className="h-4 w-4 text-orange-600" />
+                  <p className="text-sm text-orange-800 font-medium">{alertMessage}</p>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowAlert(false)}
+                  className="text-orange-600 hover:bg-orange-100 p-1"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          )}
+          
           <div className="px-4 py-3 flex items-center justify-between">
             <h1 className="text-2xl font-bold text-green-700 flex items-center gap-2">Agrilo</h1>
             <Button
@@ -101,17 +123,23 @@ export default function AgriApp() {
           <div className="min-h-screen flex w-full bg-gradient-to-br from-green-50 to-green-100">
             {/* Sidebar */}
             <Sidebar variant="inset" className="border-r-2 border-green-100">
-              <SidebarHeader className="border-b border-green-100 bg-gradient-to-r from-green-500 to-green-600">
-                <div className="flex items-center gap-3 px-4 py-3">
-                  {/* <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                    <Sprout className="h-6 w-6 text-white" />
-                  </div> */}
+              <SidebarHeader className="relative border-b border-green-100 overflow-hidden">
+                {/* Background image with slow opacity, adjusts opacity in dark mode */}
+                <div
+                  className="absolute inset-0 z-0"
+                  style={{
+                    backgroundImage: "url('/img-2.png')",
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                  }}
+                  aria-hidden="true"
+                />
+                <div className="relative flex items-center gap-3 px-4 py-3 z-10">
                   <div className="text-white">
                     <Link href="/" className="flex">
-                        <Leaf className="h-6 w-6 text-green-100" />
-                        <span className="text-lg font-bold">Agrilo</span>
+                        <Leaf className="h-6 w-6 text-green-100 drop-shadow-md" />
+                        <span className="text-lg font-bold drop-shadow-md">Agrilo</span>
                     </Link>
-                    <p className="text-xs text-green-100">Smart Farming Solutions</p>
                   </div>
                 </div>
               </SidebarHeader>
@@ -204,31 +232,53 @@ export default function AgriApp() {
 
             {/* Main Content */}
             <SidebarInset className="flex-1">
-              <header className="flex h-16 shrink-0 items-center gap-2 border-b border-green-100 px-4 bg-white/80 backdrop-blur-sm">
-                <SidebarTrigger className="-ml-1 text-green-600 hover:bg-green-50" />
-                <Separator orientation="vertical" className="mr-2 h-4" />
-                <div className="flex items-center gap-2">
-                  <h2 className="text-lg font-semibold text-green-800 capitalize">
-                    {currentPage === "profile"
-                      ? "Profile"
-                      : navItems.find((item) => item.id === currentPage)?.label || "Dashboard"}
-                  </h2>
-                </div>
-                <div className="ml-auto flex items-center gap-2">
-                  <div className="hidden lg:flex items-center gap-2 text-sm text-green-600">
-                    <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-                    <span>System Online</span>
+              <header className="flex flex-col shrink-0 border-b border-green-100 bg-white/80 backdrop-blur-sm">
+                {/* Alert Banner */}
+                {showAlert && (
+                  <div className="bg-orange-50 border-b border-orange-200 px-4 py-2">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <AlertTriangle className="h-4 w-4 text-orange-600" />
+                        <p className="text-sm text-orange-800 font-medium">{alertMessage}</p>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setShowAlert(false)}
+                        className="text-orange-600 hover:bg-orange-100 p-1"
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setCurrentPage("profile")}
-                    className={`rounded-full p-2 ml-2 ${
-                      currentPage === "profile" ? "bg-green-500 text-white" : "text-green-600 hover:bg-green-50"
-                    }`}
-                  >
-                    <User className="h-5 w-5" />
-                  </Button>
+                )}
+                
+                <div className="flex h-16 items-center gap-2 px-4">
+                  <SidebarTrigger className="-ml-1 text-green-600 hover:bg-green-50" />
+                  <Separator orientation="vertical" className="mr-2 h-4" />
+                  <div className="flex items-center gap-2">
+                    <h2 className="text-lg font-semibold text-green-800 capitalize">
+                      {currentPage === "profile"
+                        ? "Profile"
+                        : navItems.find((item) => item.id === currentPage)?.label || "Dashboard"}
+                    </h2>
+                  </div>
+                  <div className="ml-auto flex items-center gap-2">
+                    <div className="hidden lg:flex items-center gap-2 text-sm text-green-600">
+                      <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+                      <span>System Online</span>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setCurrentPage("profile")}
+                      className={`rounded-full p-2 ml-2 ${
+                        currentPage === "profile" ? "bg-green-500 text-white" : "text-green-600 hover:bg-green-50"
+                      }`}
+                    >
+                      <User className="h-5 w-5" />
+                    </Button>
+                  </div>
                 </div>
               </header>
 

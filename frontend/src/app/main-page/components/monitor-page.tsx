@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Camera, Upload, AlertTriangle, CheckCircle, MessageCircle, Bell, Calendar, TrendingUp } from "lucide-react"
+import { Camera, Upload, AlertTriangle, CheckCircle, MessageCircle, Bell, Calendar, TrendingUp, AlertCircle, Droplets, Sprout } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Progress } from "@/components/ui/progress"
 
@@ -25,25 +25,60 @@ export default function MonitorPage() {
 
   return (
     <div className="p-4 lg:p-6 space-y-6">
-      {/* Header */}
-      {/* <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-3xl p-6 text-white">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-          <div>
-            <h2 className="text-xl lg:text-2xl font-bold mb-2">🔍 Monitor & Diagnose</h2>
-            <p className="text-green-100">Keep your crops healthy with AI insights</p>
-          </div>
-          <div className="flex items-center gap-4">
-            <div className="text-right">
-              <p className="text-green-100 text-sm">Health Score</p>
-              <p className="text-white font-bold text-2xl">92%</p>
+       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+        <Card className="rounded-2xl border-2 border-green-100 shadow-lg">
+          <CardContent className="p-3 md:p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs md:text-sm text-green-600 font-medium">Total Yield</p>
+                <p className="text-lg md:text-2xl font-bold text-green-800">2.8 tons</p>
+                <p className="text-xs text-green-600">+12% from last season</p>
+              </div>
+              <TrendingUp className="h-6 w-6 md:h-8 md:w-8 text-green-500" />
             </div>
-            <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center">
-              <TrendingUp className="h-8 w-8" />
-            </div>
-          </div>
-        </div>
-      </div> */}
+          </CardContent>
+        </Card>
 
+        <Card className="rounded-2xl border-2 border-green-100 shadow-lg">
+          <CardContent className="p-3 md:p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs md:text-sm text-green-600 font-medium">Crop Health</p>
+                <p className="text-lg md:text-2xl font-bold text-green-800">92%</p>
+                <Progress value={92} className="w-12 md:w-16 h-2 mt-1" />
+              </div>
+              <Sprout className="h-6 w-6 md:h-8 md:w-8 text-green-500" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="rounded-2xl border-2 border-green-100 shadow-lg">
+          <CardContent className="p-3 md:p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs md:text-sm text-green-600 font-medium">Water Usage</p>
+                <p className="text-lg md:text-2xl font-bold text-green-800">1,250L</p>
+                <p className="text-xs text-green-600">Today</p>
+              </div>
+              <Droplets className="h-6 w-6 md:h-8 md:w-8 text-green-500" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="rounded-2xl border-2 border-green-100 shadow-lg">
+          <CardContent className="p-3 md:p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs md:text-sm text-green-600 font-medium">Active Alerts</p>
+                <p className="text-lg md:text-2xl font-bold text-green-800">3</p>
+                <p className="text-xs text-green-600">Requires attention</p>
+              </div>
+              <AlertCircle className="h-6 w-6 md:h-8 md:w-8 text-green-500" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    
       <Tabs defaultValue="diagnosis" className="space-y-6">
         <TabsList className="grid w-full grid-cols-2 lg:w-auto lg:grid-cols-2 bg-white rounded-2xl p-1 shadow-sm">
           <TabsTrigger
@@ -61,92 +96,6 @@ export default function MonitorPage() {
         </TabsList>
 
         <TabsContent value="diagnosis" className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Image Upload Section */}
-            <Card className="rounded-2xl border-2 border-green-100 shadow-lg">
-              <CardHeader>
-                <CardTitle className="text-green-700 flex items-center gap-2">📱 Crop Health Diagnosis</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <p className="text-gray-600 text-sm">
-                  Upload or capture images of your crop, leaf, or soil for AI analysis
-                </p>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <Button
-                    onClick={handleImageUpload}
-                    className="h-32 flex flex-col gap-3 bg-green-500 hover:bg-green-600 rounded-2xl"
-                  >
-                    <Camera className="h-12 w-12" />
-                    <span className="text-sm font-medium">Capture Image</span>
-                    <span className="text-xs opacity-80">Use camera</span>
-                  </Button>
-                  <Button
-                    onClick={handleImageUpload}
-                    variant="outline"
-                    className="h-32 flex flex-col gap-3 border-2 border-green-300 rounded-2xl hover:bg-green-50 bg-transparent"
-                  >
-                    <Upload className="h-12 w-12 text-green-600" />
-                    <span className="text-sm font-medium text-green-600">Upload Image</span>
-                    <span className="text-xs text-green-600 opacity-80">From gallery</span>
-                  </Button>
-                </div>
-
-                <div className="p-4 bg-green-50 rounded-xl">
-                  <p className="text-sm text-green-700">
-                    <strong>Pro Tip:</strong> For best results, capture images in natural daylight and ensure the
-                    affected area is clearly visible.
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Quick Stats */}
-            <Card className="rounded-2xl border-2 border-green-100 shadow-lg">
-              <CardHeader>
-                <CardTitle className="text-green-700 flex items-center gap-2">📊 Health Overview</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-3">
-                  <div>
-                    <div className="flex justify-between items-center mb-1">
-                      <span className="text-sm font-medium text-gray-700">Overall Health</span>
-                      <span className="text-sm font-bold text-green-600">92%</span>
-                    </div>
-                    <Progress value={92} className="h-2" />
-                  </div>
-
-                  <div>
-                    <div className="flex justify-between items-center mb-1">
-                      <span className="text-sm font-medium text-gray-700">Disease Risk</span>
-                      <span className="text-sm font-bold text-green-600">Low</span>
-                    </div>
-                    <Progress value={25} className="h-2" />
-                  </div>
-
-                  <div>
-                    <div className="flex justify-between items-center mb-1">
-                      <span className="text-sm font-medium text-gray-700">Nutrient Level</span>
-                      <span className="text-sm font-bold text-green-600">Good</span>
-                    </div>
-                    <Progress value={78} className="h-2" />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3 mt-4">
-                  <div className="bg-green-50 p-3 rounded-xl text-center">
-                    <p className="text-2xl font-bold text-green-700">15</p>
-                    <p className="text-xs text-green-600">Scans this month</p>
-                  </div>
-                  <div className="bg-green-50 p-3 rounded-xl text-center">
-                    <p className="text-2xl font-bold text-green-700">2</p>
-                    <p className="text-xs text-green-600">Issues detected</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
           {/* AI Diagnosis Result */}
           {showDiagnosisResult && (
             <Card className="rounded-2xl border-2 border-green-100 shadow-lg animate-in slide-in-from-bottom duration-500">
@@ -199,6 +148,93 @@ export default function MonitorPage() {
               </CardContent>
             </Card>
           )}
+          <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
+            {/* Image Upload Section */}
+            <Card className="rounded-1xl border-2 border-green-100 shadow-lg">
+              <CardHeader>
+                <CardTitle className="text-green-700 flex items-center gap-2">📱 Crop Health Diagnosis</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p className="text-gray-600 text-sm">
+                  Upload or capture images of your crop, leaf, or soil for AI analysis
+                </p>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <Button
+                    onClick={handleImageUpload}
+                    className="h-32 flex flex-col gap-3 bg-green-500 hover:bg-green-600 rounded-2xl"
+                  >
+                    <Camera className="h-12 w-12" />
+                    <span className="text-sm font-medium">Capture Image</span>
+                    <span className="text-xs opacity-80">Use camera</span>
+                  </Button>
+                  <Button
+                    onClick={handleImageUpload}
+                    variant="outline"
+                    className="h-32 flex flex-col gap-3 border-2 border-green-300 rounded-2xl hover:bg-green-50 bg-transparent"
+                  >
+                    <Upload className="h-12 w-12 text-green-600" />
+                    <span className="text-sm font-medium text-green-600">Upload Image</span>
+                    <span className="text-xs text-green-600 opacity-80">From gallery</span>
+                  </Button>
+                </div>
+
+                <div className="p-4 bg-green-50 rounded-xl">
+                  <p className="text-sm text-green-700">
+                    <strong>Pro Tip:</strong> For best results, capture images in natural daylight and ensure the
+                    affected area is clearly visible.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Quick Stats */}
+            {/* <Card className="rounded-2xl border-2 border-green-100 shadow-lg">
+              <CardHeader>
+                <CardTitle className="text-green-700 flex items-center gap-2">📊 Health Overview</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-3">
+                  <div>
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="text-sm font-medium text-gray-700">Overall Health</span>
+                      <span className="text-sm font-bold text-green-600">92%</span>
+                    </div>
+                    <Progress value={92} className="h-2" />
+                  </div>
+
+                  <div>
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="text-sm font-medium text-gray-700">Disease Risk</span>
+                      <span className="text-sm font-bold text-green-600">Low</span>
+                    </div>
+                    <Progress value={25} className="h-2" />
+                  </div>
+
+                  <div>
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="text-sm font-medium text-gray-700">Nutrient Level</span>
+                      <span className="text-sm font-bold text-green-600">Good</span>
+                    </div>
+                    <Progress value={78} className="h-2" />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3 mt-4">
+                  <div className="bg-green-50 p-3 rounded-xl text-center">
+                    <p className="text-2xl font-bold text-green-700">15</p>
+                    <p className="text-xs text-green-600">Scans this month</p>
+                  </div>
+                  <div className="bg-green-50 p-3 rounded-xl text-center">
+                    <p className="text-2xl font-bold text-green-700">2</p>
+                    <p className="text-xs text-green-600">Issues detected</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card> */}
+          </div>
+
+          
         </TabsContent>
 
         <TabsContent value="tracker" className="space-y-6">
@@ -240,7 +276,7 @@ export default function MonitorPage() {
             </div>
 
             {/* Alert System */}
-            <Card className="rounded-2xl border-2 border-green-100 shadow-lg">
+            {/* <Card className="rounded-2xl border-2 border-green-100 shadow-lg">
               <CardHeader>
                 <CardTitle className="text-green-700 flex items-center gap-2">🚨 Alert System</CardTitle>
               </CardHeader>
@@ -284,7 +320,7 @@ export default function MonitorPage() {
                   </div>
                 </div>
               </CardContent>
-            </Card>
+            </Card> */}
           </div>
         </TabsContent>
       </Tabs>
