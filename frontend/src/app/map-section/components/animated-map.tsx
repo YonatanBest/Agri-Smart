@@ -73,7 +73,7 @@ export default function AnimatedMap() {
       } else {
         setIsAnimating(false)
         startTimeRef.current = null // Reset start time
-        router.push("/language-selection") // Redirect to language selection page
+        router.push("/land-mapping") // Redirect to land mapping page
       }
     },
     [router],
@@ -123,7 +123,7 @@ export default function AnimatedMap() {
           disabled={isAnimating} // Disable button while animating
           className="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-lg shadow-lg text-lg disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {isAnimating ? "Animating..." : "Start"}
+          {isAnimating ? "Animating..." : "Start Farm Mapping"}
         </Button>
         <div className="w-20 h-20 rounded-full border-4 border-red-500 flex items-center justify-center text-red-600 text-3xl font-bold bg-white shadow-lg">
           10
