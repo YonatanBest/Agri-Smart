@@ -3,7 +3,7 @@ from statistics import mean
 
 
 async def fetch_weather_summary(
-    latitude: float, longitude: float, past_days: int = 7, forecast_days: int = 0
+    latitude: float, longitude: float, past_days: int = 7, forecast_days: int = 9
 ) -> dict:
     url = "https://api.open-meteo.com/v1/forecast"
     params = {
