@@ -1,6 +1,7 @@
 import re
 import requests
 from fastapi import APIRouter, HTTPException, Query, Depends, UploadFile, File
+from fastapi import APIRouter, HTTPException, Query, Depends, Request
 from pydantic import BaseModel
 from typing import Optional
 from src.services.chat_service import chat_session_manager
@@ -12,6 +13,7 @@ from src.services.llm_service import llm_service
 from src.services.audio_service import audio_service
 from src.services.tts_service import tts_service
 from src.auth.auth_utils import get_current_user
+from src.logging_config import get_logger, RequestLogger, log_function_call
 
 
 def clean_text_for_tts(text: str) -> str:
@@ -140,6 +142,7 @@ def clean_location_for_display(location: str) -> str:
 
 
 router = APIRouter(prefix="/api/chat", tags=["Chat"])
+logger = get_logger(__name__)
 
 
 class StartSessionRequest(BaseModel):
@@ -156,12 +159,59 @@ class SendAudioMessageRequest(BaseModel):
 
 
 @router.post("/start-session")
-def start_session(req: StartSessionRequest, current_user=Depends(get_current_user)):
-    session = chat_session_manager.start_session(user_id=req.user_id)
-    return {"session_id": session.session_id, "created_at": session.created_at}
+@log_function_call(logger)
+def start_session(req: StartSessionRequest, current_user=Depends(get_current_user), request: Request = None):
+    request_id = getattr(request.state, 'request_id', 'unknown') if request else 'unknown'
+    
+    logger.info(
+        "Starting chat session",
+        request_id=request_id,
+        user_id=req.user_id,
+        current_user_id=getattr(current_user, 'id', None)
+    )
+    
+    try:
+        session = chat_session_manager.start_session(user_id=req.user_id)
+        logger.info(
+            "Chat session started successfully",
+            request_id=request_id,
+            session_id=session.session_id,
+            created_at=session.created_at
+        )
+        return {"session_id": session.session_id, "created_at": session.created_at}
+    except Exception as e:
+        logger.error(
+            "Failed to start chat session",
+            request_id=request_id,
+            user_id=req.user_id,
+            error_type=type(e).__name__,
+            error_message=str(e)
+        )
+        raise HTTPException(status_code=500, detail="Failed to start chat session")
 
 
 @router.post("/send-message")
+@log_function_call(logger)
+async def send_message(req: SendMessageRequest, current_user=Depends(get_current_user), request: Request = None):
+    request_id = getattr(request.state, 'request_id', 'unknown') if request else 'unknown'
+    
+    logger.info(
+        "Processing chat message",
+        request_id=request_id,
+        session_id=req.session_id,
+        message_length=len(req.message),
+        current_user_id=getattr(current_user, 'id', None)
+    )
+    
+    try:
+        session = chat_session_manager.get_session(req.session_id)
+        if not session:
+            logger.warning(
+                "Chat session not found",
+                request_id=request_id,
+                session_id=req.session_id
+            )
+            raise HTTPException(status_code=404, detail="Session not found")
 async def send_message(
     req: SendMessageRequest,
     preferred_language: Optional[str] = Query(
@@ -195,10 +245,10 @@ async def send_message(
                 req.message
             )
 
-    # Add user message
-    chat_session_manager.add_message(
-        req.session_id, sender="user", message=message_for_llm
-    )
+        # Add user message
+        chat_session_manager.add_message(
+            req.session_id, sender="user", message=message_for_llm
+        )
 
     messages_formatted = "\n".join(
         [f"{m.sender}: {m.message}" for m in session.messages[-10:]]
@@ -630,8 +680,44 @@ Respond as the agricultural assistant, taking into account the farmer's specific
 
 
 @router.get("/history")
-def get_history(session_id: str = Query(...), current_user=Depends(get_current_user)):
-    history = chat_session_manager.get_history(session_id)
-    if history is None:
-        raise HTTPException(status_code=404, detail="Session not found")
-    return {"messages": [m.dict() for m in history]}
+@log_function_call(logger)
+def get_history(session_id: str = Query(...), current_user=Depends(get_current_user), request: Request = None):
+    request_id = getattr(request.state, 'request_id', 'unknown') if request else 'unknown'
+    
+    logger.info(
+        "Retrieving chat history",
+        request_id=request_id,
+        session_id=session_id,
+        current_user_id=getattr(current_user, 'id', None)
+    )
+    
+    try:
+        history = chat_session_manager.get_history(session_id)
+        if history is None:
+            logger.warning(
+                "Chat session not found for history retrieval",
+                request_id=request_id,
+                session_id=session_id
+            )
+            raise HTTPException(status_code=404, detail="Session not found")
+        
+        logger.info(
+            "Chat history retrieved successfully",
+            request_id=request_id,
+            session_id=session_id,
+            message_count=len(history)
+        )
+        
+        return {"messages": [m.dict() for m in history]}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(
+            "Failed to retrieve chat history",
+            request_id=request_id,
+            session_id=session_id,
+            error_type=type(e).__name__,
+            error_message=str(e)
+        )
+        raise HTTPException(status_code=500, detail="Failed to retrieve chat history")

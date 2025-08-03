@@ -3,8 +3,7 @@ from sqlalchemy.orm import declarative_base, relationship
 from sqlalchemy.dialects.postgresql import UUID
 import uuid
 from datetime import datetime
-
-Base = declarative_base()
+from .base import Base
 
 
 class ChatSessionDB(Base):
@@ -28,6 +27,7 @@ class ChatMessageDB(Base):
     session = relationship("ChatSessionDB", back_populates="messages")
 
 
+<<<<<<< HEAD
 class User(Base):
     __tablename__ = "users"
     user_id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
@@ -67,3 +67,5 @@ class AITaskCache(Base):
     weather_context = Column(Text)  # JSON string of weather data used
     created_at = Column(DateTime, default=datetime.utcnow)
     expires_at = Column(DateTime)  # Cache expires after 24 hours
+=======
+>>>>>>> dcf64e176fd825917c7bf30dde50f0dca9f0daeb
