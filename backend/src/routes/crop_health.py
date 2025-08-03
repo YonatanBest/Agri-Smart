@@ -1,19 +1,17 @@
-from fastapi import APIRouter, UploadFile, File
-from src.core.crop_health_api import predict_crop_health
+from fastapi import APIRouter, UploadFile, File, Form, Depends
 import tempfile
+from flows import diagnosis_flow
+from src.auth.auth_utils import get_current_user
 
 router = APIRouter(prefix="/api/crop-health", tags=["Crop Health"])
 
 
 
-@router.post("/predict")
-async def analyze_crop_health(image: UploadFile = File(...), model: str = "binary"):
+@router.post("/diagnose", dependencies=[Depends(get_current_user)])
+async def analyze_crop_health(image: UploadFile = File(...)):
     with tempfile.NamedTemporaryFile(delete=False) as tmp:
         tmp.write(await image.read())
         tmp_path = tmp.name
 
-    result = predict_crop_health(tmp_path, model)
-    return {"prediction": result}
-
-
-
+    result = await diagnosis_flow(tmp_path)
+    return result
