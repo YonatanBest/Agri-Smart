@@ -1,89 +1,101 @@
+# 🌾 AgriLo - AI-Powered Smart Agriculture Assistant
 
----
+## 📋 Problem Statement
 
-## ⚙️ Backend Setup (FastAPI + Poetry)
+Over **60% of Africa's population** relies on agriculture, yet most **smallholder farmers, especially women**, lack access to timely, localized data. A **2024 CGIAR review** found that farmers in Sub-Saharan Africa face severe gaps in **real-time weather and soil data**, and over **70% of digital solutions are fragmented**, offering raw numbers instead of clear guidance.
 
-> *For backend contributors only*
+Generic platforms often ignore **local languages, customs, and agro-ecological needs**, making them ineffective. For example, **women farmers, who make up nearly 50% of the agricultural labor force**, are disproportionately affected by poor access to tailored, actionable insights. Without an integrated, user-friendly system, millions remain vulnerable to **climate shocks, low yields, and inefficient resource use**.
 
----
+## 🎯 The idea (Our solution)
 
-### 📂 Project Structure
+**AgriLo** is an **AI-powered smart agriculture assistant** designed to support **smallholder farmers, especially women in Sub-Saharan Africa and beyond**. Built using the **OpenEPI ecosystem of APIs**, AgriLo combines **real-time weather forecasts, soil data, and crop health diagnostics** to provide personalized recommendations, intelligent scheduling, and actionable plans tailored to each farmer's land.
 
-```
+With support for **natural language in multiple local languages**, AgriLo is designed to be accessible and user-friendly, especially for communities often excluded from tech solutions.
 
-root/
-├── frontend/
-├── backend/
-│   ├── src/
-│   ├── tests/
-│   ├── pyproject.toml
-│   ├── poetry.lock
-├── README.md
+No more bulky charts, confusing dashboards, or inaccessible apps, AgriLo brings **smart farming insights straight to the farmer's fingertips** through a simple, conversational interface.
 
-````
+## 🚀 Key Features:
 
-Backend code and dependencies live in the `backend/` folder.
+### 1) **Recommendations** to improve yield and productivity
+- **Fertilizer recommendation system**
+- **Crop recommendation**
 
----
+### 2) **AI-powered task scheduling** that helps prevent losses by:
+- **Checking weather forecasts** to plan irrigation and harvesting
+- **Recommending the right time** to apply fertilizers
+- **Creating weekly action plans** (e.g., "Irrigate Monday", "Fertilize Wednesday") based on crop stage and weather
 
-### 1. Install Poetry (if needed)
+### 3) 🩺 **Monitoring & Diagnosis**
+Our system enables real-time **plant health diagnosis** using photos or live image capture. It supports **700+ plant diseases** across **38 crop species** and offers:
+- **Representative images** of affected crops
+- **Clear treatment instructions**
+- **Disease symptoms and severity levels**
+- **Treatment history and future prevention tips**
+- **AI-powered chatbot** for personalized guidance and support
 
-```bash
-pip install poetry 
-````
-If it is not successful installed, follow this guide
+### 4) **AI/Voice chat interaction**
+Our AI assistant supports live chat and voice-based interaction, making it easy to get help hands-free. It currently understands multiple languages, including **English, Swahili, Indonesian, Amharic, and Norwegian**. By supporting both text and audio communication, we ensure farmers can interact in the way that's most comfortable for them and in a language they understand
 
-Install Poetry following the official guide:  
-[https://python-poetry.org/docs/#installation](https://python-poetry.org/docs/#installation)
+## 👥 Who it benefits:
 
-Verify:
+### **Small Scale Farmers**
+This web app is especially targeted for **small scale farmers** who use traditional farming methods which do not depend on data. This app can provide a full plan that can is easily be used in the farming process until the crop is harvested.
 
+### **Large Enterprise Farms**
+This app can also be used to manage and plan **enterprise grade farms** that might be difficult to manage without digital management means.
 
-```bash
-poetry --version
-````
+## 🚀 Further technical development/scale (already started)
 
----
+We tried to implement a user-friendly approach for farmers to input their land boundaries. This is a **GPS-based land mapping feature** that uses the phone's sensors to automatically trace the farmland perimeter, area and location. So no need for map drawing on the phone. But we faced a time shortage for the integration of the system to the current project. So we have a plan to continue in the integration of this important feature, but it is still accessible for testing in the `location_setter` branch in the github.
 
-### 2. Setup Virtual Environment & Install Dependencies
+- **Include SMS and USSD methods** to deliver data to farmers who do not have access to the internet or do not use a smartphone.
+- We planned to design **Symbolic AI** – so that our app would provide real accurate data. Since AI models are generic and sensitive to error margin
+- We managed to test an AI model that can run offline without any internet access that can answer and chat with the farmers in agriculture. So in future we plan to design an app so that farmers can interact with our app without any internet bundle.
 
-Navigate to backend:
+**Test Model:**      **Ollama run sike_aditya/AgriLlama**
+This model can give suggestions on the disease of the plant and some agricultural advice. But we aim to have more robust AI that is agricultural specialist, so we might need more resources to fine tune another base model using agricultural datasets, and we plan to use **tensorflow lite** to minimize and quantize the size and complexity of the fine tuned model. (We have tested on the **tensorflow lite** method and it is promising, for testing the **tensorflow-lite-test** branch.) For now, we decided to stick with **Gemini**.
 
-```bash
-cd backend
-```
+**Colab Link** that we experimented on tensorflow lite: 
+https://colab.research.google.com/drive/158-rip9q8HwslSV-YDm83DNo37E9L37x?usp=sharing
 
-**Option B: Create and activate a virtual environment manually**
+By using **AI agent** we can utilize automation so that the farmer schedule just by ai chat instruction, which it provides weekly report on the field
 
-```bash
-python -m venv .venv
-# Activate it:
-# Windows (PowerShell):
-.venv\Scripts\Activate
-# macOS/Linux:
-source .venv/bin/activate
+## 🔮 Further (Special) Feature development
 
-poetry install
-```
+Connect with **NGOs and Agricultural Financial advisors** so that we can empower small-scaled farmers to achieve their economic stability.
 
----
+We plan to add one more feature called **"MarketPlace"**, it is where farmers receive contracts from government, and private companies, allowing them to sell their crops at fair price and market demand.
 
-### 3. Run the Server
+## 🛠️ Used Technology:
 
-With the environment active, run:
+**NextJs (Frontend)**
+**FastAPI (Backend)**
+**Pydantic (Data Validation)**
+**Postgres (Database)**
+**Gemini (AI)**
+**Figma (Design)**
+**Material Design/Symbol and Google Font (Design)**
 
-```bash
-uvicorn src.main:app --reload
-```
+## 🔌 APIs and Resources Used
 
-Visit: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
+We integrated several APIs to support smart, data-driven decisions in our project, with a strong focus on agricultural insights. Our primary API is the **OpenEPI API**, which we complemented with additional APIs to enrich functionality:
 
----
+**Soil Recommendations**
+**iSDA Soil API** (via OpenEPI)
+**SoilGrids API** (via OpenEPI)
 
-### Quick Tips
+**Geocoding**
+**OpenEPI Geocoding API** (via OpenEPI)
 
-* Add a dependency: `poetry add package-name`
-* Run a script: `poetry run python script.py`
-* Exit from venv: `exit`
+**Crop Health Diagnosis**
+**OpenEPI Crop Health Model API** (via OpenEPI)
+**Deepleaf API**
+**Kindwise API**
 
----
+**Weather Forecasting**
+**OpenMetro Weather API**
+
+🔧 **Additional Tools and Services**
+**Google Cloud Translation API** – for multilingual support
+**Google Cloud Text-to-Speech (TTS)** – to assist low-literacy users
+**Google Maps API** – for farmland mapping
