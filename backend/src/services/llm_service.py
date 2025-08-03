@@ -3,6 +3,7 @@ from typing import Any, Dict, Optional
 from google import genai
 from pathlib import Path
 from dotenv import load_dotenv
+
 load_dotenv()
 
 
@@ -10,6 +11,7 @@ class LLMService:
 
     def __init__(self, model_name: str = "gemini-2.0-flash-001"):
         api_key = os.getenv("GOOGLE_API_KEY")
+        print(api_key, "test 1244")
         if not api_key:
             raise ValueError("GOOGLE_API_KEY environment variable not set.")
         self.client = genai.Client(api_key=api_key)

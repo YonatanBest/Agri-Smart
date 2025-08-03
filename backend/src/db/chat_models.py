@@ -3,8 +3,7 @@ from sqlalchemy.orm import declarative_base, relationship
 from sqlalchemy.dialects.postgresql import UUID
 import uuid
 from datetime import datetime
-
-Base = declarative_base()
+from .base import Base
 
 
 class ChatSessionDB(Base):
@@ -28,6 +27,7 @@ class ChatMessageDB(Base):
     session = relationship("ChatSessionDB", back_populates="messages")
 
 
+<<<<<<< HEAD
 class User(Base):
     __tablename__ = "users"
     user_id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
@@ -42,3 +42,30 @@ class User(Base):
     password_hash = Column(String)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
+class WeatherCache(Base):
+    __tablename__ = "weather_cache"
+    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    user_id = Column(String, ForeignKey("users.user_id"))
+    lat = Column(String)
+    lon = Column(String)
+    days = Column(Integer)
+    weather_data = Column(Text)  # JSON string
+    created_at = Column(DateTime, default=datetime.utcnow)
+    expires_at = Column(DateTime)  # Cache expires after 6 hours
+
+
+class AITaskCache(Base):
+    __tablename__ = "ai_task_cache"
+    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    user_id = Column(String, ForeignKey("users.user_id"))
+    lat = Column(String)
+    lon = Column(String)
+    date = Column(String)  # YYYY-MM-DD format
+    tasks_data = Column(Text)  # JSON string
+    weather_context = Column(Text)  # JSON string of weather data used
+    created_at = Column(DateTime, default=datetime.utcnow)
+    expires_at = Column(DateTime)  # Cache expires after 24 hours
+=======
+>>>>>>> dcf64e176fd825917c7bf30dde50f0dca9f0daeb
