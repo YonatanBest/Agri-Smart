@@ -48,6 +48,16 @@ This app can also be used to manage and plan **enterprise grade farms** that mig
 
 We tried to implement a user-friendly approach for farmers to input their land boundaries. This is a **GPS-based land mapping feature** that uses the phone's sensors to automatically trace the farmland perimeter, area and location. So no need for map drawing on the phone. But we faced a time shortage for the integration of the system to the current project. So we have a plan to continue in the integration of this important feature, but it is still accessible for testing in the `location_setter` branch in the GitHub. (Screenshot of the implementation test is available.)
 
+<table>
+  <tr>
+    <td><img src="./mapping-instructions.jpg" alt="Map Your Farmland Instructions" width="300" /></td>
+       <td><img src="./location-permission.jpg" alt="Location Permission Request" width="300" height="600" style="border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
+</td>
+    <td><img src="./mapping-progress.jpg" alt="Mapping in Progress" width="300" /></td>
+   
+  </tr>
+</table>
+
 
 - **Include SMS and USSD methods** to deliver data to farmers who do not have access to the internet or do not use a smartphone.
 - We planned to design **Symbolic AI** – so that our app would provide real accurate data. Since AI models are generic and sensitive to error margin
@@ -88,26 +98,27 @@ We plan to add one more feature called **"MarketPlace"**, it is where farmers re
 We integrated several APIs to support smart, data-driven decisions in our project, with a strong focus on agricultural insights. Our primary API is the **OpenEPI API**, which we complemented with additional APIs to enrich functionality:
 
 **Soil Recommendations**
-
-**iSDA Soil API** (via OpenEPI)
-
-**SoilGrids API** (via OpenEPI)
-
+ ```bash
+   iSDA Soil API** (via OpenEPI)
+   SoilGrids API** (via OpenEPI)
+   
+   ```
 **Geocoding**
-
-**OpenEPI Geocoding API** (via OpenEPI)
-
+ ```bash
+   OpenEPI Geocoding API** (via OpenEPI)
+   
+   ```
 **Crop Health Diagnosis**
-
-**OpenEPI Crop Health Model API** (via OpenEPI)
-
-**Deepleaf API**
-
-**Kindwise API**
-
+ ```bash
+ OpenEPI Crop Health Model API** (via OpenEPI)
+Deepleaf API
+Kindwise API  
+   ```
 **Weather Forecasting**
+ ```bash
+OpenMetro Weather API
+   ```
 
-**OpenMetro Weather API**
 
 🔧 **Additional Tools and Services**
 
@@ -173,8 +184,5 @@ We integrated several APIs to support smart, data-driven decisions in our projec
 ## 📱 GPS-Based Land Mapping Feature Screenshots
 
 
-<img src="./mapping-instructions.jpg" alt="Map Your Farmland Instructions" width="300" height="600" style="border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
 
-<img src="./location-permission.jpg" alt="Location Permission Request" width="300" height="600" style="border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
 
-<img src="./mapping-progress.jpg" alt="Mapping in Progress" width="300" height="600" style="border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
