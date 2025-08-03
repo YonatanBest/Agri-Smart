@@ -137,7 +137,16 @@ OpenMetro Weather API
    cd backend
    ```
 
-2. **Install dependencies:**
+2. **Create and activate virtual environment:**
+   ```bash
+   python -m venv venv
+   # On Windows:
+   venv\Scripts\activate
+   # On macOS/Linux:
+   source venv/bin/activate
+   ```
+
+3. **Install dependencies:**
    ```bash
    poetry install
    ```
@@ -172,6 +181,32 @@ OpenMetro Weather API
    - Open your browser and go to: `http://localhost:3000`
    - The AgriLo application will be running
 
+
+### Environment Variables
+
+To run this project, you need to set up the following environment variables:
+
+```bash
+# API Keys
+KINDWISE_API_KEY=your_kindwise_api_key_here
+GOOGLE_API_KEY=your_google_api_key_here
+DEEPL_API_KEY=your_deepl_api_key_here
+TAVILY_API_KEY=your_tavily_api_key_here
+DETECT_LANGUAGE_API=your_detect_language_api_key_here
+GOOGLE_MAPS_API_KEY=your_google_maps_api_key_here
+
+# Database Credentials
+ISDA_USERNAME=your_isda_username_here
+ISDA_PASSWORD=your_isda_password_here
+
+# Security
+JWT_SECRET_KEY=your_jwt_secret_key_here
+
+# Google Cloud Platform
+GCP_CREDENTIALS_B64=your_base64_encoded_gcp_credentials_here
+```
+
+**Note:** Create a `.env` file in the backend directory and add these environment variables with your actual API keys and credentials.
 
 ### Prerequisites
 
