@@ -212,6 +212,9 @@ async def send_message(req: SendMessageRequest, current_user=Depends(get_current
                 session_id=req.session_id
             )
             raise HTTPException(status_code=404, detail="Session not found")
+    except:
+        raise 
+
 async def send_message(
     req: SendMessageRequest,
     preferred_language: Optional[str] = Query(

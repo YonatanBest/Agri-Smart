@@ -4,3 +4,4 @@
 *.db
 gcp_key.json
 gcp_key_base64.txt
+logs/
