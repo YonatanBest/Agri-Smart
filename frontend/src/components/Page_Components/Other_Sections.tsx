@@ -1,9 +1,14 @@
+"use client"
+
 import Link from 'next/link'
 import React from 'react'
 import { Input } from '../ui/input'
 import { Button } from '../ui/button'
+import { useAuth } from '@/contexts/AuthContext'
 
 export default function Other_Sections() {
+  const { isAuthenticated } = useAuth();
+  
   return (
     <div>
         <section id="contact" className="w-full py-12 md:py-24 lg:py-32 border-t bg-white">
@@ -13,23 +18,14 @@ export default function Other_Sections() {
                 Ready to Transform Your Farm?
             </h2>
             <p className="mx-auto max-w-[600px] text-gray-600 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                Join the future of farming. Sign up for updates or get in touch with our team.
-            </p>
+                            </p>
             </div>
-            <div className="mx-auto w-full max-w-sm space-y-2">
-            <form className="flex flex-col sm:flex-row gap-2">
-                <Input type="email" placeholder="Enter your email" className="max-w-lg flex-1 min-w-0" />
-                <Button type="submit" className="bg-green-600 hover:bg-green-700 text-white w-full sm:w-auto">
-                Sign Up
+            <div className="mx-auto w-full max-w-sm space-y-4">
+                <Button asChild className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 text-lg font-semibold">
+                    <Link href={isAuthenticated ? "/main-page" : "/auth-options"}>
+                        {isAuthenticated ? "Go to Dashboard" : "Get Started"}
+                    </Link>
                 </Button>
-            </form>
-            <p className="text-xs text-gray-500">
-                We respect your privacy. Read our{" "}
-                <Link href="#" className="underline underline-offset-2 text-green-600 hover:text-green-700">
-                Privacy Policy
-                </Link>
-                .
-            </p>
             </div>
         </div>
         </section>

@@ -1,7 +1,10 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Home, Activity, MessageCircle, Calendar, User, Sprout, Bell, Leaf, X, AlertTriangle } from "lucide-react"
+import { Home, Activity, MessageCircle, Calendar, User, Sprout, Leaf, LogOut, Settings, Globe } from "lucide-react"
+import { useAuth } from "@/contexts/AuthContext"
+import { useLanguage, SUPPORTED_LANGUAGES } from "@/contexts/LanguageContext"
+import { useRouter } from "next/navigation"
 import {
   Sidebar,
   SidebarContent,
@@ -25,67 +28,145 @@ import HomePage from "./components/home-page"
 import MonitorPage from "./components/monitor-page"
 import ChatPage from "./components/chat-page"
 import CalendarPage from "./components/calendar-page"
-import ProfilePage from "./components/profile-page"
 import Link from "next/link"
 
 export default function AgriApp() {
+  const { user, isAuthenticated, isLoading, logout } = useAuth()
+  const { selectedLanguage, setSelectedLanguage, t } = useLanguage()
+  const router = useRouter()
   const [currentPage, setCurrentPage] = useState("home")
-  const [showAlert, setShowAlert] = useState(true)
-  const [alertMessage, setAlertMessage] = useState("🚨 AI detected potential pest activity in Field A. Schedule inspection today!")
+  const [showLanguageDropdown, setShowLanguageDropdown] = useState(false)
+
+  // Listen for navigation events from child components
+  useEffect(() => {
+    const handleNavigateToChat = (event: CustomEvent) => {
+      if (event.detail?.withDiagnosis) {
+        setCurrentPage("chat")
+      }
+    }
+
+    window.addEventListener('navigateToChat', handleNavigateToChat as EventListener)
+    
+    return () => {
+      window.removeEventListener('navigateToChat', handleNavigateToChat as EventListener)
+    }
+  }, [])
+
+  // Close language dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (showLanguageDropdown) {
+        const target = event.target as Element
+        if (!target.closest('.language-dropdown')) {
+          setShowLanguageDropdown(false)
+        }
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [showLanguageDropdown])
+
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      router.push('/login')
+    }
+  }, [isAuthenticated, isLoading, router])
+
+  const handleLogout = () => {
+    logout()
+    router.push('/login')
+  }
 
   const pages = {
     home: <HomePage />,
     monitor: <MonitorPage />,
     chat: <ChatPage />,
     calendar: <CalendarPage />,
-    profile: <ProfilePage />,
   }
 
   const navItems = [
-    { id: "home", icon: Home, label: "Home", badge: null },
-    { id: "monitor", icon: Activity, label: "Monitor", badge: "2" },
-    { id: "chat", icon: MessageCircle, label: "Chat", badge: null },
-    { id: "calendar", icon: Calendar, label: "Calendar", badge: "5" },
+    { id: "home", icon: Home, label: t("home"), badge: null },
+    { id: "monitor", icon: Activity, label: t("monitor"), badge: "2" },
+    { id: "chat", icon: MessageCircle, label: t("chat"), badge: null },
+    { id: "calendar", icon: Calendar, label: t("calendar"), badge: "5" },
   ]
+
+  // Show loading state
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500 mx-auto mb-4"></div>
+          <p className="text-green-700 font-medium">{t("loading")}</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Show loading state when not authenticated
+  if (!isAuthenticated) {
+    return null // Will redirect to login
+  }
 
   return (
     <>
       {/* Mobile Layout */}
       <div className="md:hidden min-h-screen bg-gradient-to-br from-green-50 to-green-100">
         {/* Mobile Header */}
-        <header className="bg-white border-b border-green-100 shadow-sm">
-          {/* Alert Banner */}
-          {showAlert && (
-            <div className="bg-orange-50 border-b border-orange-200 px-4 py-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <AlertTriangle className="h-4 w-4 text-orange-600" />
-                  <p className="text-sm text-orange-800 font-medium">{alertMessage}</p>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowAlert(false)}
-                  className="text-orange-600 hover:bg-orange-100 p-1"
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-          )}
+        <header className="bg-white border-b border-green-100 shadow-sm relative z-[9998]">
           
           <div className="px-4 py-3 flex items-center justify-between">
             <h1 className="text-2xl font-bold text-green-700 flex items-center gap-2">Agrilo</h1>
-            <Button
+            <div className="flex items-center gap-2">
+              {/* Language Selector */}
+              <div className="relative language-dropdown">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowLanguageDropdown(!showLanguageDropdown)}
+                  className="rounded-full p-2 text-green-600 hover:bg-green-50 flex items-center gap-1"
+                >
+                  <Globe className="h-4 w-4" />
+                  <span className="text-xs font-medium">
+                    {SUPPORTED_LANGUAGES.find(lang => lang.code === selectedLanguage)?.flag}
+                  </span>
+                </Button>
+                
+                {showLanguageDropdown && (
+                  <div className="absolute top-full right-0 mt-1 bg-white border border-green-200 rounded-lg shadow-xl z-[9999] min-w-[200px] language-dropdown">
+                    <div className="p-2 text-xs text-gray-500 border-b">Available Languages:</div>
+                    {SUPPORTED_LANGUAGES.map((lang) => (
+                      <button
+                        key={lang.code}
+                        onClick={() => {
+                          setSelectedLanguage(lang.code);
+                          setShowLanguageDropdown(false);
+                        }}
+                        className={`w-full text-left px-3 py-2 hover:bg-green-50 flex items-center gap-2 ${
+                          selectedLanguage === lang.code ? 'bg-green-100 text-green-700' : 'text-gray-700'
+                        }`}
+                      >
+                        <span>{lang.flag}</span>
+                        <span className="text-sm">{lang.name}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+              
+                          <Button
               variant="ghost"
               size="sm"
-              onClick={() => setCurrentPage("profile")}
-              className={`rounded-full p-2 ${
-                currentPage === "profile" ? "bg-green-500 text-white" : "text-green-600 hover:bg-green-50"
-              }`}
+              onClick={() => router.push('/settings')}
+              className="rounded-full p-2 text-green-600 hover:bg-green-50"
             >
               <User className="h-5 w-5" />
             </Button>
+            </div>
           </div>
         </header>
 
@@ -123,7 +204,7 @@ export default function AgriApp() {
           <div className="min-h-screen flex w-full bg-gradient-to-br from-green-50 to-green-100">
             {/* Sidebar */}
             <Sidebar variant="inset" className="border-r-2 border-green-100">
-              <SidebarHeader className="relative border-b border-green-100 overflow-hidden">
+              <SidebarHeader className="relative border-b border-green-100 overflow-visible">
                 {/* Background image with slow opacity, adjusts opacity in dark mode */}
                 <div
                   className="absolute inset-0 z-0"
@@ -146,7 +227,7 @@ export default function AgriApp() {
 
               <SidebarContent className="bg-white">
                 <SidebarGroup>
-                  <SidebarGroupLabel className="text-gray-900 font-semibold">Farm Management</SidebarGroupLabel>
+                  <SidebarGroupLabel className="text-gray-900 font-semibold">{t("farmManagement")}</SidebarGroupLabel>
                   <SidebarGroupContent>
                     <SidebarMenu>
                       {navItems.map((item) => {
@@ -184,7 +265,7 @@ export default function AgriApp() {
                 </SidebarGroup>
 
                 <SidebarGroup>
-                  <SidebarGroupLabel className="text-green-700 font-semibold">Quick Actions</SidebarGroupLabel>
+                  <SidebarGroupLabel className="text-green-700 font-semibold">{t("quickActions")}</SidebarGroupLabel>
                   <SidebarGroupContent>
                     <SidebarMenu>
                       <SidebarMenuItem>
@@ -193,7 +274,7 @@ export default function AgriApp() {
                           className="w-full justify-start gap-3 rounded-xl py-3 px-4 text-green-700 hover:bg-green-50"
                         >
                           <span className="text-lg">🔍</span>
-                          <span className="font-medium">Crop Diagnosis</span>
+                          <span className="font-medium">{t("cropDiagnosis")}</span>
                         </SidebarMenuButton>
                       </SidebarMenuItem>
                       <SidebarMenuItem>
@@ -202,7 +283,41 @@ export default function AgriApp() {
                           className="w-full justify-start gap-3 rounded-xl py-3 px-4 text-green-700 hover:bg-green-50"
                         >
                           <span className="text-lg">💬</span>
-                          <span className="font-medium">Ask AI Expert</span>
+                          <span className="font-medium">{t("askAIExpert")}</span>
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                      <SidebarMenuItem>
+                        <SidebarMenuButton
+                          onClick={() => {
+                            setCurrentPage("home");
+                            // Dispatch custom event to navigate to fertilizer section
+                            setTimeout(() => {
+                              window.dispatchEvent(new CustomEvent('navigateToSection', {
+                                detail: { section: 'fertilizer' }
+                              }));
+                            }, 100);
+                          }}
+                          className="w-full justify-start gap-3 rounded-xl py-3 px-4 text-green-700 hover:bg-green-50"
+                        >
+                          <span className="text-lg">⚡</span>
+                          <span className="font-medium">Fertilizer Recommendation</span>
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                      <SidebarMenuItem>
+                        <SidebarMenuButton
+                          onClick={() => {
+                            setCurrentPage("home");
+                            // Dispatch custom event to navigate to crops section
+                            setTimeout(() => {
+                              window.dispatchEvent(new CustomEvent('navigateToSection', {
+                                detail: { section: 'crops' }
+                              }));
+                            }, 100);
+                          }}
+                          className="w-full justify-start gap-3 rounded-xl py-3 px-4 text-green-700 hover:bg-green-50"
+                        >
+                          <span className="text-lg">🌱</span>
+                          <span className="font-medium">Soil Recommendation</span>
                         </SidebarMenuButton>
                       </SidebarMenuItem>
                     </SidebarMenu>
@@ -214,16 +329,34 @@ export default function AgriApp() {
                 <div className="p-4">
                   <div className="flex items-center gap-3 mb-2">
                     <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
-                      <span className="text-white text-sm font-bold">RK</span>
+                      <span className="text-white text-sm font-bold">
+                        {user?.name?.charAt(0)?.toUpperCase() || 'U'}
+                      </span>
                     </div>
                     <div>
-                      <p className="text-sm font-semibold text-green-800">Rajesh Kumar</p>
-                      <p className="text-xs text-green-600">2.5 hectares • Punjab</p>
+                      <p className="text-sm font-semibold text-green-800">{user?.name || 'User'}</p>
+                      <p className="text-xs text-green-600">{user?.location || t("locationNotSet")}</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 text-xs text-green-600">
-                    <Bell className="h-3 w-3" />
-                    <span>3 pending notifications</span>
+                  <div className="flex items-center justify-end">
+                    <div className="flex items-center gap-1">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => router.push('/settings')}
+                        className="text-green-600 hover:text-green-700 hover:bg-green-50 p-1"
+                      >
+                        <Settings className="h-3 w-3" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleLogout}
+                        className="text-red-600 hover:text-red-700 hover:bg-red-50 p-1"
+                      >
+                        <LogOut className="h-3 w-3" />
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </SidebarFooter>
@@ -232,49 +365,60 @@ export default function AgriApp() {
 
             {/* Main Content */}
             <SidebarInset className="flex-1">
-              <header className="flex flex-col shrink-0 border-b border-green-100 bg-white/80 backdrop-blur-sm">
-                {/* Alert Banner */}
-                {showAlert && (
-                  <div className="bg-orange-50 border-b border-orange-200 px-4 py-2">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <AlertTriangle className="h-4 w-4 text-orange-600" />
-                        <p className="text-sm text-orange-800 font-medium">{alertMessage}</p>
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setShowAlert(false)}
-                        className="text-orange-600 hover:bg-orange-100 p-1"
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                )}
+              <header className="flex flex-col shrink-0 border-b border-green-100 bg-white/80 backdrop-blur-sm relative z-[9998]">
                 
                 <div className="flex h-16 items-center gap-2 px-4">
                   <SidebarTrigger className="-ml-1 text-green-600 hover:bg-green-50" />
                   <Separator orientation="vertical" className="mr-2 h-4" />
                   <div className="flex items-center gap-2">
-                    <h2 className="text-lg font-semibold text-green-800 capitalize">
-                      {currentPage === "profile"
-                        ? "Profile"
-                        : navItems.find((item) => item.id === currentPage)?.label || "Dashboard"}
-                    </h2>
+                                          <h2 className="text-lg font-semibold text-green-800 capitalize">
+                        {navItems.find((item) => item.id === currentPage)?.label || t("dashboard")}
+                      </h2>
                   </div>
                   <div className="ml-auto flex items-center gap-2">
-                    <div className="hidden lg:flex items-center gap-2 text-sm text-green-600">
-                      <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-                      <span>System Online</span>
+
+                    
+                    {/* Desktop Language Selector */}
+                    <div className="relative language-dropdown">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setShowLanguageDropdown(!showLanguageDropdown)}
+                        className="rounded-full p-2 text-green-600 hover:bg-green-50 flex items-center gap-1"
+                      >
+                        <Globe className="h-4 w-4" />
+                        <span className="text-xs font-medium">
+                          {SUPPORTED_LANGUAGES.find(lang => lang.code === selectedLanguage)?.flag}
+                        </span>
+                      </Button>
+                      
+                      {showLanguageDropdown && (
+                        <div className="absolute top-full right-0 mt-1 bg-white border border-green-200 rounded-lg shadow-xl z-[9999] min-w-[200px] language-dropdown">
+                          <div className="p-2 text-xs text-gray-500 border-b">Available Languages:</div>
+                          {SUPPORTED_LANGUAGES.map((lang) => (
+                            <button
+                              key={lang.code}
+                              onClick={() => {
+                                setSelectedLanguage(lang.code);
+                                setShowLanguageDropdown(false);
+                              }}
+                              className={`w-full text-left px-3 py-2 hover:bg-green-50 flex items-center gap-2 ${
+                                selectedLanguage === lang.code ? 'bg-green-100 text-green-700' : 'text-gray-700'
+                              }`}
+                            >
+                              <span>{lang.flag}</span>
+                              <span className="text-sm">{lang.name}</span>
+                            </button>
+                          ))}
+                        </div>
+                      )}
                     </div>
+                    
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => setCurrentPage("profile")}
-                      className={`rounded-full p-2 ml-2 ${
-                        currentPage === "profile" ? "bg-green-500 text-white" : "text-green-600 hover:bg-green-50"
-                      }`}
+                      onClick={() => router.push('/settings')}
+                      className="rounded-full p-2 ml-2 text-green-600 hover:bg-green-50"
                     >
                       <User className="h-5 w-5" />
                     </Button>
@@ -282,7 +426,7 @@ export default function AgriApp() {
                 </div>
               </header>
 
-              <main className="flex-1 overflow-auto">{pages[currentPage as keyof typeof pages]}</main>
+              <main className="flex-1 overflow-visible">{pages[currentPage as keyof typeof pages]}</main>
             </SidebarInset>
           </div>
         </SidebarProvider>

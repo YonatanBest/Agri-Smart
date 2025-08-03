@@ -175,3 +175,43 @@ body {
     overflow-x: hidden;
   }
 }
+
+/* Markdown styling for chat messages */
+.prose {
+  color: inherit;
+}
+
+.prose p {
+  margin: 0;
+  line-height: 1.5;
+}
+
+.prose strong {
+  font-weight: 600;
+}
+
+.prose em {
+  font-style: italic;
+}
+
+.prose code {
+  background-color: rgba(34, 197, 94, 0.1);
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
+}
+
+.prose ul, .prose ol {
+  margin: 0.5rem 0;
+  padding-left: 1rem;
+}
+
+.prose li {
+  margin: 0.25rem 0;
+}
+
+.prose h1, .prose h2, .prose h3 {
+  margin: 0.5rem 0 0.25rem 0;
+  font-weight: 600;
+}

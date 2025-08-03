@@ -23,7 +23,7 @@ class User(BaseModel):
     email: Optional[str] = None
     location: Optional[str] = None
     preferred_language: Optional[str] = None
-    crops_grown: Optional[str] = None
+    crops_grown: Optional[List[str]] = None
     user_type: Optional[str] = None  # aspiring, beginner, experienced, explorer
     years_experience: Optional[int] = None
     main_goal: Optional[str] = None
@@ -37,7 +37,7 @@ class UserCreate(BaseModel):
     password: str
     location: Optional[str] = None
     preferred_language: Optional[str] = None
-    crops_grown: Optional[str] = None
+    crops_grown: Optional[List[str]] = None
     user_type: Optional[str] = None
     years_experience: Optional[int] = None
     main_goal: Optional[str] = None

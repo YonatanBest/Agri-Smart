@@ -8,6 +8,7 @@ import { useGSAP } from "@gsap/react" // Import useGSAP
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { CheckCircleIcon, InfoIcon } from "lucide-react"
 import Iphone15Pro from "../magicui/iphone-15-pro"
+import { useLanguage } from '@/contexts/LanguageContext'
 
 // Register ScrollTrigger plugin once globally
 gsap.registerPlugin(ScrollTrigger)
@@ -19,6 +20,8 @@ export default function ScrollAnimation() {
   const faqContainerRef = useRef(null)
   const featuresContainerRef = useRef(null)
   const aboutUsContainerRef = useRef(null)
+
+  const { t, selectedLanguage } = useLanguage();
 
   // useGSAP hook for all GSAP animations within this component
   useGSAP(
@@ -156,38 +159,35 @@ export default function ScrollAnimation() {
     { scope: sectionRef }, // The scope for useGSAP, automatically handles cleanup
   )
 
-  // Define FAQ data
+  // Define FAQ data based on selected language
   const faqs = [
     {
-      question: "What is GSAP?",
-      answer: "GSAP is a JavaScript library for high-performance web animations.",
+      question: t('faq1q') || "How does Agrilo's AI crop recommendation work?",
+      answer: t('faq1a') || "Our AI analyzes your soil type, location, weather patterns, and farming goals to provide personalized crop recommendations that maximize yield and sustainability.",
     },
     {
-      question: "What is ScrollTrigger?",
-      answer: "ScrollTrigger is a GSAP plugin for scroll-based animations and pinning.",
+      question: t('faq2q') || "What data does Agrilo use for analysis?",
+      answer: t('faq2a') || "We use soil composition data, weather forecasts, historical crop performance, market prices, and local agricultural practices to generate accurate recommendations.",
     },
     {
-      question: "Is GSAP free?",
-      answer: "GSAP is free for most projects; a Business Green license is for commercial uses.",
+      question: t('faq3q') || "Is Agrilo suitable for all types of farming?",
+      answer: t('faq3a') || "Yes! Agrilo works for small-scale family farms, large commercial operations, and everything in between. Our recommendations adapt to your specific farming context.",
     },
-  ]
-
-  // Define Key Features data
+  ];
+  // Define Key Features data based on selected language
   const features = [
-    "Smooth Animations",
-    "Scroll-Triggered Effects",
-    "Responsive Design",
-    "Easy Integration",
-    "High Performance",
-  ]
-
-  // Define About Us content
+    t('feature1') || "AI-Powered Crop Recommendations",
+    t('feature2') || "Real-Time Weather Integration",
+    t('feature3') || "Soil Analysis & Mapping",
+    t('feature4') || "Multi-Language Support",
+    t('feature5') || "Precision Farming Tools",
+  ];
+  // Define About Us content based on selected language
   const aboutUsContent = {
-    title: "About Our Platform",
-    description:
-      "Our platform is dedicated to providing cutting-edge solutions for modern web development. We focus on delivering intuitive user experiences with powerful, performant technologies like Next.js and GSAP. Our mission is to empower developers to create stunning, interactive web applications with ease.",
-    mission: "Empowering developers to build the future of the web.",
-  }
+    title: t('aboutUsTitle') || "About Agrilo Platform",
+    description: t('aboutUsDescription') || "Agrilo is a revolutionary agricultural technology platform that combines artificial intelligence, data science, and precision farming to help farmers make smarter decisions. Our platform analyzes soil conditions, weather patterns, and market trends to provide personalized crop recommendations that maximize yield while promoting sustainable farming practices.",
+    mission: t('aboutUsMission') || "Empowering farmers worldwide with AI-driven agricultural insights for a sustainable future.",
+  };
 
   return (
     <section
@@ -201,7 +201,7 @@ export default function ScrollAnimation() {
       >
         <Iphone15Pro
           className="size-full"
-          videoSrc="https://videos.pexels.com/video-files/8946986/8946986-uhd_1440_2732_25fps.mp4"
+          videoSrc="/Video.mp4"
       />
       </div>
 
@@ -210,7 +210,7 @@ export default function ScrollAnimation() {
         ref={faqContainerRef}
         className="bg-gray-100 rounded-lg shadow-inner text-gray-800 max-h-[80vh] overflow-hidden"
       >
-        <h2 className="text-3xl font-bold mb-6 text-center">FAQs</h2>
+        <h2 className="text-3xl font-bold mb-6 text-center">{t('faqs') || 'FAQs'}</h2>
         <Accordion type="single" collapsible className="w-full">
           {faqs.map((faq, index) => (
             <AccordionItem key={index} value={`item-${index}`}>
@@ -226,7 +226,7 @@ export default function ScrollAnimation() {
         ref={featuresContainerRef}
         className="bg-purple-100 p-8 rounded-lg shadow-inner text-gray-800 max-h-[80vh] overflow-hidden"
       >
-        <h2 className="text-3xl font-bold mb-6 text-center">Key Features</h2>
+        <h2 className="text-3xl font-bold mb-6 text-center">{t('keyFeatures') || 'Key Features'}</h2>
         <ul className="space-y-4">
           {features.map((feature, index) => (
             <li key={index} className="flex items-center gap-3 text-lg">
@@ -247,7 +247,7 @@ export default function ScrollAnimation() {
           {aboutUsContent.title}
         </h2>
         <p className="text-lg mb-4 text-center">{aboutUsContent.description}</p>
-        <p className="text-md font-semibold text-center text-green-700">Mission: {aboutUsContent.mission}</p>
+        <p className="text-md font-semibold text-center text-green-700">{t('mission') || 'Mission'}: {aboutUsContent.mission}</p>
       </div>
 
 

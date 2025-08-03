@@ -1,534 +1,546 @@
 "use client"
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Droplets, Thermometer, MapPin, Sprout, Users, TrendingUp, AlertCircle, ChevronLeft, ChevronRight, Sun, Cloud, CheckCircle, Circle, Badge, Brain, Target } from "lucide-react"
-import { Progress } from "@/components/ui/progress"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { MapPin, Sprout, Users, TrendingUp, AlertCircle, Brain, Target, Map, Leaf, Clock, Calendar, Thermometer, Droplets, Zap } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
 import { useState, useEffect } from "react"
+import { useAuth } from "@/contexts/AuthContext"
+import { useLanguage } from "@/contexts/LanguageContext"
+import { apiService } from "@/lib/api"
+import { formatRecommendation } from "@/utils/formatRecommendation"
+import RecommendationDisplay from "@/components/RecommendationDisplay"
+
+interface Crop {
+  name: string;
+  status: "current" | "planned";
+}
+
+interface CropRecommendation {
+  crop_name: string;
+  confidence: number;
+  reasoning: string;
+  planting_season: string;
+  water_requirements: string;
+}
+
+interface CropRecommendationResponse {
+  status: string;
+  recommendation: string;
+  soil_summary: any;
+  weather_summary: any;
+}
+
+interface FertilizerRecommendationResponse {
+  status: string;
+  recommendation: string;
+  soil_summary: any;
+  weather_summary: any;
+  deficiency_notes: string[];
+  rotation_note: string;
+  growth_stage_note: string;
+}
 
 export default function HomePage() {
+  const { user } = useAuth()
+  const { t } = useLanguage()
+  const [cropRecommendation, setCropRecommendation] = useState<CropRecommendationResponse | null>(null)
+  const [fertilizerRecommendation, setFertilizerRecommendation] = useState<FertilizerRecommendationResponse | null>(null)
+  const [isLoadingRecommendations, setIsLoadingRecommendations] = useState(false)
+  const [isLoadingFertilizer, setIsLoadingFertilizer] = useState(false)
+  const [selectedCropForFertilizer, setSelectedCropForFertilizer] = useState<string>("")
+  const [locationData, setLocationData] = useState<{lat: number, lon: number} | null>(null)
+  const [currentMapView, setCurrentMapView] = useState<string>("satellite")
+  const [mapEmbedUrl, setMapEmbedUrl] = useState<string | null>(null)
+  const [isLoadingMap, setIsLoadingMap] = useState(false)
+  const [activeSection, setActiveSection] = useState<string>("overview") // overview, crops, fertilizer
 
-  const weekDays = [
-    { day: "Mon", date: 20, tasks: ["Soil check"], weather: "sunny" },
-    { day: "Tue", date: 21, tasks: ["Irrigate field A", "Check equipment"], weather: "cloudy" },
-    { day: "Wed", date: 22, tasks: ["Apply fertilizer"], weather: "rainy" },
-    { day: "Thu", date: 23, tasks: ["Pest inspection"], weather: "sunny" },
-    { day: "Fri", date: 24, tasks: ["Fertilize field B", "Water plants"], weather: "cloudy" },
-    { day: "Sat", date: 25, tasks: ["Market visit"], weather: "sunny" },
-    { day: "Sun", date: 26, tasks: ["Rest day", "Planning"], weather: "sunny" },
-  ]
-
-  const [userTasks, setUserTasks] = useState([
-    {
-      id: 1,
-      task: "Check water pump functionality",
-      time: "8:00 AM",
-      completed: true,
-      priority: "medium",
-      field: "Equipment",
-      isAI: false,
-    },
-    {
-      id: 2,
-      task: "Record daily observations",
-      time: "6:00 PM",
-      completed: false,
-      priority: "low",
-      field: "General",
-      isAI: false,
-    },
-  ])
-
-  // Generate AI recommendations based on mock crop data
-  const generateAITasks = () => {
-    const aiTasks = []
-    const currentDate = new Date()
-    const dayOfWeek = currentDate.getDay()
+  // Parse user's crops from the crops_grown array
+  const parseUserCrops = (): Crop[] => {
+    if (!user?.crops_grown) return []
     
-    // Mock crop data for UI demonstration
-    const mockCrops = [
-      { name: "Rice", stage: "Vegetative", icon: "🌾" },
-      { name: "Wheat", stage: "Flowering", icon: "🌾" },
-      { name: "Pulses", stage: "Germination", icon: "🫘" }
-    ]
-
-    // Generate tasks based on crop stages and current date
-    mockCrops.forEach((crop: any, index: number) => {
-      const baseTime = 6 + (index * 2) // Spread tasks throughout the day
-      const time = `${baseTime}:00 ${baseTime < 12 ? 'AM' : 'PM'}`
-      
-      switch (crop.stage) {
-        case "Germination":
-          aiTasks.push({
-            id: `ai-${index}-1`,
-            task: `Check soil moisture for ${crop.name} germination`,
-            time: time,
-            completed: false,
-            priority: "high",
-            field: `${crop.name} Field`,
-            isAI: true,
-            reason: "Critical for successful germination"
-          })
-          break
-        case "Vegetative":
-          aiTasks.push({
-            id: `ai-${index}-1`,
-            task: `Apply nitrogen fertilizer to ${crop.name}`,
-            time: time,
-            completed: false,
-            priority: "high",
-            field: `${crop.name} Field`,
-            isAI: true,
-            reason: "Vegetative stage requires high nitrogen"
-          })
-          break
-        case "Flowering":
-          aiTasks.push({
-            id: `ai-${index}-1`,
-            task: `Monitor ${crop.name} for pest activity`,
-            time: time,
-            completed: false,
-            priority: "high",
-            field: `${crop.name} Field`,
-            isAI: true,
-            reason: "Flowering stage is vulnerable to pests"
-          })
-          break
-        case "Ripening":
-          aiTasks.push({
-            id: `ai-${index}-1`,
-            task: `Reduce irrigation for ${crop.name} ripening`,
-            time: time,
-      completed: false, 
-      priority: "medium", 
-            field: `${crop.name} Field`,
-            isAI: true,
-            reason: "Ripening stage needs controlled water"
-          })
-          break
-        case "Harvest":
-          aiTasks.push({
-            id: `ai-${index}-1`,
-            task: `Prepare harvesting equipment for ${crop.name}`,
-            time: time,
-      completed: false,
-      priority: "high",
-            field: `${crop.name} Field`,
-            isAI: true,
-            reason: "Harvest preparation is critical"
-          })
-          break
-        default:
-          aiTasks.push({
-            id: `ai-${index}-1`,
-            task: `Monitor ${crop.name} growth progress`,
-            time: time,
-            completed: false,
-            priority: "medium",
-            field: `${crop.name} Field`,
-            isAI: true,
-            reason: "Regular monitoring ensures optimal growth"
-          })
+    try {
+      // If it's already an array, parse each crop string
+      if (Array.isArray(user.crops_grown)) {
+        return user.crops_grown.map(cropStr => {
+          const [name, status] = cropStr.split(':')
+          return {
+            name: name || cropStr,
+            status: (status as "current" | "planned") || "current"
+          }
+        })
       }
-    })
-
-    // Add weather-based tasks
-    if (dayOfWeek === 1 || dayOfWeek === 4) { // Monday or Thursday
-      aiTasks.push({
-        id: "ai-weather-1",
-        task: "Check weather forecast for irrigation planning",
-        time: "7:00 AM",
-        completed: false,
-        priority: "medium",
-        field: "All Fields",
-        isAI: true,
-        reason: "Weather affects irrigation decisions"
-      })
-    }
-
-    // Add soil health tasks
-    if (dayOfWeek === 2) { // Tuesday
-      aiTasks.push({
-        id: "ai-soil-1",
-        task: "Test soil pH levels",
-        time: "9:00 AM",
-        completed: false,
-        priority: "medium",
-        field: "All Fields",
-        isAI: true,
-        reason: "Weekly soil monitoring maintains health"
-      })
-    }
-
-    return aiTasks
-  }
-
-  const [aiTasks, setAiTasks] = useState(generateAITasks())
-  const [showAddTask, setShowAddTask] = useState(false)
-  const [newTask, setNewTask] = useState({
-    task: "",
-    time: "",
-    priority: "medium",
-    field: "General"
-  })
-
-  const getWeatherIcon = (weather: string) => {
-    switch (weather) {
-      case "sunny":
-        return <Sun className="h-4 w-4 text-green-500" />
-      case "cloudy":
-        return <Cloud className="h-4 w-4 text-green-500" />
-      case "rainy":
-        return <Droplets className="h-4 w-4 text-green-500" />
-      default:
-        return <Sun className="h-4 w-4 text-green-500" />
+      
+      // If it's a string, try to parse it as JSON
+      const crops = JSON.parse(user.crops_grown)
+      if (Array.isArray(crops)) {
+        return crops.map(crop => {
+          if (typeof crop === 'string') {
+            const [name, status] = crop.split(':')
+            return {
+              name: name || crop,
+              status: (status as "current" | "planned") || "current"
+            }
+          }
+          return {
+            name: crop.name || crop,
+            status: crop.status || "current"
+          }
+        })
+      }
+      
+      return []
+    } catch (error) {
+      console.error('Error parsing user crops:', error)
+      return []
     }
   }
+
+  const userCrops = parseUserCrops()
   
-  const toggleTask = (taskId: number) => {
-    console.log(`Toggle task ${taskId}`)
+  // Separate current and planned crops
+  const currentCrops = userCrops.filter(crop => crop.status === "current")
+  const plannedCrops = userCrops.filter(crop => crop.status === "planned")
+
+  // Parse location coordinates
+  const parseLocation = () => {
+    if (!user?.location) return null
+    
+    try {
+      // Try to parse as coordinates
+      const coords = user.location.split(',').map(coord => parseFloat(coord.trim()))
+      if (coords.length === 2 && !isNaN(coords[0]) && !isNaN(coords[1])) {
+        return { lat: coords[0], lon: coords[1] }
+      }
+      return null
+    } catch (error) {
+      console.error('Error parsing location:', error)
+      return null
+    }
   }
 
-  const [selectedDay, setSelectedDay] = useState(2) // Tuesday selected
-  const [showWeeklyPlan, setShowWeeklyPlan] = useState(false)
-  const [aiRecommendations, setAiRecommendations] = useState<any[]>([])
+  // Get crop recommendations from backend
+  const getCropRecommendations = async () => {
+    if (!locationData) return
+    
+    setIsLoadingRecommendations(true)
+    try {
+      const result = await apiService.recommendCrops(
+        locationData.lat,
+        locationData.lon
+      )
+      setCropRecommendation(result)
+    } catch (error) {
+      console.error('Error getting crop recommendations:', error)
+    } finally {
+      setIsLoadingRecommendations(false)
+    }
+  }
 
-  // Mock AI recommendations for UI demonstration
+  // Get fertilizer recommendations from backend
+  const getFertilizerRecommendations = async (cropName: string) => {
+    if (!locationData) return
+    
+    setIsLoadingFertilizer(true)
+    try {
+      const result = await apiService.recommendFertilizer(
+        locationData.lat,
+        locationData.lon,
+        cropName
+      )
+      setFertilizerRecommendation(result)
+      setSelectedCropForFertilizer(cropName)
+    } catch (error) {
+      console.error('Error getting fertilizer recommendations:', error)
+    } finally {
+      setIsLoadingFertilizer(false)
+    }
+  }
+
+
+
   useEffect(() => {
-    const mockRecommendations = [
-      { name: "Rice", stage: "Vegetative", icon: "🌾" },
-      { name: "Wheat", stage: "Flowering", icon: "🌾" },
-      { name: "Pulses", stage: "Germination", icon: "🫘" }
-    ]
-    setAiRecommendations(mockRecommendations)
+    const location = parseLocation()
+    if (location) {
+      setLocationData(location)
+    }
+  }, [user])
+
+  // Fetch detailed map view when location or view type changes
+  useEffect(() => {
+    const fetchDetailedMapView = async () => {
+      if (!locationData) return
+      
+      setIsLoadingMap(true)
+      try {
+        const response = await apiService.getDetailedMapView(
+          locationData.lat,
+          locationData.lon,
+          currentMapView
+        )
+        setMapEmbedUrl(response.embed_url)
+      } catch (error) {
+        console.error('Error fetching detailed map view:', error)
+        // Fallback to basic satellite view
+        try {
+          const fallbackResponse = await apiService.getDetailedMapView(
+            locationData.lat,
+            locationData.lon,
+            "satellite"
+          )
+          setMapEmbedUrl(fallbackResponse.embed_url)
+        } catch (fallbackError) {
+          console.error('Fallback map view also failed:', fallbackError)
+        }
+      } finally {
+        setIsLoadingMap(false)
+      }
+    }
+    
+    fetchDetailedMapView()
+  }, [locationData, currentMapView])
+
+  // Debug: Log user data when it changes
+  useEffect(() => {
+    console.log('🏠 Home page - User data updated:', user)
+    console.log('🌾 Crops data:', user?.crops_grown)
+  }, [user])
+
+  // Listen for section navigation from sidebar
+  useEffect(() => {
+    const handleSectionNavigation = (event: CustomEvent) => {
+      if (event.detail?.section) {
+        setActiveSection(event.detail.section);
+      }
+    }
+
+    window.addEventListener('navigateToSection', handleSectionNavigation as EventListener);
+    
+    return () => {
+      window.removeEventListener('navigateToSection', handleSectionNavigation as EventListener);
+    }
   }, [])
-  return (
-    <div className="p-4 space-y-6">
+
+
+
+  const getCropStatusColor = (status: string) => {
+    return status === "current" ? "bg-green-100 text-green-800" : "bg-blue-100 text-blue-800"
+  }
+
+  const getCropStatusText = (status: string) => {
+    return status === "current" ? t("currentlyGrowing") : t("planningToGrow")
+  }
+
+  const renderOverview = () => (
+    <div className="space-y-6 p-6">
       {/* Welcome Section */}
-      <div
-        className="relative rounded-3xl p-4 md:p-6 text-white overflow-hidden"
-        style={{
-          backgroundImage: "url('/img-2.jpg')",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
-      >
-        <div className="absolute inset-0 bg-gradient-to-r from-black/15 to-black/50 z-0" />
-        <div className="relative flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 z-10">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+      <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-xl p-6 text-white">
+        <div className="flex items-center gap-3 mb-2">
               <Users className="h-6 w-6" />
+          <h1 className="text-2xl font-bold">{t("welcomeBack")}, {user?.name || t("farmer")}!</h1>
             </div>
-            <div>
-              <h2 className="text-lg md:text-xl lg:text-2xl font-bold">Welcome back, Farmer! 👋</h2>
-              <p className="text-green-100 text-sm md:text-base">Your virtual farmland awaits</p>
-            </div>
+        <p className="text-green-100">{t("yourVirtualFarmland")}</p>
+        {locationData && (
+          <div className="flex items-center gap-2 mt-3 text-green-100">
+            <MapPin className="h-4 w-4" />
+            <span className="text-sm">
+              {locationData.lat.toFixed(4)}, {locationData.lon.toFixed(4)}
+            </span>
           </div>
-          <div className="hidden lg:block text-right">
-            <p className="text-green-100 text-sm">Last updated</p>
-            <p className="text-white font-semibold">Today, 10:30 AM</p>
-          </div>
-        </div>
+        )}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-1 gap-4 md:gap-6">
-        {/* AI Recommendation Overview */}
-        <Card className="rounded-2xl border-2 border-green-100 shadow-lg">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-green-700 flex items-center gap-2 text-base md:text-lg">
-              <Brain className="h-5 w-5" />
-              AI Recommendation Overview
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                 {/* Farmer's Crops Section */}
+         <Card>
+           <CardHeader>
+             <CardTitle className="flex items-center gap-2">
+               <Sprout className="h-5 w-5 text-green-600" />
+               {t("yourCrops")}
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
-            {aiRecommendations.length > 0 ? (
+           <CardContent>
+             <Tabs defaultValue="current" className="w-full">
+               <TabsList className="grid w-full grid-cols-2">
+                 <TabsTrigger value="current" className="flex items-center gap-2">
+                   <Leaf className="h-4 w-4" />
+                   {t("currentlyGrowing")} ({currentCrops.length})
+                 </TabsTrigger>
+                 <TabsTrigger value="planned" className="flex items-center gap-2">
+                   <Calendar className="h-4 w-4" />
+                   {t("planningToGrow")} ({plannedCrops.length})
+                 </TabsTrigger>
+               </TabsList>
+               
+               <TabsContent value="current" className="mt-4">
+                 {currentCrops.length > 0 ? (
               <div className="space-y-3">
-                {aiRecommendations.map((rec, index) => (
-                  <div key={index} className="flex items-center gap-3 p-3 bg-green-50 rounded-xl">
-                    <div className="text-2xl">{rec.icon}</div>
-                    <div className="flex-1">
-                      <p className="font-medium text-green-800">{rec.name}</p>
-                      <p className="text-sm text-green-600">Stage: {rec.stage}</p>
-                    </div>
-                    <Badge className="bg-green-100 text-green-700 border-green-200">
-                      AI Recommended
+                     {currentCrops.map((crop, index) => (
+                       <div key={index} className="flex items-center justify-between p-3 bg-green-50 rounded-lg border border-green-200">
+                         <div className="flex items-center gap-3">
+                           <Leaf className="h-5 w-5 text-green-600" />
+                           <div>
+                             <p className="font-medium text-gray-900">{crop.name}</p>
+                             <Badge className="bg-green-100 text-green-800">
+                               {t("currentlyGrowing")}
                     </Badge>
+                           </div>
+                         </div>
                   </div>
                 ))}
               </div>
             ) : (
-            <div className="grid grid-cols-2 gap-3 md:gap-4">
-              <div className="bg-green-50 p-3 md:p-4 rounded-xl">
-                  <p className="text-xs md:text-sm text-green-600 font-medium">Soil Type</p>
-                  <p className="text-green-800 font-bold text-sm md:text-lg">Clay Loam</p>
-                  <p className="text-xs text-green-600 mt-1">pH: 6.8 (Good)</p>
+                   <div className="text-center py-8 text-gray-500">
+                     <Sprout className="h-12 w-12 mx-auto mb-3 text-gray-300" />
+                     <p>{t("noCurrentCrops")}</p>
+                     <p className="text-sm mt-1">{t("addCurrentCropsToGetStarted")}</p>
               </div>
-              <div className="bg-green-50 p-3 md:p-4 rounded-xl">
-                  <p className="text-xs md:text-sm text-green-600 font-medium">Land Area</p>
-                  <p className="text-green-800 font-bold text-sm md:text-lg">2.5 hectares</p>
-                  <p className="text-xs text-green-600 mt-1">6.2 acres</p>
+                 )}
+               </TabsContent>
+               
+               <TabsContent value="planned" className="mt-4">
+                 {plannedCrops.length > 0 ? (
+                   <div className="space-y-3">
+                     {plannedCrops.map((crop, index) => (
+                       <div key={index} className="flex items-center justify-between p-3 bg-blue-50 rounded-lg border border-blue-200">
+                         <div className="flex items-center gap-3">
+                           <Calendar className="h-5 w-5 text-blue-600" />
+                           <div>
+                             <p className="font-medium text-gray-900">{crop.name}</p>
+                             <Badge className="bg-blue-100 text-blue-800">
+                               {t("planningToGrow")}
+                             </Badge>
               </div>
-              <div className="bg-green-50 p-3 md:p-4 rounded-xl">
-                  <p className="text-xs md:text-sm text-green-600 font-medium">Crop Type</p>
-                  <p className="text-green-800 font-bold text-sm md:text-lg">Rice & Wheat</p>
-                  <p className="text-xs text-green-600 mt-1">Rotation cycle</p>
-              </div>
-              <div className="bg-green-50 p-3 md:p-4 rounded-xl">
-                  <p className="text-xs md:text-sm text-green-600 font-medium">Water Access</p>
-                  <p className="text-green-800 font-bold text-sm md:text-lg">Tube Well</p>
-                  <p className="text-xs text-green-600 mt-1">150ft depth</p>
                 </div>
+                       </div>
+                     ))}
+                   </div>
+                 ) : (
+                   <div className="text-center py-8 text-gray-500">
+                     <Calendar className="h-12 w-12 mx-auto mb-3 text-gray-300" />
+                     <p>{t("noPlannedCrops")}</p>
+                     <p className="text-sm mt-1">{t("addPlannedCropsToGetStarted")}</p>
               </div>
             )}
+               </TabsContent>
+             </Tabs>
           </CardContent>
         </Card>
-      </div>
 
-      <div className="lg:col-span-2 space-y-6">
-          {/* Today's Tasks */}
-          <Card className="rounded-2xl border-2 border-green-100 shadow-lg">
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="text-green-700 flex items-center gap-2">
-                <Target className="h-5 w-5" />
-                Today's Tasks - {new Date().toLocaleDateString('en-US', { weekday: 'long' })}
+                                   {/* Detailed Location Map Section */}
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center gap-2">
+                  <Map className="h-5 w-5 text-green-600" />
+                  {t("yourLocation")} - Detailed View
               </CardTitle>
+                                                   <div className="flex gap-2">
+                    <Button
+                      variant={currentMapView === "satellite" ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setCurrentMapView("satellite")}
+                      className="text-xs"
+                    >
+                      🛰️ Satellite
+                    </Button>
               <Button
-                variant="outline"
-                onClick={() => setShowAddTask(!showAddTask)}
-                className="rounded-xl bg-transparent border-green-200 text-green-600 hover:bg-green-50"
-              >
-                + Add Task
+                      variant={currentMapView === "roadmap" ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setCurrentMapView("roadmap")}
+                      className="text-xs"
+                    >
+                      🗺️ Roadmap
               </Button>
+                  </div>
+              </div>
             </CardHeader>
-            <CardContent className="space-y-3">
-              {/* AI Tasks */}
-              {aiTasks.map((task: any) => (
-                <div
-                  key={task.id}
-                  className="flex items-start gap-4 p-4 bg-blue-50 rounded-xl hover:bg-blue-100 transition-colors border-l-4 border-blue-400"
-                >
-                  <Button variant="ghost" size="sm" onClick={() => toggleTask(task.id)} className="p-0 h-auto">
-                    {task.completed ? (
-                      <CheckCircle className="h-6 w-6 text-green-500" />
-                    ) : (
-                      <Circle className="h-6 w-6 text-green-400" />
-                    )}
-                  </Button>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <p className={`font-medium ${task.completed ? "line-through text-green-500" : "text-green-800"}`}>
-                        {task.task}
-                      </p>
-                      <Badge className="text-xs bg-blue-100 text-blue-700 border-blue-200">
-                        <Brain className="h-3 w-3 mr-1" />
-                        AI
-                      </Badge>
-                    </div>
-                    <div className="flex items-center gap-3 mt-2">
-                      <span className="text-sm text-green-600">{task.time}</span>
-                      <Badge className="text-xs border-green-200 text-green-600">
-                        {task.field}
-                      </Badge>
-                      <Badge
-                        className={`text-xs ${
-                          task.priority === "high"
-                            ? "border-green-300 text-green-700 bg-green-50"
-                            : task.priority === "medium"
-                              ? "border-green-200 text-green-600"
-                              : "border-green-200 text-green-600"
-                        }`}
-                      >
-                        {task.priority}
-                      </Badge>
-                    </div>
-                    {task.reason && (
-                      <p className="text-xs text-blue-600 mt-1 italic">💡 {task.reason}</p>
-                    )}
-                  </div>
-                </div>
-              ))}
-
-              {/* User Tasks */}
-              {userTasks.map((task: any) => (
-                <div
-                  key={task.id}
-                  className="flex items-start gap-4 p-4 bg-green-50 rounded-xl hover:bg-green-100 transition-colors"
-                >
-                  <Button variant="ghost" size="sm" onClick={() => toggleTask(task.id)} className="p-0 h-auto">
-                    {task.completed ? (
-                      <CheckCircle className="h-6 w-6 text-green-500" />
-                    ) : (
-                      <Circle className="h-6 w-6 text-green-400" />
-                    )}
-                  </Button>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <p className={`font-medium ${task.completed ? "line-through text-green-500" : "text-green-800"}`}>
-                        {task.task}
-                      </p>
-                      <Badge className="text-xs bg-green-100 text-green-700 border-green-200">
-                        Manual
-                        </Badge>
-                    </div>
-                    <div className="flex items-center gap-3 mt-2">
-                      <span className="text-sm text-green-600">{task.time}</span>
-                      <Badge className="text-xs border-green-200 text-green-600">
-                        {task.field}
-                      </Badge>
-                      <Badge
-                        className={`text-xs ${
-                          task.priority === "high"
-                            ? "border-green-300 text-green-700 bg-green-50"
-                            : task.priority === "medium"
-                              ? "border-green-200 text-green-600"
-                              : "border-green-200 text-green-600"
-                        }`}
-                      >
-                        {task.priority}
-                      </Badge>
-                    </div>
-                  </div>
-                </div>
-              ))}
-
-              {/* Add Task Form */}
-              {showAddTask && (
-                <div className="p-4 bg-yellow-50 rounded-xl border border-yellow-200">
-                  <div className="space-y-3">
-                    <input
-                      type="text"
-                      placeholder="Enter task description"
-                      value={newTask.task}
-                      onChange={(e) => setNewTask({...newTask, task: e.target.value})}
-                      className="w-full p-2 border border-yellow-300 rounded-lg"
-                    />
-                    <div className="grid grid-cols-2 gap-2">
-                      <input
-                        type="time"
-                        value={newTask.time}
-                        onChange={(e) => setNewTask({...newTask, time: e.target.value})}
-                        className="p-2 border border-yellow-300 rounded-lg"
+            <CardContent>
+              {locationData ? (
+                <div className="space-y-4">
+                  <div className="bg-gray-100 rounded-lg p-4 h-80 flex items-center justify-center relative overflow-hidden">
+                    {mapEmbedUrl && !isLoadingMap ? (
+                      <iframe
+                        src={mapEmbedUrl}
+                        width="100%"
+                        height="100%"
+                        style={{ border: 0 }}
+                        title="Detailed Farm Location"
+                        className="rounded-lg"
+                        allowFullScreen
+                        loading="lazy"
+                        referrerPolicy="no-referrer-when-downgrade"
                       />
-                      <select
-                        value={newTask.priority}
-                        onChange={(e) => setNewTask({...newTask, priority: e.target.value})}
-                        className="p-2 border border-yellow-300 rounded-lg"
-                      >
-                        <option value="low">Low Priority</option>
-                        <option value="medium">Medium Priority</option>
-                        <option value="high">High Priority</option>
-                      </select>
+                    ) : (
+                      <div className="flex items-center justify-center h-full">
+                        <div className="text-center">
+                          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-500 mx-auto mb-2"></div>
+                          <p className="text-gray-600">
+                            {isLoadingMap ? "Loading detailed view..." : "Loading map..."}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                    <div className="absolute top-2 left-2 bg-white px-3 py-1 rounded-lg shadow-md text-sm font-medium text-gray-700">
+                      📍 {locationData.lat.toFixed(6)}, {locationData.lon.toFixed(6)}
                     </div>
-                    <div className="flex gap-2">
-                      <Button
-                        onClick={() => {
-                          if (newTask.task && newTask.time) {
-                            setUserTasks([...userTasks, {
-                              id: Date.now(),
-                              ...newTask,
-                              completed: false,
-                              isAI: false
-                            }])
-                            setNewTask({task: "", time: "", priority: "medium", field: "General"})
-                            setShowAddTask(false)
-                          }
-                        }}
-                        className="bg-green-500 hover:bg-green-600 text-white"
-                      >
-                        Add Task
-                      </Button>
-                      <Button
-                        variant="outline"
-                        onClick={() => setShowAddTask(false)}
-                        className="border-yellow-300 text-yellow-700"
-                      >
-                        Cancel
-                      </Button>
+                                         <div className="absolute top-2 right-2 bg-white px-3 py-1 rounded-lg shadow-md text-sm font-medium text-gray-700">
+                       {currentMapView === "satellite" && "🛰️ Satellite View"}
+                       {currentMapView === "roadmap" && "🗺️ Roadmap View"}
                     </div>
                   </div>
+                  <div className="text-center space-y-2">
+                    <p className="text-sm text-gray-600">
+                      <strong>High-Detail Farm View:</strong> Explore your farm location with maximum detail.
+                    </p>
+                                         <div className="flex justify-center gap-4 text-xs text-gray-500">
+                       <span>🛰️ <strong>Satellite:</strong> Aerial imagery</span>
+                       <span>🗺️ <strong>Roadmap:</strong> Standard map view</span>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center py-8 text-gray-500">
+                  <MapPin className="h-12 w-12 mx-auto mb-3 text-gray-300" />
+                  <p>{t("locationNotSet")}</p>
+                  <p className="text-sm mt-1">{t("updateLocationInSettings")}</p>
                 </div>
               )}
             </CardContent>
           </Card>
       </div>
 
-
-     
-
-      {/* Stats Overview - Mobile: 2 cols, Desktop: 4 cols */}
-      {/* Calendar and Tasks */}
-     
-      {/* Quick Actions - Mobile: 2 cols, Desktop: 4 cols */}
-      {/* <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
-        <Card className="rounded-2xl border-2 border-green-100 shadow-lg cursor-pointer hover:shadow-xl transition-all hover:scale-105">
-          <CardContent className="p-4 md:p-6 text-center">
-            <div className="w-12 h-12 md:w-16 md:h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2 md:mb-3">
-              <span className="text-2xl md:text-3xl">🔍</span>
+                    {/* AI Recommendations Section */}
+       <div className="space-y-6">
+         {/* Crop Recommendations */}
+         <Card id="crop-section">
+           <CardHeader>
+             <div className="flex items-center justify-between">
+               <CardTitle className="flex items-center gap-2">
+                 <Brain className="h-5 w-5 text-green-600" />
+                 {t("aiCropRecommendations")}
+               </CardTitle>
+               <Button
+                 onClick={getCropRecommendations}
+                 disabled={!locationData || isLoadingRecommendations}
+                 className="bg-green-600 hover:bg-green-700"
+               >
+                 {isLoadingRecommendations ? (
+                   <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                 ) : (
+                   <Target className="h-4 w-4 mr-2" />
+                 )}
+                 {t("getRecommendations")}
+               </Button>
+             </div>
+           </CardHeader>
+           <CardContent>
+             {cropRecommendation ? (
+               <RecommendationDisplay
+                 recommendation={formatRecommendation(cropRecommendation.recommendation, 'crop')}
+                 soilSummary={cropRecommendation.soil_summary}
+                 weatherSummary={cropRecommendation.weather_summary}
+                 type="crop"
+               />
+             ) : (
+               <div className="text-center py-8 text-gray-500">
+                 <Brain className="h-12 w-12 mx-auto mb-3 text-gray-300" />
+                 <p>{t("noRecommendationsYet")}</p>
+                 <p className="text-sm mt-1">{t("clickGetRecommendations")}</p>
             </div>
-            <p className="font-semibold text-green-700 text-sm md:text-lg">Crop Diagnosis</p>
-            <p className="text-xs md:text-sm text-green-600 mt-1">AI-powered health check</p>
+             )}
           </CardContent>
         </Card>
 
-        <Card className="rounded-2xl border-2 border-green-100 shadow-lg cursor-pointer hover:shadow-xl transition-all hover:scale-105">
-          <CardContent className="p-4 md:p-6 text-center">
-            <div className="w-12 h-12 md:w-16 md:h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2 md:mb-3">
-              <span className="text-2xl md:text-3xl">💬</span>
+         {/* Fertilizer Recommendations */}
+         <Card id="fertilizer-section">
+           <CardHeader>
+             <div className="flex items-center justify-between">
+               <CardTitle className="flex items-center gap-2">
+                 <Zap className="h-5 w-5 text-blue-600" />
+                 Fertilizer Recommendations
+               </CardTitle>
+               <div className="flex gap-2">
+                 <input
+                   type="text"
+                   placeholder="Enter crop name (e.g., maize, wheat, rice)"
+                   value={selectedCropForFertilizer}
+                   onChange={(e) => setSelectedCropForFertilizer(e.target.value)}
+                   className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-64"
+                 />
+                 <Button
+                   onClick={() => getFertilizerRecommendations(selectedCropForFertilizer)}
+                   disabled={!selectedCropForFertilizer.trim() || isLoadingFertilizer}
+                   className="bg-blue-600 hover:bg-blue-700"
+                 >
+                   {isLoadingFertilizer ? (
+                     <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                   ) : (
+                     <Zap className="h-4 w-4 mr-2" />
+                   )}
+                   Get Fertilizer Plan
+                 </Button>
+               </div>
             </div>
-            <p className="font-semibold text-green-700 text-sm md:text-lg">Ask AI Expert</p>
-            <p className="text-xs md:text-sm text-green-600 mt-1">Get instant farming advice</p>
+           </CardHeader>
+           <CardContent>
+             {fertilizerRecommendation ? (
+               <RecommendationDisplay
+                 recommendation={formatRecommendation(fertilizerRecommendation.recommendation, 'fertilizer')}
+                 soilSummary={fertilizerRecommendation.soil_summary}
+                 weatherSummary={fertilizerRecommendation.weather_summary}
+                 type="fertilizer"
+               />
+             ) : (
+               <div className="text-center py-8 text-gray-500">
+                 <Zap className="h-12 w-12 mx-auto mb-3 text-gray-300" />
+                 <p>Enter a crop name and click "Get Fertilizer Plan" to get recommendations</p>
+                 <p className="text-sm mt-1">Examples: maize, wheat, rice, beans, tomatoes</p>
+            </div>
+             )}
           </CardContent>
         </Card>
-
-        <Card className="rounded-2xl border-2 border-green-100 shadow-lg cursor-pointer hover:shadow-xl transition-all hover:scale-105">
-          <CardContent className="p-4 md:p-6 text-center">
-            <div className="w-12 h-12 md:w-16 md:h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2 md:mb-3">
-              <span className="text-2xl md:text-3xl">📅</span>
             </div>
-            <p className="font-semibold text-green-700 text-sm md:text-lg">Farm Calendar</p>
-            <p className="text-xs md:text-sm text-green-600 mt-1">Weekly task planning</p>
-          </CardContent>
-        </Card>
 
-        <Card className="rounded-2xl border-2 border-green-100 shadow-lg cursor-pointer hover:shadow-xl transition-all hover:scale-105">
-          <CardContent className="p-4 md:p-6 text-center">
-            <div className="w-12 h-12 md:w-16 md:h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2 md:mb-3">
-              <span className="text-2xl md:text-3xl">📊</span>
-            </div>
-            <p className="font-semibold text-green-700 text-sm md:text-lg">Analytics</p>
-            <p className="text-xs md:text-sm text-green-600 mt-1">Farm performance insights</p>
-          </CardContent>
-        </Card>
-      </div> */}
-
-      {/* Recent Activity */}
-      <Card className="rounded-2xl border-2 border-green-100 shadow-lg">
+      {/* Farmer Information */}
+      <Card>
         <CardHeader>
-          <CardTitle className="text-green-700 flex items-center gap-2 text-base md:text-lg">
-            📈 Recent Activity
+          <CardTitle className="flex items-center gap-2">
+            <Users className="h-5 w-5 text-green-600" />
+            {t("farmerInformation")}
           </CardTitle>
         </CardHeader>
         <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-3">
-            <div className="flex items-center gap-3 p-3 bg-green-50 rounded-xl">
-              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-              <div className="flex-1">
-                <p className="text-sm font-medium text-green-800">Irrigation completed for Field A</p>
-                <p className="text-xs text-green-600">2 hours ago</p>
+              <div>
+                <label className="text-sm font-medium text-gray-600">{t("name")}</label>
+                <p className="text-gray-900">{user?.name || t("notProvided")}</p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-600">{t("experience")}</label>
+                <p className="text-gray-900">
+                  {user?.years_experience ? `${user.years_experience} ${t("years")}` : t("notProvided")}
+                </p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-600">{t("userType")}</label>
+                <p className="text-gray-900">{user?.user_type || t("notProvided")}</p>
               </div>
             </div>
-            <div className="flex items-center gap-3 p-3 bg-green-50 rounded-xl">
-              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-              <div className="flex-1">
-                <p className="text-sm font-medium text-green-800">Fertilizer application scheduled</p>
-                <p className="text-xs text-green-600">Tomorrow, 6:00 AM</p>
+            <div className="space-y-3">
+              <div>
+                <label className="text-sm font-medium text-gray-600">{t("mainGoal")}</label>
+                <p className="text-gray-900">{user?.main_goal || t("notProvided")}</p>
               </div>
+              <div>
+                <label className="text-sm font-medium text-gray-600">{t("preferredLanguage")}</label>
+                <p className="text-gray-900">{user?.preferred_language || t("notProvided")}</p>
             </div>
-            <div className="flex items-center gap-3 p-3 bg-green-50 rounded-xl">
-              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-              <div className="flex-1">
-                <p className="text-sm font-medium text-green-800">Crop health scan completed</p>
-                <p className="text-xs text-green-600">Yesterday, 4:30 PM</p>
+              <div>
+                <label className="text-sm font-medium text-gray-600">{t("location")}</label>
+                <p className="text-gray-900">{user?.location || t("notProvided")}</p>
               </div>
             </div>
           </div>
@@ -536,4 +548,110 @@ export default function HomePage() {
       </Card>
     </div>
   )
+
+  const renderCropsSection = () => (
+    <div className="space-y-6 p-6">
+      {/* Crop Recommendations Only */}
+      <Card id="crop-section">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center gap-2">
+              <Brain className="h-5 w-5 text-green-600" />
+              {t("aiCropRecommendations")}
+            </CardTitle>
+            <Button
+              onClick={getCropRecommendations}
+              disabled={!locationData || isLoadingRecommendations}
+              className="bg-green-600 hover:bg-green-700"
+            >
+              {isLoadingRecommendations ? (
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+              ) : (
+                <Target className="h-4 w-4 mr-2" />
+              )}
+              {t("getRecommendations")}
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {cropRecommendation ? (
+            <RecommendationDisplay
+              recommendation={formatRecommendation(cropRecommendation.recommendation, 'crop')}
+              soilSummary={cropRecommendation.soil_summary}
+              weatherSummary={cropRecommendation.weather_summary}
+              type="crop"
+            />
+          ) : (
+            <div className="text-center py-8 text-gray-500">
+              <Brain className="h-12 w-12 mx-auto mb-3 text-gray-300" />
+              <p>{t("noRecommendationsYet")}</p>
+              <p className="text-sm mt-1">{t("clickGetRecommendations")}</p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  )
+
+  const renderFertilizerSection = () => (
+    <div className="space-y-6 p-6">
+      {/* Fertilizer Recommendations Only */}
+      <Card id="fertilizer-section">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center gap-2">
+              <Zap className="h-5 w-5 text-blue-600" />
+              Fertilizer Recommendations
+            </CardTitle>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                placeholder="Enter crop name (e.g., maize, wheat, rice)"
+                value={selectedCropForFertilizer}
+                onChange={(e) => setSelectedCropForFertilizer(e.target.value)}
+                className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-64"
+              />
+              <Button
+                onClick={() => getFertilizerRecommendations(selectedCropForFertilizer)}
+                disabled={!selectedCropForFertilizer.trim() || isLoadingFertilizer}
+                className="bg-blue-600 hover:bg-blue-700"
+              >
+                {isLoadingFertilizer ? (
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                ) : (
+                  <Zap className="h-4 w-4 mr-2" />
+                )}
+                Get Fertilizer Plan
+              </Button>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {fertilizerRecommendation ? (
+            <RecommendationDisplay
+              recommendation={formatRecommendation(fertilizerRecommendation.recommendation, 'fertilizer')}
+              soilSummary={fertilizerRecommendation.soil_summary}
+              weatherSummary={fertilizerRecommendation.weather_summary}
+              type="fertilizer"
+            />
+          ) : (
+            <div className="text-center py-8 text-gray-500">
+              <Zap className="h-12 w-12 mx-auto mb-3 text-gray-300" />
+              <p>Enter a crop name and click "Get Fertilizer Plan" to get recommendations</p>
+              <p className="text-sm mt-1">Examples: maize, wheat, rice, beans, tomatoes</p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  )
+
+  // Return based on active section
+  if (activeSection === "crops") {
+    return renderCropsSection()
+  } else if (activeSection === "fertilizer") {
+    return renderFertilizerSection()
+  } else {
+    return renderOverview()
+  }
 }

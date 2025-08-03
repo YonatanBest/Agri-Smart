@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono , Outfit } from "next/font/google";
 import "./globals.css";
+import { AuthProvider } from "@/contexts/AuthContext";
+import { LanguageProvider } from "@/contexts/LanguageContext";
+import { DiagnosisProvider } from "@/contexts/DiagnosisContext";
 
 const outfit = Outfit({
   variable: "--font-geist-sans",
@@ -19,9 +22,16 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        // className={`${outfit.variable} antialiased`}
+        className={`${outfit.variable} antialiased`}
+        suppressHydrationWarning={true}
       >
-        {children}
+        <AuthProvider>
+          <LanguageProvider>
+            <DiagnosisProvider>
+              {children}
+            </DiagnosisProvider>
+          </LanguageProvider>
+        </AuthProvider>
       </body>
     </html>
   );

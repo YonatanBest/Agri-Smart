@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 import os
 
 
-key_path = os.path.join(os.path.dirname(__file__), '..', 'gcp_key.json')
+key_path = os.path.join(os.path.dirname(__file__), '../../', 'gcp_key.json')
 key_path = os.path.abspath(key_path)
 load_dotenv()
 

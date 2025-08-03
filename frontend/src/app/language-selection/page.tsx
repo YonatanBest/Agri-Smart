@@ -10,20 +10,11 @@ import { useRouter } from "next/navigation"
 
 const languages = [
   { code: "en", name: "English", flag: "🇺🇸", nativeName: "English" },
-  { code: "hi", name: "Hindi", flag: "🇮🇳", nativeName: "हिंदी" },
-  { code: "pa", name: "Punjabi", flag: "🇮🇳", nativeName: "ਪੰਜਾਬੀ" },
-  { code: "bn", name: "Bengali", flag: "🇮🇳", nativeName: "বাংলা" },
-  { code: "te", name: "Telugu", flag: "🇮🇳", nativeName: "తెలుగు" },
-  { code: "ta", name: "Tamil", flag: "🇮🇳", nativeName: "தமிழ்" },
-  { code: "mr", name: "Marathi", flag: "🇮🇳", nativeName: "मराठी" },
-  { code: "gu", name: "Gujarati", flag: "🇮🇳", nativeName: "ગુજરાતી" },
-  { code: "kn", name: "Kannada", flag: "🇮🇳", nativeName: "ಕನ್ನಡ" },
-  { code: "ml", name: "Malayalam", flag: "🇮🇳", nativeName: "മലയാളം" },
-  { code: "ur", name: "Urdu", flag: "🇮🇳", nativeName: "اردو" },
-  { code: "or", name: "Odia", flag: "🇮🇳", nativeName: "ଓଡ଼ିଆ" },
-  { code: "as", name: "Assamese", flag: "🇮🇳", nativeName: "অসমীয়া" },
-  { code: "ne", name: "Nepali", flag: "🇳🇵", nativeName: "नेपाली" },
-  { code: "si", name: "Sinhala", flag: "🇱🇰", nativeName: "සිංහල" },
+  { code: "am", name: "Amharic", flag: "🇪🇹", nativeName: "አማርኛ" },
+  { code: "no", name: "Norwegian", flag: "🇳🇴", nativeName: "Norsk" },
+  { code: "sw", name: "Swahili", flag: "🇹🇿", nativeName: "Kiswahili" },
+  { code: "es", name: "Spanish", flag: "🇪🇸", nativeName: "Español" },
+  { code: "id", name: "Indonesian", flag: "🇮🇩", nativeName: "Bahasa Indonesia" },
 ]
 
 export default function LanguageSelectionPage() {
@@ -37,9 +28,10 @@ export default function LanguageSelectionPage() {
 
   const handleContinue = () => {
     if (selectedLanguage) {
-      // Mock storage for UI demonstration
+      // Store selected language in session storage
+      sessionStorage.setItem('agrilo_preferred_language', selectedLanguage)
       console.log("Selected language:", selectedLanguage)
-      router.push("/crop-recommendation")
+      router.push("/user-registration")
     }
   }
 

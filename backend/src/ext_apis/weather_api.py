@@ -22,10 +22,23 @@ async def fetch_weather_summary(
         "forecast_days": forecast_days,
         "timezone": "auto",
     }
+
+    print(f"Weather API request: {url}")
+    print(f"Weather API params: {params}")
+
     async with httpx.AsyncClient(timeout=20.0) as client:
         response = await client.get(url, params=params)
-        response.raise_for_status()
+        print(f"Weather API response status: {response.status_code}")
+
+        if response.status_code != 200:
+            error_text = await response.text()
+            print(f"Weather API error response: {error_text}")
+            raise Exception(
+                f"OpenMeteo API error: {response.status_code} - {error_text}"
+            )
+
         data = response.json()
+        print(f"Weather API response data keys: {list(data.keys())}")
 
     # Extract daily data
     daily = data.get("daily", {})

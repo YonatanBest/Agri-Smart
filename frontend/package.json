@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "dev:full": "concurrently \"npm run dev\" \"cd ../backend && poetry run uvicorn src.main:app --reload --host 0.0.0.0 --port 8000\""
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",
@@ -30,6 +31,7 @@
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-leaflet": "^5.0.0",
+    "react-markdown": "^10.1.0",
     "tailwind-merge": "^3.3.1"
   },
   "devDependencies": {
@@ -38,6 +40,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "concurrently": "^8.2.2",
     "tailwindcss": "^4",
     "tw-animate-css": "^1.3.5",
     "typescript": "^5"
