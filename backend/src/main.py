@@ -73,16 +73,17 @@ app.include_router(recommend_router)
 app.include_router(chat_router)
 app.include_router(user_router)
 app.include_router(monitoring_router)
+app.include_router(maps_router)
 
 @app.on_event("startup")
 async def startup_event():
-    logger.info("Application starting up", extra={"app_name": "Agri-Smart API"})
+    logger.info("Application starting up", extra={"app_name": "Agrilo API"})
 
 @app.on_event("shutdown")
 async def shutdown_event():
-    logger.info("Application shutting down", extra={"app_name": "Agri-Smart API"})
+    logger.info("Application shutting down", extra={"app_name": "Agrilo API"})
 
 @app.get("/health")
 async def health_check():
     logger.info("Health check requested")
-    return {"status": "healthy", "service": "Agri-Smart API"}
+    return {"status": "healthy", "service": "Agrilo API"}
