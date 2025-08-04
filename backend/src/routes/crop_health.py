@@ -1,6 +1,6 @@
 from fastapi import APIRouter, UploadFile, File, Form, Depends
 import tempfile
-from flows import diagnosis_flow
+from src.flows import diagnosis_flow
 from src.auth.auth_utils import get_current_user
 
 router = APIRouter(prefix="/api/crop-health", tags=["Crop Health"])
