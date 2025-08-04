@@ -15,10 +15,9 @@ router = APIRouter(prefix="/api/weather", tags=["Weather"])
 
 def get_db_session():
     """Get database session"""
-    database_url = os.getenv("DATABASE_URL", "sqlite:///./agri_smart.db")
-    engine = create_engine(database_url)
-    Base.metadata.create_all(engine)
-    return Session(engine)
+    from src.db import SessionLocal
+
+    return SessionLocal()
 
 
 def get_cached_weather(user_id: str, lat: float, lon: float, days: int) -> dict:

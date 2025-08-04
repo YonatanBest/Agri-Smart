@@ -333,7 +333,7 @@ export default function CalendarPage() {
     console.log(`Toggle task ${taskId}`)
   }
 
-  const getWeatherIcon = (weather: WeatherDay | null) => {
+  const getWeatherIcon = (weather: WeatherDay | null | undefined) => {
     if (!weather) return <Sun className="h-4 w-4 text-yellow-500" />
     
     if (weather.is_rainy) {
@@ -559,13 +559,14 @@ export default function CalendarPage() {
                 </CardTitle>
                 <div className="flex items-center gap-2">
                   <Badge variant="outline" className="text-green-600 border-green-200">
-                    {getTasksForDisplay(selectedDayData.date).length} tasks
+                    {selectedDayData ? getTasksForDisplay(selectedDayData.date).length : 0} tasks
                   </Badge>
                   <Button
                     variant="outline"
                     size="sm"
                     className="rounded-xl bg-transparent border-green-200 text-green-600 hover:bg-green-50"
-                    onClick={() => loadTasksForDate(selectedDayData.date)}
+                    onClick={() => selectedDayData && loadTasksForDate(selectedDayData.date)}
+                    disabled={isLoadingTasks || !selectedDayData}
                   >
                     <Plus className="h-4 w-4 mr-1" />
                     {isLoadingTasks ? "Loading..." : "Load AI Tasks"}
@@ -573,7 +574,7 @@ export default function CalendarPage() {
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
-                {getTasksForDisplay(selectedDayData.date).length > 0 ? (
+                {selectedDayData && getTasksForDisplay(selectedDayData.date).length > 0 ? (
                   getTasksForDisplay(selectedDayData.date).map((task) => (
                     <div
                       key={task.id}
@@ -633,14 +634,17 @@ export default function CalendarPage() {
                   <div className="text-center py-8 text-green-600">
                     <CalendarIcon className="h-12 w-12 mx-auto mb-2 opacity-50" />
                     <p>No AI tasks loaded for this day</p>
-                    <Button 
-                      variant="outline" 
-                      className="mt-2 border-green-200 text-green-600"
-                      onClick={() => loadTasksForDate(selectedDayData.date)}
-                    >
-                      <Plus className="h-4 w-4 mr-1" />
-                      {isLoadingTasks ? "Loading AI Tasks..." : "Load AI Tasks"}
-                    </Button>
+                    {selectedDayData && (
+                      <Button 
+                        variant="outline" 
+                        className="mt-2 border-green-200 text-green-600"
+                        onClick={() => loadTasksForDate(selectedDayData.date)}
+                        disabled={isLoadingTasks}
+                      >
+                        <Plus className="h-4 w-4 mr-1" />
+                        {isLoadingTasks ? "Loading AI Tasks..." : "Load AI Tasks"}
+                      </Button>
+                    )}
                   </div>
                 )}
               </CardContent>

@@ -106,19 +106,26 @@ def complete_user_registration(user_data: dict):
     # Convert back to array for API response
     crops_grown_array = db_user.crops_grown.split(",") if db_user.crops_grown else []
 
-    return User(
-        user_id=db_user.user_id,
-        name=db_user.name,
-        email=db_user.email,
-        location=db_user.location,
-        preferred_language=db_user.preferred_language,
-        crops_grown=crops_grown_array,
-        user_type=db_user.user_type,
-        years_experience=db_user.years_experience,
-        main_goal=db_user.main_goal,
-        created_at=db_user.created_at,
-        updated_at=db_user.updated_at,
-    )
+    # Create access token for the newly registered user
+    access_token = create_access_token(db_user.user_id)
+
+    return {
+        "user": User(
+            user_id=db_user.user_id,
+            name=db_user.name,
+            email=db_user.email,
+            location=db_user.location,
+            preferred_language=db_user.preferred_language,
+            crops_grown=crops_grown_array,
+            user_type=db_user.user_type,
+            years_experience=db_user.years_experience,
+            main_goal=db_user.main_goal,
+            created_at=db_user.created_at,
+            updated_at=db_user.updated_at,
+        ),
+        "access_token": access_token,
+        "token_type": "bearer",
+    }
 
 
 @router.get("/me")

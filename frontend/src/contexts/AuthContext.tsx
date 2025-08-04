@@ -76,8 +76,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       setError(null);
       setIsLoading(true);
-      const newUser = await apiService.completeRegistration(userData);
-      setUser(newUser);
+      const response = await apiService.completeRegistration(userData);
+      setUser(response.user);
     } catch (err: any) {
       setError(err.message || 'Registration failed');
       throw err;

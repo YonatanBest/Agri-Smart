@@ -191,11 +191,19 @@ class ApiService {
 
 
 
-  async completeRegistration(userData: any): Promise<User> {
-    return await this.request<User>('/api/user/complete-registration', {
+  async completeRegistration(userData: any): Promise<{ user: User; access_token: string; token_type: string }> {
+    const response = await this.request<{ user: User; access_token: string; token_type: string }>('/api/user/complete-registration', {
       method: 'POST',
       body: JSON.stringify(userData),
     });
+    
+    // Set the token automatically after successful registration
+    this.token = response.access_token;
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('auth_token', response.access_token);
+    }
+    
+    return response;
   }
 
   async updateUser(userId: string, userData: Partial<User>): Promise<User> {
