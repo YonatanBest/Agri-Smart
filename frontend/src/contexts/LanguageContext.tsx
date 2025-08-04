@@ -57,7 +57,7 @@ const translations = {
     continue: "Continue",
     
     // About Section
-    aboutUs: "What we believe",
+    about_Us: "What we believe",
     aboutDescription: "At Agrilo, we believe in the power of technology to transform agriculture. Our team of AI specialists, agronomists, and data scientists are dedicated to building intelligent tools that empower farmers to make smarter decisions, increase productivity, and foster sustainable growth. We are committed to supporting the global farming community with innovative and accessible solutions.",
     
     // Main Page Navigation
@@ -137,10 +137,8 @@ const translations = {
     
     // Auth Options Page
     createAccount: "Create Account",
-    welcomeBack: "Welcome Back",
     joinAgrilo: "Join Agrilo to start your smart farming journey",
     signInToContinue: "Sign in to continue your farming journey",
-    signIn: "Sign In",
     signUp: "Sign Up",
     fullName: "Full Name",
     enterFullName: "Enter your full name",
@@ -201,7 +199,7 @@ const translations = {
     continue: "ቀጥል",
     
     // About Section
-    aboutUs: "ስለ እኛ",
+    about_Us: "ስለ እኛ",
     aboutDescription: "በአግሪሎ፣ ቴክኖሎጂ እርሻን ለመለወጥ ያለውን ኃይል እናምናለን። የእኛ የአይ ስፔሻሊስቶች፣ አግሮኖሚስቶች እና የውሂብ ሳይንቲስቶች ቡድን አርሶ አደሮች የተሻለ ውሳኔ እንዲያደርጉ፣ ምርታማነት እንዲጨምሩ እና ዘላቂ እድገት እንዲያሳድጉ የሚያስችሉ ዘመናዊ መሳሪያዎችን ለመገንባት ቁርጠኞች ናቸው። በዘመናዊ እና ተደራሽ መፍትሄዎች የዓለም አርሶ አደር ማህበረሰብን ለመደገፍ ቁርጠኞች ነን።",
     
     // Main Page Navigation
@@ -269,7 +267,6 @@ const translations = {
     
     // Auth Options Page
     createAccount: "መለያ ፍጠር",
-    welcomeBack: "እንደገና እንኳን ደስ አለዎት",
     joinAgrilo: "የብልሽ እርሻ ጉዞዎን ለመጀመር አግሪሎ ላይ ይቀላቀሉ",
     signInToContinue: "የእርሻ ጉዞዎን ለመቀጠል ይግቡ",
     signIn: "ግባ",
@@ -342,7 +339,7 @@ const translations = {
     continue: "Fortsett",
     
     // About Section
-    aboutUs: "Om Oss",
+    about_Us: "Om Oss",
     aboutDescription: "Hos Agrilo tror vi på teknologiens kraft til å forvandle landbruket. Vårt team av AI-spesialister, agronomer og datavitenskapsmenn er dedikert til å bygge intelligente verktøy som styrker bønder til å ta smartere beslutninger, øke produktiviteten og fremme bærekraftig vekst. Vi er forpliktet til å støtte det globale landbrukssamfunnet med innovative og tilgjengelige løsninger.",
     
     // Main Page Navigation
@@ -453,7 +450,7 @@ const translations = {
     continue: "Endelea",
     
     // About Section
-    aboutUs: "Kuhusu Sisi",
+    about_Us: "Kuhusu Sisi",
     aboutDescription: "Katika Agrilo, tunamini nguvu ya teknolojia kubadilisha kilimo. Timu yetu ya wataalam wa AI, wataalam wa kilimo, na wanasayansi wa data wamejitolea kujenga zana za busara zinazowezesha wakulima kufanya maamuzi ya busara zaidi, kuongeza uzalishaji, na kukuza ukuaji endelevu. Tumejitolea kusaidia jamii ya kilimo ya ulimwengu kwa suluhisho za uvumbuzi na zinazopatikana.",
     
     // Main Page Navigation
@@ -564,7 +561,7 @@ const translations = {
     continue: "Continuar",
     
     // About Section
-    aboutUs: "Sobre Nosotros",
+    about_Us: "Sobre Nosotros",
     aboutDescription: "En Agrilo, creemos en el poder de la tecnología para transformar la agricultura. Nuestro equipo de especialistas en IA, agrónomos y científicos de datos están dedicados a construir herramientas inteligentes que empoderen a los agricultores para tomar decisiones más inteligentes, aumentar la productividad y fomentar el crecimiento sostenible. Estamos comprometidos a apoyar a la comunidad agrícola global con soluciones innovadoras y accesibles.",
     
     // Main Page Navigation
@@ -657,7 +654,7 @@ const translations = {
     continue: "Lanjutkan",
     
     // About Section
-    aboutUs: "Tentang Kami",
+    about_Us: "Tentang Kami",
     aboutDescription: "Di Agrilo, kami percaya pada kekuatan teknologi untuk mengubah pertanian. Tim kami yang terdiri dari spesialis AI, agronom, dan ilmuwan data berdedikasi untuk membangun alat cerdas yang memberdayakan petani untuk membuat keputusan yang lebih cerdas, meningkatkan produktivitas, dan mendorong pertumbuhan berkelanjutan. Kami berkomitmen untuk mendukung komunitas pertanian global dengan solusi yang inovatif dan mudah diakses.",
     
     // Main Page Navigation
