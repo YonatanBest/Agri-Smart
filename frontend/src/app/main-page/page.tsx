@@ -24,6 +24,12 @@ import {
 import { Separator } from "@/components/ui/separator"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 import HomePage from "./components/home-page"
 import MonitorPage from "./components/monitor-page"
 import ChatPage from "./components/chat-page"
@@ -36,6 +42,7 @@ export default function AgriApp() {
   const router = useRouter()
   const [currentPage, setCurrentPage] = useState("home")
   const [showLanguageDropdown, setShowLanguageDropdown] = useState(false)
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false)
 
   // Listen for navigation events from child components
   useEffect(() => {
@@ -80,6 +87,14 @@ export default function AgriApp() {
     logout()
     router.push('/auth-options')
   }
+
+  const confirmLogout = () => {
+    if (confirm('Are you sure you want to sign out? You\'ll need to sign in again to access your account.')) {
+      handleLogout()
+    }
+  }
+
+
 
   const pages = {
     home: <HomePage />,
@@ -158,14 +173,23 @@ export default function AgriApp() {
                 )}
               </div>
               
-                          <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => router.push('/settings')}
-              className="rounded-full p-2 text-green-600 hover:bg-green-50"
-            >
-              <User className="h-5 w-5" />
-            </Button>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => router.push('/settings')}
+                      className="rounded-full p-2 text-green-600 hover:bg-green-50"
+                    >
+                      <Settings className="h-5 w-5" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Profile Settings</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </div>
           </div>
         </header>
@@ -317,7 +341,7 @@ export default function AgriApp() {
                           className="w-full justify-start gap-3 rounded-xl py-3 px-4 text-green-700 hover:bg-green-50"
                         >
                           <span className="text-lg">🌱</span>
-                          <span className="font-medium">Soil Recommendation</span>
+                          <span className="font-medium">Crop Recommendation</span>
                         </SidebarMenuButton>
                       </SidebarMenuItem>
                     </SidebarMenu>
@@ -327,8 +351,8 @@ export default function AgriApp() {
 
               <SidebarFooter className="border-t border-green-100 bg-gradient-to-r from-green-50 to-green-100">
                 <div className="p-4">
-                  <div className="flex items-center gap-3 mb-2">
-                    <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
                       <span className="text-white text-sm font-bold">
                         {user?.name?.charAt(0)?.toUpperCase() || 'U'}
                       </span>
@@ -338,25 +362,43 @@ export default function AgriApp() {
                       <p className="text-xs text-green-600">{user?.location || t("locationNotSet")}</p>
                     </div>
                   </div>
-                  <div className="flex items-center justify-end">
-                    <div className="flex items-center gap-1">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => router.push('/settings')}
-                        className="text-green-600 hover:text-green-700 hover:bg-green-50 p-1"
-                      >
-                        <Settings className="h-3 w-3" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={handleLogout}
-                        className="text-red-600 hover:text-red-700 hover:bg-red-50 p-1"
-                      >
-                        <LogOut className="h-3 w-3" />
-                      </Button>
-                    </div>
+                  <div className="flex items-center gap-2">
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => router.push('/settings')}
+                            className="flex-1 text-green-600 hover:text-green-700 hover:bg-green-50 border-green-200"
+                          >
+                            <Settings className="h-4 w-4 mr-2" />
+                            <span className="text-sm font-medium">Settings</span>
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Manage your profile and preferences</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={confirmLogout}
+                            className="flex-1 text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
+                          >
+                            <LogOut className="h-4 w-4 mr-2" />
+                            <span className="text-sm font-medium">Logout</span>
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Sign out of your account</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                   </div>
                 </div>
               </SidebarFooter>
@@ -414,14 +456,23 @@ export default function AgriApp() {
                       )}
                     </div>
                     
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => router.push('/settings')}
-                      className="rounded-full p-2 ml-2 text-green-600 hover:bg-green-50"
-                    >
-                      <User className="h-5 w-5" />
-                    </Button>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => router.push('/settings')}
+                            className="rounded-full p-2 ml-2 text-green-600 hover:bg-green-50"
+                          >
+                            <Settings className="h-5 w-5" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Profile Settings</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                   </div>
                 </div>
               </header>
@@ -431,6 +482,8 @@ export default function AgriApp() {
           </div>
         </SidebarProvider>
       </div>
+
+
     </>
   )
 }

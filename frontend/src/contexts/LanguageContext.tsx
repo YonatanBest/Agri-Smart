@@ -32,6 +32,7 @@ const translations = {
     heroTitle: "Empowering Farmers with Intelligent AI Solutions",
     heroSubtitle: "Agrilo provides cutting-edge artificial intelligence to optimize crop yields, manage resources, and predict market trends for a more sustainable and profitable future.",
     getStarted: "Get Started",
+    goToDashboard: "Go to Dashboard",
     learnMore: "Learn More",
     
     // Features Section
@@ -175,6 +176,7 @@ const translations = {
     heroTitle: "የአርሶ አደሮችን በዘመናዊ የአሰልጣኝ አይ ስልቶች እንዲያበረታቱ",
     heroSubtitle: "አግሪሎ የተሻሻለው የአሰልጣኝ አይ ቴክኖሎጂ ያቀርባል የዝርያ ምርትን ለማሳደግ፣ ሀብቶችን ለማስተዳደር እና የገበያ አዝማሚያዎችን ለመተንበይ ለተጨማሪ ዘላቂ እና ትርፋማ መስክ።",
     getStarted: "ጀምር",
+    goToDashboard: "ወደ ዳሽቦርድ ይሂዱ",
     learnMore: "ተጨማሪ ይወቁ",
     
     // Features Section
@@ -315,6 +317,7 @@ const translations = {
     heroTitle: "Støtter Bønder med Intelligente AI-løsninger",
     heroSubtitle: "Agrilo tilbyr banebrytende kunstig intelligens for å optimalisere avling, administrere ressurser og forutsi markedsutvikling for en mer bærekraftig og lønnsom fremtid.",
     getStarted: "Kom i Gang",
+    goToDashboard: "Gå til Dashbord",
     learnMore: "Lær Mer",
     
     // Features Section
@@ -425,6 +428,7 @@ const translations = {
     heroTitle: "Kuwawezesha Wakulima na Suluhisho za AI za Busara",
     heroSubtitle: "Agrilo inatoa artificial intelligence ya kisasa kukarabati mavuno, kusimamia rasilimali, na kutabiri mwelekeo wa soko kwa mustakabali wa endelevu na wa faida.",
     getStarted: "Anza",
+    goToDashboard: "Nenda kwenye Dashibodi",
     learnMore: "Jifunze Zaidi",
     
     // Features Section
@@ -535,6 +539,7 @@ const translations = {
     heroTitle: "Empoderando a los Agricultores con Soluciones Inteligentes de IA",
     heroSubtitle: "Agrilo proporciona inteligencia artificial de vanguardia para optimizar rendimientos de cultivos, gestionar recursos y predecir tendencias del mercado para un futuro más sostenible y rentable.",
     getStarted: "Comenzar",
+    goToDashboard: "Ir al Panel de Control",
     learnMore: "Saber Más",
     
     // Features Section
@@ -627,6 +632,7 @@ const translations = {
     heroTitle: "Memberdayakan Petani dengan Solusi AI Cerdas",
     heroSubtitle: "Agrilo menyediakan artificial intelligence terkini untuk mengoptimalkan hasil panen, mengelola sumber daya, dan memprediksi tren pasar untuk masa depan yang lebih berkelanjutan dan menguntungkan.",
     getStarted: "Mulai",
+    goToDashboard: "Pergi ke Dasbor",
     learnMore: "Pelajari Lebih Lanjut",
     
     // Features Section

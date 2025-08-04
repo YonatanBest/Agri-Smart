@@ -383,9 +383,9 @@ const HeroSectionTwo: React.FC = () => {
                   <div className="flex justify-center mb-2">
                     <Leaf className="h-10 w-10 text-green-600 group-hover:scale-110 group-hover:rotate-12 transition-transform duration-300" />
                   </div>
-                  <h3 className="text-xl font-bold text-gray-900 group-hover:text-green-700 transition-colors duration-300">Sustainable Practices</h3>
+                  <h3 className="text-xl font-bold text-gray-900 group-hover:text-green-700 transition-colors duration-300">{t('sustainablePractices')}</h3>
                   <p className="text-gray-500 group-hover:text-gray-700 transition-colors duration-300">
-                    Promote eco-friendly farming methods for long-term environmental health.
+                    {t('sustainablePracticesDesc')}
                   </p>
                 </div>
               </div>
