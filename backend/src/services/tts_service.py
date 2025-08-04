@@ -1,22 +1,22 @@
 import os
 import base64
+import json
+import tempfile
+import logging
 from typing import Dict, Any, Optional
 from google.cloud import texttospeech
 from google.cloud.texttospeech import SynthesisInput, VoiceSelectionParams, AudioConfig
-import json
+from dotenv import load_dotenv
+
+load_dotenv()
+logger = logging.getLogger(__name__)
 
 
 class TTSService:
     def __init__(self):
-        # Use the same Google Cloud credentials as other services
-        key_path = os.path.join(os.path.dirname(__file__), "../../", "gcp_key.json")
-        key_path = os.path.abspath(key_path)
-        if not os.path.exists(key_path):
-            raise FileNotFoundError(f"Google Cloud credentials not found at {key_path}")
-
-        self.client = texttospeech.TextToSpeechClient.from_service_account_json(
-            key_path
-        )
+        self.client = None
+        self.key_file_path = None
+        self._initialize_client()
 
         # Language to voice mapping
         self.voice_mapping = {
@@ -52,6 +52,107 @@ class TTSService:
             },
         }
 
+    def _initialize_client(self):
+        """Initialize Google Cloud Text-to-Speech client with proper error handling"""
+        try:
+            # First try environment variable (for Railway deployment)
+            key_b64 = os.getenv("GCP_CREDENTIALS_B64")
+
+            if key_b64:
+                # Decode base64 credentials
+                try:
+                    key_json = base64.b64decode(key_b64).decode("utf-8")
+                    # Validate JSON
+                    json.loads(key_json)
+
+                    # Create temporary file with proper encoding
+                    temp_file = tempfile.NamedTemporaryFile(
+                        delete=False, suffix=".json", mode="w", encoding="utf-8"
+                    )
+                    temp_file.write(key_json)
+                    temp_file.close()
+                    self.key_file_path = temp_file.name
+                    logger.info(
+                        "Using credentials from GCP_CREDENTIALS_B64 environment variable"
+                    )
+
+                    # Initialize Google Cloud client
+                    try:
+                        self.client = (
+                            texttospeech.TextToSpeechClient.from_service_account_json(
+                                self.key_file_path
+                            )
+                        )
+                        logger.info(
+                            "Google Cloud Text-to-Speech client initialized successfully"
+                        )
+                        return
+                    except Exception as e:
+                        logger.error(
+                            f"Failed to initialize Google Cloud TTS client: {e}"
+                        )
+                        self.client = None
+
+                except Exception as e:
+                    logger.error(f"Failed to decode base64 credentials: {e}")
+
+            # If environment variable fails, try local file (for development)
+            key_path = os.path.join(os.path.dirname(__file__), "../../", "gcp_key.json")
+            key_path = os.path.abspath(key_path)
+
+            if os.path.exists(key_path):
+                try:
+                    # Validate JSON
+                    with open(key_path, "r", encoding="utf-8") as f:
+                        json.load(f)
+                    self.key_file_path = key_path
+                    logger.info(f"Using credentials from local file: {key_path}")
+
+
+                    # Initialize Google Cloud client
+                    try:
+                        self.client = (
+                            texttospeech.TextToSpeechClient.from_service_account_json(
+                                self.key_file_path
+                            )
+                        )
+                        logger.info(
+                            "Google Cloud Text-to-Speech client initialized successfully"
+                        )
+                        return
+                    except Exception as e:
+                        logger.error(
+                            f"Failed to initialize Google Cloud TTS client: {e}"
+                        )
+                        self.client = None
+
+                except Exception as e:
+                    logger.error(f"Error reading local credentials file: {e}")
+
+            # If both fail, log warning
+            logger.warning(
+                "No valid Google Cloud credentials found. Text-to-speech will not work."
+            )
+            return
+
+        except Exception as e:
+            logger.error(
+                f"Unexpected error during Google Cloud TTS initialization: {e}"
+            )
+            self.client = None
+
+    def __del__(self):
+        """Clean up temporary file on object destruction"""
+        if self.key_file_path and os.path.exists(self.key_file_path):
+            # Only delete if it's a temporary file (not a local credential file)
+            if self.key_file_path.startswith(tempfile.gettempdir()):
+                try:
+                    os.unlink(self.key_file_path)
+                except Exception as e:
+                    logger.warning(
+                        f"Failed to clean up temporary credentials file: {e}"
+                    )
+
     def text_to_speech(self, text: str, language: str = "en") -> Dict[str, Any]:
         """
         Convert text to speech audio
@@ -64,6 +165,13 @@ class TTSService:
             Dict containing audio data and metadata
         """
         try:
+            if not self.client:
+                return {
+                    "success": False,
+                    "error": "TTS client not initialized",
+                    "language": language,
+                }
+
             # Get voice configuration for the language
             voice_config = self.voice_mapping.get(language, self.voice_mapping["en"])
 
@@ -112,10 +220,17 @@ class TTSService:
         Args:
             language_code: Optional language code to filter voices
 
+
         Returns:
             Dict containing available voices
         """
         try:
+            if not self.client:
+                return {
+                    "success": False,
+                    "error": "TTS client not initialized",
+                }
+
             if language_code:
                 voices = self.client.list_voices(language_code=language_code)
             else:
@@ -138,4 +253,9 @@ class TTSService:
             return {"success": False, "error": str(e)}
 
 
-tts_service = TTSService()
+# Initialize TTS service with fallback handling
+try:
+    tts_service = TTSService()
+except Exception as e:
+    logger.error(f"Failed to initialize TTS service: {e}")
+    tts_service = None

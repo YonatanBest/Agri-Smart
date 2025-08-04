@@ -1,5 +1,8 @@
 import os
 import base64
+import json
+import tempfile
+import logging
 from typing import Optional, Dict, Any
 from google.cloud import speech_v1
 from pathlib import Path
@@ -10,20 +13,125 @@ from src.services.transalation_service import (
 )
 
 load_dotenv()
+logger = logging.getLogger(__name__)
 
 
 class AudioService:
     def __init__(self):
-        key_path = os.path.join(os.path.dirname(__file__), "../../", "gcp_key.json")
-        key_path = os.path.abspath(key_path)
+        self.speech_client = None
+        self.key_file_path = None
+        self._initialize_client()
 
-        self.speech_client = speech_v1.SpeechClient.from_service_account_json(key_path)
+    def _initialize_client(self):
+        """Initialize Google Cloud Speech client with proper error handling"""
+        try:
+            # First try environment variable (for Railway deployment)
+            key_b64 = os.getenv("GCP_CREDENTIALS_B64")
+
+            if key_b64:
+                # Decode base64 credentials
+                try:
+                    key_json = base64.b64decode(key_b64).decode("utf-8")
+                    # Validate JSON
+                    json.loads(key_json)
+
+                    # Create temporary file with proper encoding
+                    temp_file = tempfile.NamedTemporaryFile(
+                        delete=False, suffix=".json", mode="w", encoding="utf-8"
+                    )
+                    temp_file.write(key_json)
+                    temp_file.close()
+                    self.key_file_path = temp_file.name
+                    logger.info(
+                        "Using credentials from GCP_CREDENTIALS_B64 environment variable"
+                    )
+
+                    # Initialize Google Cloud client
+                    try:
+                        self.speech_client = (
+                            speech_v1.SpeechClient.from_service_account_json(
+                                self.key_file_path
+                            )
+                        )
+                        logger.info(
+                            "Google Cloud Speech client initialized successfully"
+                        )
+                        return
+                    except Exception as e:
+                        logger.error(
+                            f"Failed to initialize Google Cloud Speech client: {e}"
+                        )
+                        self.speech_client = None
+
+                except Exception as e:
+                    logger.error(f"Failed to decode base64 credentials: {e}")
+
+            # If environment variable fails, try local file (for development)
+            key_path = os.path.join(os.path.dirname(__file__), "../../", "gcp_key.json")
+            key_path = os.path.abspath(key_path)
+
+            if os.path.exists(key_path):
+                try:
+                    # Validate JSON
+                    with open(key_path, "r", encoding="utf-8") as f:
+                        json.load(f)
+                    self.key_file_path = key_path
+                    logger.info(f"Using credentials from local file: {key_path}")
+
+                    # Initialize Google Cloud client
+                    try:
+                        self.speech_client = (
+                            speech_v1.SpeechClient.from_service_account_json(
+                                self.key_file_path
+                            )
+                        )
+                        logger.info(
+                            "Google Cloud Speech client initialized successfully"
+                        )
+                        return
+                    except Exception as e:
+                        logger.error(
+                            f"Failed to initialize Google Cloud Speech client: {e}"
+                        )
+                        self.speech_client = None
+
+                except Exception as e:
+                    logger.error(f"Error reading local credentials file: {e}")
+
+            # If both fail, log warning
+            logger.warning(
+                "No valid Google Cloud credentials found. Speech-to-text will not work."
+            )
+            return
+
+
+        except Exception as e:
+            logger.error(
+                f"Unexpected error during Google Cloud Speech initialization: {e}"
+            )
+            self.speech_client = None
+
+    def __del__(self):
+        """Clean up temporary file on object destruction"""
+        if self.key_file_path and os.path.exists(self.key_file_path):
+            # Only delete if it's a temporary file (not a local credential file)
+            if self.key_file_path.startswith(tempfile.gettempdir()):
+                try:
+                    os.unlink(self.key_file_path)
+                except Exception as e:
+                    logger.warning(
+                        f"Failed to clean up temporary credentials file: {e}"
+                    )
 
     def detect_audio_language(self, audio_content: bytes) -> str:
         """
         Detect the language of audio content
         """
         try:
+            if not self.speech_client:
+                logger.warning("Speech client not initialized, defaulting to English")
+                return "en"
+
             sample_text = self._extract_sample_text(audio_content)
             if sample_text:
                 print(f"📝 Sample text for language detection: '{sample_text}'")
@@ -48,6 +156,9 @@ class AudioService:
         Extract a small sample of text from audio for language detection
         """
         try:
+            if not self.speech_client:
+                return None
+
             # Create audio object
             audio = speech_v1.RecognitionAudio(content=audio_content)
 
@@ -81,8 +192,17 @@ class AudioService:
             Dict with transcribed text and confidence score
         """
         try:
+            if not self.speech_client:
+                return {
+                    "success": False,
+                    "error": "Speech client not initialized",
+                    "text": "",
+                    "confidence": 0.0,
+                }
+
             # Create audio object
             audio = speech_v1.RecognitionAudio(content=audio_content)
+
 
             # Configure recognition for WebM/OPUS format
             config = speech_v1.RecognitionConfig(
@@ -192,6 +312,7 @@ class AudioService:
                 "detected_language": "en",
             }
 
+
     def process_audio_message_with_language(
         self, audio_content: bytes, language: str
     ) -> Dict[str, Any]:
@@ -256,10 +377,19 @@ class AudioService:
         Try speech recognition with different audio formats
         """
         try:
+            if not self.speech_client:
+                return {
+                    "success": False,
+                    "error": "Speech client not initialized",
+                    "text": "",
+                    "confidence": 0.0,
+                }
+
             # Create audio object
             audio = speech_v1.RecognitionAudio(content=audio_content)
 
             print(f"🔍 Trying format: {format_type} with language: {language_code}")
+
 
             # Configure based on format type
             if format_type == "webm_opus":
@@ -365,9 +495,15 @@ class AudioService:
 
             return lang_mapping.get(detected_lang, "en-US")
 
+
         except Exception as e:
             print(f"Error detecting language from text: {e}")
             return "en-US"
 
 
-audio_service = AudioService()
+# Initialize audio service with fallback handling
+try:
+    audio_service = AudioService()
+except Exception as e:
+    logger.error(f"Failed to initialize Audio service: {e}")
+    audio_service = None
