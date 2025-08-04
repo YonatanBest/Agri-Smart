@@ -69,16 +69,16 @@ export default function AgriApp() {
     }
   }, [showLanguageDropdown])
 
-  // Redirect to login if not authenticated
+  // Redirect to auth-options if not authenticated
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
-      router.push('/login')
+      router.push('/auth-options')
     }
   }, [isAuthenticated, isLoading, router])
 
   const handleLogout = () => {
     logout()
-    router.push('/login')
+    router.push('/auth-options')
   }
 
   const pages = {
@@ -109,7 +109,7 @@ export default function AgriApp() {
 
   // Show loading state when not authenticated
   if (!isAuthenticated) {
-    return null // Will redirect to login
+    return null // Will redirect to auth-options
   }
 
   return (

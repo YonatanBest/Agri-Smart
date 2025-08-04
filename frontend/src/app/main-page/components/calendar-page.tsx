@@ -75,57 +75,72 @@ export default function CalendarPage() {
   const [locationData, setLocationData] = useState<{lat: number, lon: number} | null>(null)
   const [taskCache, setTaskCache] = useState<{[key: string]: Task[]}>({})
   const [isLoadingTasks, setIsLoadingTasks] = useState(false)
+  const [isWeatherFetched, setIsWeatherFetched] = useState(false)
+  const [lastLoadedDate, setLastLoadedDate] = useState<number | null>(null)
 
   const months = [
     "January", "February", "March", "April", "May", "June",
     "July", "August", "September", "October", "November", "December"
   ]
 
-  // Parse user location from crops_grown or use default
+  // Parse user location from user.location field
   useEffect(() => {
-    if (user?.crops_grown && user.crops_grown.length > 0) {
-      const locationStr = user.crops_grown.find(crop => crop.includes('lat:') && crop.includes('lon:'))
-      if (locationStr) {
-        const latMatch = locationStr.match(/lat:([\d.-]+)/)
-        const lonMatch = locationStr.match(/lon:([\d.-]+)/)
-        if (latMatch && lonMatch) {
-          setLocationData({
-            lat: parseFloat(latMatch[1]),
-            lon: parseFloat(lonMatch[1])
-          })
+    if (user?.location && user.location !== "unknown") {
+      // Parse location string like "5, 39" or "9.145, 40.489"
+      const locationParts = user.location.split(',').map(part => part.trim())
+      if (locationParts.length === 2) {
+        const lat = parseFloat(locationParts[0])
+        const lon = parseFloat(locationParts[1])
+        
+        if (!isNaN(lat) && !isNaN(lon)) {
+          setLocationData({ lat, lon })
+          console.log(`📍 Using user location: ${lat}, ${lon}`)
+          return
         }
       }
     }
     
-    // Fallback to default location if no location found
-    if (!locationData) {
-      setLocationData({ lat: 9.145, lon: 40.489 }) // Default to Ethiopia
-    }
-  }, [user, locationData])
+    // Fallback to default location if no valid location found
+    const defaultLocation = { lat: 9.145, lon: 40.489 } // Default to Ethiopia
+    setLocationData(defaultLocation)
+    console.log(`📍 Using default location: ${defaultLocation.lat}, ${defaultLocation.lon}`)
+  }, [user?.location])
+
+  // Reset weather fetched state when user location changes
+  useEffect(() => {
+    setIsWeatherFetched(false)
+    setLastLoadedDate(null)
+  }, [user?.location])
 
   // Fetch weather data when location changes
   useEffect(() => {
-    if (locationData) {
+    if (locationData && !isWeatherFetched) {
       fetchWeatherData()
+      // Clear task cache when location changes to get fresh AI recommendations
+      setTaskCache({})
     }
-  }, [locationData])
+  }, [locationData, isWeatherFetched])
 
   // Load tasks when a date is selected
   useEffect(() => {
-    if (selectedDate > 0 && locationData && weatherData.length > 0) {
+    if (selectedDate > 0 && locationData && weatherData.length > 0 && lastLoadedDate !== selectedDate) {
       loadTasksForDate(selectedDate)
+      setLastLoadedDate(selectedDate)
     }
-  }, [selectedDate, locationData, weatherData])
+  }, [selectedDate, locationData, weatherData.length])
 
      const fetchWeatherData = async () => {
      if (!locationData) return
      
      setIsLoadingWeather(true)
      try {
+       console.log(`🌤️ Fetching weather data for location: ${locationData.lat}, ${locationData.lon}`)
        // OpenMeteo supports up to 16 days, but using 14 to be safe
        const response = await apiService.getCalendarWeather(locationData.lat, locationData.lon, 14)
        if (response.status === "success") {
          setWeatherData(response.daily_weather)
+         setIsWeatherFetched(true)
+         console.log(`✅ Weather data loaded: ${response.daily_weather.length} days`)
        }
      } catch (error) {
        console.error("Error fetching weather data:", error)
@@ -289,16 +304,18 @@ export default function CalendarPage() {
      
      const cacheKey = `${currentYear}-${currentMonth + 1}-${date}`
      
-     // Check if tasks are already cached
-     if (taskCache[cacheKey]) return
+     // Check if tasks are already cached or already loading
+     if (taskCache[cacheKey] || isLoadingTasks) return
      
      setIsLoadingTasks(true)
      try {
+       console.log(`📋 Loading tasks for date: ${date}`)
        const result = await getTasksForDate(date)
        setTaskCache(prev => ({
          ...prev,
          [cacheKey]: result.tasks
        }))
+       console.log(`✅ Tasks loaded for date ${date}: ${result.tasks.length} tasks`)
      } catch (error) {
        console.error("Error loading tasks for date:", date, error)
      } finally {
@@ -386,14 +403,43 @@ export default function CalendarPage() {
           <h1 className="text-2xl font-bold text-green-800">Smart Farming Calendar</h1>
           <p className="text-green-600">AI-powered task management and scheduling</p>
         </div>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            className="rounded-xl bg-transparent border-green-200 text-green-600 hover:bg-green-50"
+            onClick={() => {
+              setIsWeatherFetched(false)
+              fetchWeatherData()
+            }}
+            disabled={isLoadingWeather}
+          >
+            <Cloud className="h-4 w-4 mr-1" />
+            {isLoadingWeather ? "Refreshing..." : "Refresh Weather"}
+          </Button>
+        </div>
       </div>
 
              {/* Location Info */}
        {locationData && (
-         <Alert className="border-green-200 bg-green-50">
+         <Alert className={`border-green-200 ${user?.location && user.location !== "unknown" ? "bg-green-50" : "bg-yellow-50 border-yellow-200"}`}>
            <MapPin className="h-4 w-4" />
            <AlertDescription>
-             Weather data for location: {locationData.lat.toFixed(4)}, {locationData.lon.toFixed(4)}
+             {user?.location && user.location !== "unknown" ? (
+               <>
+                 <span className="font-medium">Weather data for your location: {user.location}</span>
+                 <br />
+                 <span className="text-sm text-green-600">Coordinates: {locationData.lat.toFixed(4)}, {locationData.lon.toFixed(4)}</span>
+               </>
+             ) : (
+               <>
+                 <span className="font-medium text-yellow-700">Using default location (Ethiopia)</span>
+                 <br />
+                 <span className="text-sm text-yellow-600">Please update your location in settings for personalized weather data</span>
+                 <br />
+                 <span className="text-sm text-green-600">Coordinates: {locationData.lat.toFixed(4)}, {locationData.lon.toFixed(4)}</span>
+               </>
+             )}
              {isLoadingWeather && " - Loading weather data..."}
              <br />
              <span className="text-sm text-green-600">

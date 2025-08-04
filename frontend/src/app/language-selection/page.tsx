@@ -1,12 +1,13 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Globe, CheckCircle, ArrowRight, Search, X } from "lucide-react"
 import { useRouter } from "next/navigation"
+import { useAuth } from "@/contexts/AuthContext"
 
 const languages = [
   { code: "en", name: "English", flag: "🇺🇸", nativeName: "English" },
@@ -21,6 +22,24 @@ export default function LanguageSelectionPage() {
   const [selectedLanguage, setSelectedLanguage] = useState<string>("")
   const [searchQuery, setSearchQuery] = useState("")
   const router = useRouter()
+  const { isAuthenticated, isLoading } = useAuth()
+
+  // Redirect authenticated users to main page (only for existing users, not new registrations)
+  useEffect(() => {
+    if (!isLoading && isAuthenticated) {
+      // Check if this is a new registration by looking for onboarding data
+      const authData = sessionStorage.getItem('auth_data')
+      
+      // If we have onboarding data, continue with onboarding flow
+      if (authData) {
+        // New user with onboarding data - let them continue the flow
+        return
+      }
+      
+      // Existing user - redirect to main page
+      router.push("/main-page")
+    }
+  }, [isAuthenticated, isLoading, router])
 
   const handleLanguageSelect = (languageCode: string) => {
     setSelectedLanguage(languageCode)
@@ -57,7 +76,6 @@ export default function LanguageSelectionPage() {
             <Globe className="h-10 w-10 text-white" />
           </div>
           <h1 className="text-3xl font-bold text-green-800 mb-2">Choose Your Language</h1>
-          <p className="text-green-600 text-lg">अपनी भाषा चुनें • ਆਪਣੀ ਭਾਸ਼ਾ ਚੁਣੋ</p>
         </div>
 
         {/* Language Selection Card */}
@@ -197,7 +215,6 @@ export default function LanguageSelectionPage() {
         {/* Footer */}
         <div className="mt-8 text-center text-sm text-green-600">
           <p>You can change this language later in settings</p>
-          <p className="mt-1">आप बाद में सेटिंग्स में इस भाषा को बदल सकते हैं</p>
         </div>
       </div>
     </div>

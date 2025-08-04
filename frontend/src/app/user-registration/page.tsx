@@ -214,7 +214,24 @@ export default function UserRegistrationPage() {
   const [activeSection, setActiveSection] = useState<"current" | "planned">("current")
   const [errors, setErrors] = useState<Record<string, string>>({})
   const router = useRouter()
-  const { completeRegistration } = useAuth()
+  const { completeRegistration, isAuthenticated, isLoading } = useAuth()
+
+  // Redirect authenticated users to main page (only for existing users, not new registrations)
+  useEffect(() => {
+    if (!isLoading && isAuthenticated) {
+      // Check if this is a new registration by looking for onboarding data
+      const authData = sessionStorage.getItem('auth_data')
+      
+      // If we have onboarding data, continue with onboarding flow
+      if (authData) {
+        // New user with onboarding data - let them continue the flow
+        return
+      }
+      
+      // Existing user - redirect to main page
+      router.push("/main-page")
+    }
+  }, [isAuthenticated, isLoading, router])
 
   useEffect(() => {
     // Get selected language from session storage
@@ -307,7 +324,7 @@ export default function UserRegistrationPage() {
             : "Unknown",
           preferred_language: selectedLanguage,
           user_type: formData.user_type,
-          years_experience: formData.years_experience,
+          years_experience: parseInt(formData.years_experience) || 1,
           main_goal: formData.main_goal,
           crops_grown: [
             ...currentlyGrowingCrops.map(crop => `${crop.name}:current`),
@@ -330,12 +347,22 @@ export default function UserRegistrationPage() {
           ]
         }))
         
+        // Clear onboarding data since user has completed the full flow
+        sessionStorage.removeItem('auth_data')
+        sessionStorage.removeItem('farmer_location')
+        
         // Navigate to main app
         router.push("/main-page")
-      } catch (error) {
+      } catch (error: any) {
         console.error('Registration error:', error)
-        // You can add error handling UI here
-        alert('Registration failed. Please try again.')
+        
+        // Handle specific error cases
+        if (error.message && error.message.includes('Email already registered')) {
+          alert('This email is already registered. Please sign in instead or use a different email address.')
+          router.push("/auth-options")
+        } else {
+          alert('Registration failed. Please try again.')
+        }
       }
     }
   }

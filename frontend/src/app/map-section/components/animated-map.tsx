@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { MapPin, Loader2, CheckCircle, AlertTriangle, Globe } from "lucide-react"
 import { useRouter } from "next/navigation"
+import { useAuth } from "@/contexts/AuthContext"
 
 interface LocationData {
   latitude: number
@@ -20,6 +21,24 @@ export default function LocationDetectionPage() {
   const [error, setError] = useState<string | null>(null)
   const [isMobile, setIsMobile] = useState(false)
   const router = useRouter()
+  const { isAuthenticated, isLoading } = useAuth()
+
+  // Redirect authenticated users to main page (only for existing users, not new registrations)
+  useEffect(() => {
+    if (!isLoading && isAuthenticated) {
+      // Check if this is a new registration by looking for onboarding data
+      const authData = sessionStorage.getItem('auth_data')
+      
+      // If we have onboarding data, continue with onboarding flow
+      if (authData) {
+        // New user with onboarding data - let them continue the flow
+        return
+      }
+      
+      // Existing user - redirect to main page
+      router.push("/main-page")
+    }
+  }, [isAuthenticated, isLoading, router])
 
   useEffect(() => {
     // Check if device is mobile

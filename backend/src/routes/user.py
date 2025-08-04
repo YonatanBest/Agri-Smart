@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, Body, Depends
-from src.models.chat import User, UserCreate
+from src.models.chat import User
 from src.db import SessionLocal
 from src.db.chat_models import User as UserDB
 from src.auth.auth_utils import create_access_token, get_current_user
@@ -19,64 +19,18 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 
 
 @router.post("/login")
-def login(user: UserCreate):
+def login(user: dict):
     db = SessionLocal()
-    db_user = db.query(UserDB).filter_by(email=user.email).first()
+    db_user = db.query(UserDB).filter_by(email=user["email"]).first()
     db.close()
     if (
         not db_user
         or not db_user.password_hash
-        or not verify_password(user.password, db_user.password_hash)
+        or not verify_password(user["password"], db_user.password_hash)
     ):
         raise HTTPException(status_code=401, detail="Invalid email or password")
     token = create_access_token(db_user.user_id)
     return {"access_token": token, "token_type": "bearer"}
-
-
-@router.post("/create")
-def create_user(user: UserCreate):
-    db = SessionLocal()
-    if user.email:
-        existing = db.query(UserDB).filter_by(email=user.email).first()
-        if existing:
-            db.close()
-            raise HTTPException(status_code=400, detail="Email already registered")
-
-    # Convert crops_grown array to comma-separated string for database storage
-    crops_grown_str = ",".join(user.crops_grown) if user.crops_grown else ""
-
-    db_user = UserDB(
-        name=user.name,
-        email=user.email,
-        location=user.location,
-        preferred_language=user.preferred_language,
-        crops_grown=crops_grown_str,
-        user_type=user.user_type,
-        years_experience=user.years_experience,
-        main_goal=user.main_goal,
-        password_hash=hash_password(user.password),
-    )
-    db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
-    db.close()
-
-    # Convert back to array for API response
-    crops_grown_array = db_user.crops_grown.split(",") if db_user.crops_grown else []
-
-    return User(
-        user_id=db_user.user_id,
-        name=db_user.name,
-        email=db_user.email,
-        location=db_user.location,
-        preferred_language=db_user.preferred_language,
-        crops_grown=crops_grown_array,
-        user_type=db_user.user_type,
-        years_experience=db_user.years_experience,
-        main_goal=db_user.main_goal,
-        created_at=db_user.created_at,
-        updated_at=db_user.updated_at,
-    )
 
 
 @router.post("/complete-registration")
@@ -120,17 +74,17 @@ def complete_user_registration(user_data: dict):
         except (ValueError, TypeError):
             years_experience_int = None
 
-        db_user = UserDB(
-            name=name,
-            email=email,
-            location=location,
-            preferred_language=preferred_language,
-            crops_grown=crops_grown_str,
-            user_type=user_type,
-            years_experience=years_experience_int,
-            main_goal=main_goal,
-            password_hash=hash_password(password),
-        )
+    db_user = UserDB(
+        name=name,
+        email=email,
+        location=location,
+        preferred_language=preferred_language,
+        crops_grown=crops_grown_str,
+        user_type=user_type,
+        years_experience=years_experience_int,
+        main_goal=main_goal,
+        password_hash=hash_password(password),
+    )
 
     print("💾 Saving user to database:")
     print(f"🆔 User ID: {db_user.user_id}")
@@ -174,7 +128,9 @@ def get_current_user_profile(current_user=Depends(get_current_user)):
         raise HTTPException(status_code=404, detail="User not found")
 
     # Convert crops_grown string to array for API response
-    crops_grown_array = current_user.crops_grown.split(",") if current_user.crops_grown else []
+    crops_grown_array = (
+        current_user.crops_grown.split(",") if current_user.crops_grown else []
+    )
 
     return User(
         user_id=current_user.user_id,
@@ -219,10 +175,19 @@ def get_user(user_id: str, current_user=Depends(get_current_user)):
 
 @router.patch("/{user_id}")
 def update_user(
-    user_id: str, user: User = Body(...), current_user=Depends(get_current_user)
+    user_id: str, user_data: dict = Body(...), current_user=Depends(get_current_user)
 ):
     print(f"🌱 Updating user {user_id}")
-    print(f"📧 Received data: {user.dict()}")
+    print(f"📧 Received data: {user_data}")
+    print(f"🔐 Current user: {current_user.user_id if current_user else 'None'}")
+    print(f"🎯 Target user: {user_id}")
+
+    # Check if current user is trying to update their own profile
+    if current_user.user_id != user_id:
+        print(f"❌ Authorization failed: {current_user.user_id} != {user_id}")
+        raise HTTPException(
+            status_code=403, detail="Not authorized to update this user"
+        )
 
     db = SessionLocal()
     db_user = db.query(UserDB).filter_by(user_id=user_id).first()
@@ -231,7 +196,6 @@ def update_user(
         raise HTTPException(status_code=404, detail="User not found")
 
     # Convert crops_grown array to string for database storage
-    user_data = user.dict(exclude_unset=True)
     if "crops_grown" in user_data and isinstance(user_data["crops_grown"], list):
         user_data["crops_grown"] = ",".join(user_data["crops_grown"])
         print(f"🌾 Converted crops_grown to: {user_data['crops_grown']}")
@@ -239,7 +203,9 @@ def update_user(
     print(f"💾 Saving to database: {user_data}")
 
     for field, value in user_data.items():
-        setattr(db_user, field, value)
+        if hasattr(db_user, field):
+            setattr(db_user, field, value)
+
     db.commit()
     db.refresh(db_user)
 

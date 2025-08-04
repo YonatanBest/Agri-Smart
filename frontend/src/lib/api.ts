@@ -16,17 +16,7 @@ export interface User {
   updated_at: string;
 }
 
-export interface UserCreate {
-  name: string;
-  email: string;
-  password: string;
-  location: string;
-  preferred_language: string;
-  crops_grown: string[];
-  user_type: string;
-  years_experience: number;
-  main_goal: string;
-}
+
 
 export interface ChatMessage {
   id: string;
@@ -199,12 +189,7 @@ class ApiService {
     return response;
   }
 
-  async register(userData: UserCreate): Promise<User> {
-    return await this.request<User>('/api/user/create', {
-      method: 'POST',
-      body: JSON.stringify(userData),
-    });
-  }
+
 
   async completeRegistration(userData: any): Promise<User> {
     return await this.request<User>('/api/user/complete-registration', {

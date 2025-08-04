@@ -8,7 +8,7 @@ interface AuthContextType {
   isLoading: boolean;
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (userData: any) => Promise<void>;
+  initiateRegistration: (userData: any) => Promise<void>;
   completeRegistration: (userData: any) => Promise<void>;
   updateUser: (userData: Partial<User>) => Promise<void>;
   refreshUser: () => Promise<void>;
@@ -57,14 +57,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const register = async (userData: any) => {
+  const initiateRegistration = async (userData: any) => {
     try {
       setError(null);
       setIsLoading(true);
-      const newUser = await apiService.register(userData);
-      setUser(newUser);
+      // This is now a client-side only operation
+      // The actual user creation will happen in completeRegistration
+      console.log('Initiating registration for:', userData.email);
     } catch (err: any) {
-      setError(err.message || 'Registration failed');
+      setError(err.message || 'Registration initiation failed');
       throw err;
     } finally {
       setIsLoading(false);
@@ -119,6 +120,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const logout = () => {
     apiService.logout();
     setUser(null);
+    
+    // Clear onboarding data on logout
+    if (typeof window !== 'undefined') {
+      sessionStorage.removeItem('auth_data')
+      sessionStorage.removeItem('farmer_location')
+      sessionStorage.removeItem('user_registration_data')
+    }
   };
 
   // Check authentication status on mount
@@ -145,7 +153,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     isLoading,
     isAuthenticated,
     login,
-    register,
+    initiateRegistration,
     completeRegistration,
     updateUser,
     refreshUser,

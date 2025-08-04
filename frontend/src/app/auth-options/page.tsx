@@ -1,13 +1,13 @@
 "use client"
 
-import { useState } from "react"
-import { Card, CardContent } from "@/components/ui/card"
+import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
+import { useAuth } from "@/contexts/AuthContext"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { LogIn, UserPlus, ArrowRight, ArrowLeft, Leaf, User } from "lucide-react"
-import { useRouter } from "next/navigation"
-import { useLanguage } from "@/contexts/LanguageContext"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 export default function AuthOptionsPage() {
   const [isSignUp, setIsSignUp] = useState(false)
@@ -17,230 +17,211 @@ export default function AuthOptionsPage() {
     password: "",
     confirmPassword: ""
   })
-  const [errors, setErrors] = useState<Record<string, string>>({})
+  const [error, setError] = useState("")
   const router = useRouter()
-  const { t } = useLanguage()
+  const { login, initiateRegistration, isAuthenticated, isLoading, error: authError, clearError } = useAuth()
+
+  // Redirect authenticated users to main page (only for existing users, not new registrations)
+  useEffect(() => {
+    if (!isLoading && isAuthenticated) {
+      // Check if this is a new registration by looking for onboarding data
+      const authData = sessionStorage.getItem('auth_data')
+      const locationData = sessionStorage.getItem('farmer_location')
+
+      // If we have onboarding data, continue with onboarding flow
+      if (authData && locationData) {
+        // New user with onboarding data - let them continue the flow
+        return
+      }
+
+      // Existing user - redirect to main page
+      router.push("/main-page")
+    }
+  }, [isAuthenticated, isLoading, router])
 
   const validateForm = () => {
-    const newErrors: Record<string, string> = {}
-    
-    if (!formData.email.trim()) {
-      newErrors.email = t('emailRequired')
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = t('invalidEmailFormat')
-    }
-    
-    if (!formData.password) {
-      newErrors.password = t('passwordRequired')
-    } else if (formData.password.length < 6) {
-      newErrors.password = t('passwordMinLength')
-    }
-    
     if (isSignUp) {
-      if (!formData.name.trim()) {
-        newErrors.name = t('nameRequired')
+      if (!formData.name || !formData.email || !formData.password || !formData.confirmPassword) {
+        setError("All fields are required")
+        return false
       }
-      
-      if (!formData.confirmPassword) {
-        newErrors.confirmPassword = t('confirmPasswordRequired')
-      } else if (formData.password !== formData.confirmPassword) {
-        newErrors.confirmPassword = t('passwordsDoNotMatch')
+      if (formData.password !== formData.confirmPassword) {
+        setError("Passwords do not match")
+        return false
+      }
+      if (formData.password.length < 6) {
+        setError("Password must be at least 6 characters")
+        return false
+      }
+    } else {
+      if (!formData.email || !formData.password) {
+        setError("Email and password are required")
+        return false
       }
     }
-    
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
+    return true
   }
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    clearLocalError()
     if (validateForm()) {
+      try {
       if (isSignUp) {
-        // Store basic user data for the onboarding process
+          // Store auth data for new user onboarding flow
         sessionStorage.setItem('auth_data', JSON.stringify({
+            name: formData.name,
+            email: formData.email,
+            password: formData.password
+          }))
+          // Initiate registration for new user (client-side only)
+          await initiateRegistration({
+            name: formData.name,
           email: formData.email,
           password: formData.password,
-          name: formData.name
-        }))
+            location: "unknown",
+            preferred_language: "en",
+            crops_grown: [],
+            user_type: "farmer",
+            years_experience: 1,
+            main_goal: "increase_yield"
+          })
         // For new users, go through the full onboarding process
         router.push("/map-section")
       } else {
+          // Login existing user
+          await login(formData.email, formData.password)
         // For existing users, go directly to main app
         router.push("/main-page")
+        }
+      } catch (err: any) {
+        // Error is handled by the auth context
+        console.error("Authentication error:", err)
+        if (isSignUp && err.message && err.message.includes('Email already registered')) {
+          alert('This email is already registered. Please sign in instead.')
+          setIsSignUp(false)
+          setFormData({ name: "", email: formData.email, password: "", confirmPassword: "" })
+        }
       }
     }
   }
 
-  const handleBack = () => {
-    router.push("/")
+  const clearLocalError = () => {
+    setError("")
+    if (authError) {
+      clearError()
+    }
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <div className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Leaf className="h-10 w-10 text-white" />
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-blue-50 p-4">
+      <Card className="w-full max-w-md">
+        <CardHeader className="text-center">
+          <CardTitle className="text-2xl font-bold text-gray-900">
+            {isSignUp ? "Create Account" : "Welcome Back"}
+          </CardTitle>
+          <CardDescription className="text-gray-600">
+            {isSignUp ? "Join AgriLo to get started" : "Sign in to your account"}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Tabs value={isSignUp ? "signup" : "signin"} onValueChange={(value) => setIsSignUp(value === "signup")}>
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="signin">Sign In</TabsTrigger>
+              <TabsTrigger value="signup">Sign Up</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="signin">
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="Enter your email"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  />
           </div>
-          <h1 className="text-3xl font-bold text-green-800 mb-2">
-            {isSignUp ? t('createAccount') : t('welcomeBack')}
-          </h1>
-          <p className="text-green-600 text-lg">
-            {isSignUp 
-              ? t('joinAgrilo')
-              : t('signInToContinue')
-            }
-          </p>
+                <div>
+                  <Label htmlFor="password">Password</Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="Enter your password"
+                    value={formData.password}
+                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  />
         </div>
-
-        {/* Auth Options Card */}
-        <Card className="rounded-2xl border-2 border-green-100 shadow-lg">
-          <CardContent className="p-6">
-            {/* Toggle Buttons */}
-            <div className="flex gap-2 mb-6">
               <Button
-                onClick={() => setIsSignUp(false)}
-                variant={!isSignUp ? "default" : "outline"}
-                className={`flex-1 ${!isSignUp ? "bg-green-500 text-white" : "border-green-200 text-green-600"}`}
-              >
-                <LogIn className="mr-2 h-4 w-4" />
-                {t('signIn')}
-              </Button>
-              <Button
-                onClick={() => setIsSignUp(true)}
-                variant={isSignUp ? "default" : "outline"}
-                className={`flex-1 ${isSignUp ? "bg-green-500 text-white" : "border-green-200 text-green-600"}`}
-              >
-                <UserPlus className="mr-2 h-4 w-4" />
-                {t('signUp')}
+                  onClick={handleSubmit} 
+                  className="w-full"
+                  disabled={isLoading}
+                >
+                  {isLoading ? "Signing In..." : "Sign In"}
               </Button>
             </div>
+            </TabsContent>
 
-            {/* Form */}
+            <TabsContent value="signup">
             <div className="space-y-4">
-              {isSignUp && (
-                <div className="space-y-2">
-                  <Label htmlFor="name" className="text-green-700 font-medium">
-                    {t('fullName')}
-                  </Label>
+                <div>
+                  <Label htmlFor="name">Full Name</Label>
                   <Input
                     id="name"
+                    type="text"
+                    placeholder="Enter your full name"
                     value={formData.name}
-                    onChange={(e) => setFormData({...formData, name: e.target.value})}
-                    placeholder={t('enterFullName')}
-                    className="rounded-xl border-green-200 focus:border-green-500"
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   />
-                  {errors.name && (
-                    <p className="text-red-600 text-sm">{errors.name}</p>
-                  )}
                 </div>
-              )}
-
-              <div className="space-y-2">
-                <Label htmlFor="email" className="text-green-700 font-medium">
-                  {t('emailAddress')}
-                </Label>
+                <div>
+                  <Label htmlFor="signup-email">Email</Label>
                 <Input
-                  id="email"
+                    id="signup-email"
                   type="email"
+                    placeholder="Enter your email"
                   value={formData.email}
-                  onChange={(e) => setFormData({...formData, email: e.target.value})}
-                  placeholder={t('enterEmailAddress')}
-                  className="rounded-xl border-green-200 focus:border-green-500"
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 />
-                {errors.email && (
-                  <p className="text-red-600 text-sm">{errors.email}</p>
-                )}
               </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="password" className="text-green-700 font-medium">
-                  {t('password')}
-                </Label>
+                <div>
+                  <Label htmlFor="signup-password">Password</Label>
                 <Input
-                  id="password"
+                    id="signup-password"
                   type="password"
+                    placeholder="Create a password"
                   value={formData.password}
-                  onChange={(e) => setFormData({...formData, password: e.target.value})}
-                  placeholder={t('enterPassword')}
-                  className="rounded-xl border-green-200 focus:border-green-500"
+                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 />
-                {errors.password && (
-                  <p className="text-red-600 text-sm">{errors.password}</p>
-                )}
               </div>
-
-              {isSignUp && (
-                <div className="space-y-2">
-                  <Label htmlFor="confirmPassword" className="text-green-700 font-medium">
-                    {t('confirmPassword')}
-                  </Label>
+                <div>
+                  <Label htmlFor="confirm-password">Confirm Password</Label>
                   <Input
-                    id="confirmPassword"
+                    id="confirm-password"
                     type="password"
+                    placeholder="Confirm your password"
                     value={formData.confirmPassword}
-                    onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
-                    placeholder={t('confirmYourPassword')}
-                    className="rounded-xl border-green-200 focus:border-green-500"
+                    onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
                   />
-                  {errors.confirmPassword && (
-                    <p className="text-red-600 text-sm">{errors.confirmPassword}</p>
-                  )}
                 </div>
-              )}
-
               <Button
                 onClick={handleSubmit}
-                className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-xl mt-6"
+                  className="w-full"
+                  disabled={isLoading}
               >
-                {isSignUp ? t('createAccountButton') : t('signInButton')}
-                <ArrowRight className="ml-2 h-4 w-4" />
+                  {isLoading ? "Creating Account..." : "Create Account"}
               </Button>
-            </div>
-
-            {/* Info Box */}
-            {isSignUp && (
-              <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-xl">
-                <div className="flex items-center gap-2 mb-2">
-                  <User className="h-4 w-4 text-blue-600" />
-                  <span className="font-medium text-blue-800">{t('newUserSetup')}</span>
-                </div>
-                <p className="text-sm text-blue-700">
-                  {t('newUserSetupDesc')}
-                </p>
+              </div>
+            </TabsContent>
+          </Tabs>
+          
+          {error && (
+            <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-md">
+              <p className="text-sm text-red-600">{error}</p>
               </div>
             )}
           </CardContent>
         </Card>
-
-        {/* Navigation */}
-        <div className="mt-6 flex justify-center">
-          <Button
-            onClick={handleBack}
-            variant="outline"
-            className="border-green-200 text-green-600 hover:bg-green-50"
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            {t('backToHome')}
-          </Button>
-        </div>
-
-        {/* Footer */}
-        <div className="mt-6 text-center text-sm text-green-600">
-          <p>
-            {isSignUp 
-              ? t('alreadyHaveAccount')
-              : t('dontHaveAccount')
-            }
-            <button
-              onClick={() => setIsSignUp(!isSignUp)}
-              className="font-medium underline hover:text-green-700"
-            >
-              {isSignUp ? t('signIn') : t('signUp')}
-            </button>
-          </p>
-        </div>
-      </div>
     </div>
   )
 } 
