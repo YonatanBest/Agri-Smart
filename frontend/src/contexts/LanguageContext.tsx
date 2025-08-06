@@ -2192,9 +2192,19 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     localStorage.setItem('agrilo_preferred_language', language)
   }
 
-  const t = (key: string): string => {
+  const t = (key: string, variables?: Record<string, string>): string => {
     const currentTranslations = translations[selectedLanguage as keyof typeof translations] || translations.en
-    return currentTranslations[key as keyof typeof currentTranslations] || key
+    let translation = currentTranslations[key as keyof typeof currentTranslations] || key
+
+    // If variables are provided, interpolate them into the translation
+    if (variables) {
+      Object.entries(variables).forEach(([variable, value]) => {
+        const placeholder = `{${variable}}`
+        translation = translation.replace(new RegExp(placeholder, 'g'), value || '')
+      })
+    }
+
+    return translation
   }
 
   const value: LanguageContextType = {
