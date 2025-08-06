@@ -14,7 +14,7 @@ export const SUPPORTED_LANGUAGES = [
 interface LanguageContextType {
   selectedLanguage: string
   setSelectedLanguage: (language: string) => void
-  t: (key: string) => string
+  t: (key: string, variables?: Record<string, string>) => string
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined)
@@ -24,23 +24,23 @@ const translations = {
   en: {
     // Navigation
     products: "Products",
-    solutions: "Solutions", 
+    solutions: "Solutions",
     aboutUs: "About-Us",
     letsContact: "Let's Contact",
-    
+
     // Hero Section
     heroTitle: "Empowering Farmers with Intelligent AI Solutions",
     heroSubtitle: "Agrilo provides cutting-edge artificial intelligence to optimize crop yields, manage resources, and predict market trends for a more sustainable and profitable future.",
     getStarted: "Get Started",
     goToDashboard: "Go to Dashboard",
     learnMore: "Learn More",
-    
+
     // Features Section
     keyFeatures: "Key Features",
     featuresSubtitle: "Our AI solutions are designed to address the most pressing challenges faced by modern farmers.",
     precisionFarming: "Precision Farming",
     precisionFarmingDesc: "Optimize planting, irrigation, and harvesting with data-driven insights.",
-    diseaseDetection: "Disease Detection", 
+    diseaseDetection: "Disease Detection",
     diseaseDetectionDesc: "Early identification of crop diseases and pests to minimize losses.",
     weatherPrediction: "Weather Prediction",
     weatherPredictionDesc: "Accurate localized weather forecasts to plan farming activities effectively.",
@@ -50,23 +50,23 @@ const translations = {
     resourceOptimizationDesc: "Efficiently manage water, fertilizer, and energy consumption.",
     sustainablePractices: "Sustainable Practices",
     sustainablePracticesDesc: "Promote eco-friendly farming methods for long-term environmental health.",
-    
+
     // Language Selection
     selectLanguage: "Select Language",
     chooseYourLanguage: "Choose your preferred language",
     continue: "Continue",
-    
+
     // About Section
     about_Us: "What we believe",
     aboutDescription: "At Agrilo, we believe in the power of technology to transform agriculture. Our team of AI specialists, agronomists, and data scientists are dedicated to building intelligent tools that empower farmers to make smarter decisions, increase productivity, and foster sustainable growth. We are committed to supporting the global farming community with innovative and accessible solutions.",
-    
+
     // Main Page Navigation
     home: "Home",
-    monitor: "Monitor", 
+    monitor: "Monitor",
     chat: "Chat",
     calendar: "Calendar",
     profile: "Profile",
-    
+
     // Main Page Content
     farmManagement: "Farm Management",
     quickActions: "Quick Actions",
@@ -76,14 +76,14 @@ const translations = {
     pendingNotifications: "pending notifications",
     dashboard: "Dashboard",
     loading: "Loading...",
-    
+
     // Alert Messages
     pestAlert: "🚨 AI detected potential pest activity in Field A. Schedule inspection today!",
-    
+
     // User Info
     locationNotSet: "Location not set",
     user: "User",
-    
+
     // Home Page
     welcomeBack: "Welcome back",
     farmer: "Farmer",
@@ -131,7 +131,7 @@ const translations = {
     notProvided: "Not provided",
     soilInformation: "Soil Information",
     texture: "Texture",
-    
+
     // Solution Section
     faqs: "FAQs",
     faq1q: "How does Agrilo's AI crop recommendation work?",
@@ -150,7 +150,7 @@ const translations = {
     aboutUsMission: "Empowering farmers worldwide with AI-driven agricultural insights for a sustainable future.",
     mission: "Mission",
     signIn: "Sign-in",
-    
+
     // Auth Options Page
     createAccount: "Create Account",
     joinAgrilo: "Join Agrilo to start your smart farming journey",
@@ -184,7 +184,7 @@ const translations = {
     signingIn: "Signing In...",
     creatingAccount: "Creating Account...",
     createPassword: "Create a password",
-    
+
     // Chat Page
     aiAssistantWelcome: "Hello! I'm your AI farming assistant. How can I help you today? 🌱",
     aiAssistant: "AI Assistant",
@@ -229,7 +229,7 @@ const translations = {
     unknownIssues: "unknown issues",
     unknown: "unknown",
     diagnosisMessageTemplate: "I just analyzed my {crop} and found {problems}. The crop health is {health} with {severity} severity. Can you help me understand what this means and what I should do next?",
-    
+
     // Monitor Page
     cropMonitor: "🌱 Crop Monitor",
     addNewField: "+ Add New Field",
@@ -283,7 +283,7 @@ const translations = {
     uploadOrCaptureImages: "Upload or capture images of your crop, leaf, or soil for AI analysis",
     useCamera: "Use camera",
     fromGallery: "From gallery",
-    
+
     // Calendar Page
     smartFarmingCalendar: "Smart Farming Calendar",
     aiPoweredTaskManagement: "AI-powered task management and scheduling",
@@ -315,7 +315,7 @@ const translations = {
     october: "October",
     november: "November",
     december: "December",
-    
+
     // Settings Page
     back: "Back",
     profileSettings: "Profile Settings",
@@ -344,13 +344,13 @@ const translations = {
     selectFarmingExperience: "Please select your farming experience",
     selectYearsExperience: "Please select years of experience",
     selectMainGoal: "Please select your main goal",
-    
+
     // Calendar Page Additional
     loading: "Loading...",
     loadAITasks: "Load AI Tasks",
     loadingAITasks: "Loading AI Tasks...",
     clearSky: "CLEAR SKY",
-    
+
     // User Registration Page
     tellUsAboutFarming: "Tell Us About Your Farming",
     helpPersonalizeExperience: "Help us personalize your experience",
@@ -376,7 +376,7 @@ const translations = {
     cropName: "Crop Name",
     continueToApp: "Continue to App",
     back: "Back",
-    
+
     // Settings Page Additional
     farmingInformation: "Farming Information",
     yourCrops: "Your Crops",
@@ -393,14 +393,14 @@ const translations = {
     solutions: "መፍትሄዎች",
     aboutUs: "ስለ እኛ",
     letsContact: "እንወያይ",
-    
+
     // Hero Section
     heroTitle: "የአርሶ አደሮችን በዘመናዊ የአሰልጣኝ አይ ስልቶች እንዲያበረታቱ",
     heroSubtitle: "አግሪሎ የተሻሻለው የአሰልጣኝ አይ ቴክኖሎጂ ያቀርባል የዝርያ ምርትን ለማሳደግ፣ ሀብቶችን ለማስተዳደር እና የገበያ አዝማሚያዎችን ለመተንበይ ለተጨማሪ ዘላቂ እና ትርፋማ መስክ።",
     getStarted: "ጀምር",
     goToDashboard: "ወደ ዳሽቦርድ ይሂዱ",
     learnMore: "ተጨማሪ ይወቁ",
-    
+
     // Features Section
     keyFeatures: "ዋና ባህሪያት",
     featuresSubtitle: "የእኛ የአይ ስልቶች የዘመናዊ አርሶ አደሮች የሚያጋጡ ችግሮችን ለመፍታት ተዘጋጅተዋል።",
@@ -416,23 +416,23 @@ const translations = {
     resourceOptimizationDesc: "ውሃ፣ ማዳበሪያ እና የኢነርጂ ፍጆታን በቅልጡፍ ያስተዳድሩ።",
     sustainablePractices: "ዘላቂ ስራዎች",
     sustainablePracticesDesc: "ለረጅም ጊዜ የአካባቢ ጥበቃ የሚያገለግሉ የአካባቢ ደህንነት ያላቸው የእርሻ ዘዴዎችን ያስፋፉ።",
-    
+
     // Language Selection
     selectLanguage: "ቋንቋ ይምረጡ",
     chooseYourLanguage: "የሚያሻዎትን ቋንቋ ይምረጡ",
     continue: "ቀጥል",
-    
+
     // About Section
     about_Us: "ስለ እኛ",
     aboutDescription: "በአግሪሎ፣ ቴክኖሎጂ እርሻን ለመለወጥ ያለውን ኃይል እናምናለን። የእኛ የአይ ስፔሻሊስቶች፣ አግሮኖሚስቶች እና የውሂብ ሳይንቲስቶች ቡድን አርሶ አደሮች የተሻለ ውሳኔ እንዲያደርጉ፣ ምርታማነት እንዲጨምሩ እና ዘላቂ እድገት እንዲያሳድጉ የሚያስችሉ ዘመናዊ መሳሪያዎችን ለመገንባት ቁርጠኞች ናቸው። በዘመናዊ እና ተደራሽ መፍትሄዎች የዓለም አርሶ አደር ማህበረሰብን ለመደገፍ ቁርጠኞች ነን።",
-    
+
     // Main Page Navigation
     home: "የመነሻ ገጽ",
-    monitor: "መከታተል", 
+    monitor: "መከታተል",
     chat: "ውይይት",
     calendar: "መዝገብ",
     profile: "መገለጫ",
-    
+
     // Main Page Content
     farmManagement: "የእርሻ አስተዳደር",
     quickActions: "ፈጣን ድርጊቶች",
@@ -442,14 +442,14 @@ const translations = {
     pendingNotifications: "የሚጠበቁ ማስታወቂያዎች",
     dashboard: "የመከወኛ ሰሌዳ",
     loading: "በመጫን ላይ...",
-    
+
     // Alert Messages
     pestAlert: "🚨 አይ በግቢ ኤ ውስጥ የጎጆ እንቅስቃሴ እንደሚያውቅ አስተውሏል። ዛሬ ምርመራ ያዘጋጁ!",
-    
+
     // User Info
     locationNotSet: "አካባቢ አልተዘጋጀም",
     user: "ተጠቃሚ",
-    
+
     // Home Page
     welcomeBack: "እንደገና እንኳን ደስ አለዎት",
     farmer: "አርሶ አደር",
@@ -487,7 +487,7 @@ const translations = {
     noRecommendationsYet: "ገና ምክር የለም",
     clickGetRecommendations: "የአይ ምክሮችን ለማየት 'ምክሮችን ያግኙ' ይጫኑ",
     farmerInformation: "የአርሶ አደር መረጃ",
-    
+
     // Solution Section
     faq1q: "የአግሪሎ የአይ ዝርያ ምክር እንዴት ይሰራል?",
     faq1a: "የእኛ አይ የእርስዎን የአፈር አይነት፣ አካባቢ፣ የአየር ሁኔታ ንድፍ እና የእርሻ ግቦች ያዳምጣል የግል ዝርያ ምክሮችን ለመስጠት የምርት እና ዘላቂነትን ያሳድጋል።",
@@ -505,7 +505,7 @@ const translations = {
     aboutUsMission: "የዓለም አርሶ አደሮችን በአይ የተጎለበተ የእርሻ ግንዛቤ ለዘላቂ መስክ እንዲያበረታቱ።",
     mission: "ተልእኮ",
     signIn: "ግባ",
-    
+
     // Auth Options Page
     createAccount: "መለያ ፍጠር",
     joinAgrilo: "የብልሽ እርሻ ጉዞዎን ለመጀመር አግሪሎ ላይ ይቀላቀሉ",
@@ -539,7 +539,7 @@ const translations = {
     signingIn: "ይግባል...",
     creatingAccount: "መለያ ይፈጥራል...",
     createPassword: "የይለፍ ቃል ይፍጠሩ",
-    
+
     // Chat Page
     aiAssistantWelcome: "ሰላም! የእርስዎ የአይ እርሻ ረዳት ነኝ። ዛሬ እንዴት ልረዳዎት እችላለሁ? 🌱",
     aiAssistant: "የአይ ረዳት",
@@ -584,7 +584,7 @@ const translations = {
     unknownIssues: "የማይታወቁ ችግሮች",
     unknown: "የማይታወቅ",
     diagnosisMessageTemplate: "የ{crop} ምርመራ አደረግኩ እና {problems} አገኘሁ። የዝርያ ጥበቃ {health} ነው ከ{severity} ከባድነት ጋር። ይህ ምን ማለት እንደሆነ እና በመቀጠል ምን ማድረግ እንደሚገባ ልረዳኝ እችላለሁ?",
-    
+
     // Monitor Page
     cropMonitor: "🌱 የዝርያ መከታተል",
     addNewField: "+ አዲስ መስክ አክል",
@@ -638,7 +638,7 @@ const translations = {
     uploadOrCaptureImages: "የዝርያዎን፣ ቅጠል ወይም አፈር ለአይ ትንተና ምስል ይጫኑ ወይም ይያዙ",
     useCamera: "ካሜራ ይጠቀሙ",
     fromGallery: "ከመደብ ያግኙ",
-    
+
     // Calendar Page
     smartFarmingCalendar: "ዘመናዊ የእርሻ መዝገብ",
     aiPoweredTaskManagement: "የአይ የተጎለበተ የስራ አስተዳደር እና የጊዜ ማዘጋጀት",
@@ -670,7 +670,7 @@ const translations = {
     october: "ጥቅምት",
     november: "ሕዳር",
     december: "ታህሳስ",
-    
+
     // Settings Page
     back: "ወደ ኋላ",
     profileSettings: "የመገለጫ ቅንብሮች",
@@ -699,13 +699,13 @@ const translations = {
     selectFarmingExperience: "እባክዎ የእርሻ ስራ ስሜትዎን ይምረጡ",
     selectYearsExperience: "እባክዎ የስራ ስሜት ዓመታትን ይምረጡ",
     selectMainGoal: "እባክዎ ዋና ግብዎን ይምረጡ",
-    
+
     // Calendar Page Additional
     loading: "በመጫን ላይ...",
     loadAITasks: "የአይ ስራዎችን ጫን",
     loadingAITasks: "የአይ ስራዎች ተጫንቷል...",
     clearSky: "ግማሽ አየር",
-    
+
     // User Registration Page
     tellUsAboutFarming: "የግብርናዎ ስለ እንደሆነ ይንገሩን",
     helpPersonalizeExperience: "የእርስዎ ልምድ እንዲስተካከል ያግዙን",
@@ -731,7 +731,7 @@ const translations = {
     cropName: "የዕፅ ስም",
     continueToApp: "ወደ መተግበሪያ ቀጥል",
     back: "ተመለስ",
-    
+
     // Settings Page Additional
     farmingInformation: "የእርሻ መረጃ",
     yourCrops: "የእርስዎ ዝርያዎች",
@@ -748,14 +748,14 @@ const translations = {
     solutions: "Løsninger",
     aboutUs: "Om Oss",
     letsContact: "La Oss Kontakte",
-    
+
     // Hero Section
     heroTitle: "Støtter Bønder med Intelligente AI-løsninger",
     heroSubtitle: "Agrilo tilbyr banebrytende kunstig intelligens for å optimalisere avling, administrere ressurser og forutsi markedsutvikling for en mer bærekraftig og lønnsom fremtid.",
     getStarted: "Kom i Gang",
     goToDashboard: "Gå til Dashbord",
     learnMore: "Lær Mer",
-    
+
     // Features Section
     keyFeatures: "Hovedfunksjoner",
     featuresSubtitle: "Våre AI-løsninger er designet for å håndtere de mest presserende utfordringene som moderne bønder møter.",
@@ -771,23 +771,23 @@ const translations = {
     resourceOptimizationDesc: "Administrer vann, gjødsel og energiforbruk effektivt.",
     sustainablePractices: "Bærekraftige Praksiser",
     sustainablePracticesDesc: "Fremme miljøvennlige landbruksmetoder for langsiktig miljøhelse.",
-    
+
     // Language Selection
     selectLanguage: "Velg Språk",
     chooseYourLanguage: "Velg ditt foretrukne språk",
     continue: "Fortsett",
-    
+
     // About Section
     about_Us: "Om Oss",
     aboutDescription: "Hos Agrilo tror vi på teknologiens kraft til å forvandle landbruket. Vårt team av AI-spesialister, agronomer og datavitenskapsmenn er dedikert til å bygge intelligente verktøy som styrker bønder til å ta smartere beslutninger, øke produktiviteten og fremme bærekraftig vekst. Vi er forpliktet til å støtte det globale landbrukssamfunnet med innovative og tilgjengelige løsninger.",
-    
+
     // Main Page Navigation
     home: "Hjem",
-    monitor: "Overvåk", 
+    monitor: "Overvåk",
     chat: "Chat",
     calendar: "Kalender",
     profile: "Profil",
-    
+
     // Main Page Content
     farmManagement: "Gårdsstyring",
     quickActions: "Hurtighandlinger",
@@ -797,14 +797,14 @@ const translations = {
     pendingNotifications: "ventende varsler",
     dashboard: "Dashbord",
     loading: "Laster...",
-    
+
     // Alert Messages
     pestAlert: "🚨 AI oppdaget potensiell skadeaktivitet i Aker. Planlegg inspeksjon i dag!",
-    
+
     // User Info
     locationNotSet: "Plassering ikke satt",
     user: "Bruker",
-    
+
     // Home Page
     welcomeBack: "Velkommen tilbake",
     farmer: "Bonde",
@@ -852,7 +852,7 @@ const translations = {
     notProvided: "Ikke oppgitt",
     soilInformation: "Jordinformasjon",
     texture: "Tekstur",
-    
+
     // Solution Section
     faqs: "FAQ",
     faq1q: "Hvordan fungerer Agrilos AI-avlingsanbefaling?",
@@ -870,7 +870,7 @@ const translations = {
     aboutUsDescription: "Agrilo er en revolusjonerende landbruksteknologiplattform som kombinerer kunstig intelligens, datavitenskap og presisjonslandbruk for å hjelpe bønder med å ta smartere beslutninger. Plattformen vår analyserer jordforhold, værmønstre og markeds trender for å gi personlige avlingsanbefalinger som maksimerer avling samtidig som den fremmer bærekraftig landbruk.",
     aboutUsMission: "Å styrke bønder over hele verden med AI-drevne landbruksinnsikter for en bærekraftig fremtid.",
     mission: "Oppdrag",
-    
+
     // Auth Options Page
     createAccount: "Opprett konto",
     welcomeBack: "Velkommen tilbake",
@@ -906,7 +906,7 @@ const translations = {
     signingIn: "Logger inn...",
     creatingAccount: "Oppretter konto...",
     createPassword: "Opprett et passord",
-    
+
     // Chat Page
     aiAssistantWelcome: "Hallo! Jeg er din AI-landbruksassistent. Hvordan kan jeg hjelpe deg i dag? 🌱",
     aiAssistant: "AI-assistent",
@@ -951,7 +951,7 @@ const translations = {
     unknownIssues: "ukjente problemer",
     unknown: "ukjent",
     diagnosisMessageTemplate: "Jeg analyserte nettopp {crop} og fant {problems}. Avlingshelsen er {health} med {severity} alvorlighetsgrad. Kan du hjelpe meg å forstå hva dette betyr og hva jeg bør gjøre videre?",
-    
+
     // Monitor Page
     cropMonitor: "🌱 Avlingsmonitor",
     addNewField: "+ Legg til nytt felt",
@@ -1005,7 +1005,7 @@ const translations = {
     uploadOrCaptureImages: "Last opp eller ta bilder av avlingen, blad eller jord for AI-analyse",
     useCamera: "Bruk kamera",
     fromGallery: "Fra galleri",
-    
+
     // Calendar Page
     smartFarmingCalendar: "Smart Landbrukskalender",
     aiPoweredTaskManagement: "AI-drevet oppgaveadministrasjon og planlegging",
@@ -1037,7 +1037,7 @@ const translations = {
     october: "Oktober",
     november: "November",
     december: "Desember",
-    
+
     // Settings Page
     back: "Tilbake",
     profileSettings: "Profilinnstillinger",
@@ -1066,13 +1066,13 @@ const translations = {
     selectFarmingExperience: "Vennligst velg din landbrukserfaring",
     selectYearsExperience: "Vennligst velg års erfaring",
     selectMainGoal: "Vennligst velg ditt hovedmål",
-    
+
     // Calendar Page Additional
     loading: "Laster...",
     loadAITasks: "Last AI-oppgaver",
     loadingAITasks: "Laster AI-oppgaver...",
     clearSky: "KLAR Himmel",
-    
+
     // User Registration Page
     tellUsAboutFarming: "Fortell oss om jordbruket ditt",
     helpPersonalizeExperience: "Hjelp oss å tilpasse din opplevelse",
@@ -1098,7 +1098,7 @@ const translations = {
     cropName: "Avlingsnavn",
     continueToApp: "Fortsett til app",
     back: "Tilbake",
-    
+
     // Settings Page Additional
     farmingInformation: "Landbruksinformasjon",
     yourCrops: "Dine avlinger",
@@ -1115,14 +1115,14 @@ const translations = {
     solutions: "Suluhisho",
     aboutUs: "Kuhusu Sisi",
     letsContact: "Tuwasiliane",
-    
+
     // Hero Section
     heroTitle: "Kuwawezesha Wakulima na Suluhisho za AI za Busara",
     heroSubtitle: "Agrilo inatoa artificial intelligence ya kisasa kukarabati mavuno, kusimamia rasilimali, na kutabiri mwelekeo wa soko kwa mustakabali wa endelevu na wa faida.",
     getStarted: "Anza",
     goToDashboard: "Nenda kwenye Dashibodi",
     learnMore: "Jifunze Zaidi",
-    
+
     // Features Section
     keyFeatures: "Vipengele Muhimu",
     featuresSubtitle: "Suluhisho zetu za AI zimeundwa kushughulikia changamoto muhimu zaidi zinazowakabili wakulima wa kisasa.",
@@ -1138,23 +1138,23 @@ const translations = {
     resourceOptimizationDesc: "Simamia maji, mbolea, na matumizi ya nishati kwa ufanisi.",
     sustainablePractices: "Mazoea Endelevu",
     sustainablePracticesDesc: "Kuendeleza mbinu za kilimo zinazofaa mazingira kwa afya ya muda mrefu ya mazingira.",
-    
+
     // Language Selection
     selectLanguage: "Chagua Lugha",
     chooseYourLanguage: "Chagua lugha unayopendelea",
     continue: "Endelea",
-    
+
     // About Section
     about_Us: "Kuhusu Sisi",
     aboutDescription: "Katika Agrilo, tunamini nguvu ya teknolojia kubadilisha kilimo. Timu yetu ya wataalam wa AI, wataalam wa kilimo, na wanasayansi wa data wamejitolea kujenga zana za busara zinazowezesha wakulima kufanya maamuzi ya busara zaidi, kuongeza uzalishaji, na kukuza ukuaji endelevu. Tumejitolea kusaidia jamii ya kilimo ya ulimwengu kwa suluhisho za uvumbuzi na zinazopatikana.",
-    
+
     // Main Page Navigation
     home: "Nyumbani",
-    monitor: "Fuatilia", 
+    monitor: "Fuatilia",
     chat: "Ongea",
     calendar: "Kalenda",
     profile: "Wasifu",
-    
+
     // Main Page Content
     farmManagement: "Usimamizi wa Shamba",
     quickActions: "Vitendo vya Haraka",
@@ -1164,14 +1164,14 @@ const translations = {
     pendingNotifications: "arifa zinazosubiri",
     dashboard: "Dashibodi",
     loading: "Inapakia...",
-    
+
     // Alert Messages
     pestAlert: "🚨 AI imegundua shughuli za wadudu katika Shamba A. Panga ukaguzi leo!",
-    
+
     // User Info
     locationNotSet: "Mahali haijatengwa",
     user: "Mtumiaji",
-    
+
     // Home Page
     welcomeBack: "Karibu Tena",
     farmer: "Mkulima",
@@ -1219,7 +1219,7 @@ const translations = {
     notProvided: "Haijatolewa",
     soilInformation: "Maelezo ya Udongo",
     texture: "Muundo",
-    
+
     // Solution Section
     faqs: "Maswali Yanayoulizwa Sana",
     faq1q: "Je, ushauri wa mazao wa AI wa Agrilo unafanyaje kazi?",
@@ -1237,7 +1237,7 @@ const translations = {
     aboutUsDescription: "Agrilo ni jukwaa la teknolojia ya kilimo la mapinduzi ambalo linaunganisha akili ya bandia, sayansi ya data, na kilimo cha usahihi kusaidia wakulima kufanya maamuzi ya busara zaidi. Jukwaa letu linachambua hali ya udongo, muundo wa hali ya hewa, na mwelekeo wa soko kutoa ushauri wa mazao wa kibinafsi ambao huongeza mavuno wakati wa kuendeleza mazoea ya kilimo endelevu.",
     aboutUsMission: "Kuwawezesha wakulima ulimwenguni kote na ufahamu wa kilimo unaoendeshwa na AI kwa mustakabali endelevu.",
     mission: "Dhamira",
-    
+
     // Auth Options Page
     createAccount: "Unda Akaunti",
     welcomeBack: "Karibu Tena",
@@ -1273,7 +1273,7 @@ const translations = {
     signingIn: "Inaingia...",
     creatingAccount: "Inaunda akaunti...",
     createPassword: "Unda nywila",
-    
+
     // Chat Page
     aiAssistantWelcome: "Hujambo! Mimi ni msaidizi wako wa AI wa kilimo. Ninawezaje kukusaidia leo? 🌱",
     aiAssistant: "Msaidizi wa AI",
@@ -1318,7 +1318,7 @@ const translations = {
     unknownIssues: "masuala yasiyojulikana",
     unknown: "asiyojulikana",
     diagnosisMessageTemplate: "Nilichambua {crop} yangu na nikapata {problems}. Afya ya mazao ni {health} na ukali wa {severity}. Unaweza kunisaidia kuelewa hii inamaanisha nini na ninapaswa kufanya nini baadaye?",
-    
+
     // Monitor Page
     cropMonitor: "🌱 Mfuatiliaji wa Mazao",
     addNewField: "+ Ongeza Shamba Jipya",
@@ -1372,7 +1372,7 @@ const translations = {
     uploadOrCaptureImages: "Pakia au upige picha za mazao, majani au udongo kwa uchambuzi wa AI",
     useCamera: "Tumia kamera",
     fromGallery: "Kutoka kwenye galeria",
-    
+
     // Calendar Page
     smartFarmingCalendar: "Kalenda ya Kilimo cha Busara",
     aiPoweredTaskManagement: "Usimamizi wa kazi unaoendeshwa na AI na upangaji",
@@ -1404,7 +1404,7 @@ const translations = {
     october: "Oktoba",
     november: "Novemba",
     december: "Desemba",
-    
+
     // Settings Page
     back: "Rudi Nyuma",
     profileSettings: "Mipangilio ya Wasifu",
@@ -1433,13 +1433,13 @@ const translations = {
     selectFarmingExperience: "Tafadhali chagua uzoefu wako wa kilimo",
     selectYearsExperience: "Tafadhali chagua miaka ya uzoefu",
     selectMainGoal: "Tafadhali chagua lengo lako kuu",
-    
+
     // Calendar Page Additional
     loading: "Inapakia...",
     loadAITasks: "Pakia Kazi za AI",
     loadingAITasks: "Inapakia Kazi za AI...",
     clearSky: "ANGA WAZURI",
-    
+
     // User Registration Page
     tellUsAboutFarming: "Tuambie Kuhusu Kilimo Chako",
     helpPersonalizeExperience: "Tusaidie kuiboresha uzoefu wako",
@@ -1465,7 +1465,7 @@ const translations = {
     cropName: "Jina la Zao",
     continueToApp: "Endelea kwenye Programu",
     back: "Rudi Nyuma",
-    
+
     // Settings Page Additional
     farmingInformation: "Maelezo ya Kilimo",
     yourCrops: "Mazao Yako",
@@ -1482,14 +1482,14 @@ const translations = {
     solutions: "Soluciones",
     aboutUs: "Sobre Nosotros",
     letsContact: "Contáctanos",
-    
+
     // Hero Section
     heroTitle: "Empoderando a los Agricultores con Soluciones Inteligentes de IA",
     heroSubtitle: "Agrilo proporciona inteligencia artificial de vanguardia para optimizar rendimientos de cultivos, gestionar recursos y predecir tendencias del mercado para un futuro más sostenible y rentable.",
     getStarted: "Comenzar",
     goToDashboard: "Ir al Panel de Control",
     learnMore: "Saber Más",
-    
+
     // Features Section
     keyFeatures: "Características Clave",
     featuresSubtitle: "Nuestras soluciones de IA están diseñadas para abordar los desafíos más apremiantes que enfrentan los agricultores modernos.",
@@ -1505,23 +1505,23 @@ const translations = {
     resourceOptimizationDesc: "Gestiona eficientemente el consumo de agua, fertilizantes y energía.",
     sustainablePractices: "Prácticas Sostenibles",
     sustainablePracticesDesc: "Promueve métodos agrícolas respetuosos con el medio ambiente para la salud ambiental a largo plazo.",
-    
+
     // Language Selection
     selectLanguage: "Seleccionar Idioma",
     chooseYourLanguage: "Elige tu idioma preferido",
     continue: "Continuar",
-    
+
     // About Section
     about_Us: "Sobre Nosotros",
     aboutDescription: "En Agrilo, creemos en el poder de la tecnología para transformar la agricultura. Nuestro equipo de especialistas en IA, agrónomos y científicos de datos están dedicados a construir herramientas inteligentes que empoderen a los agricultores para tomar decisiones más inteligentes, aumentar la productividad y fomentar el crecimiento sostenible. Estamos comprometidos a apoyar a la comunidad agrícola global con soluciones innovadoras y accesibles.",
-    
+
     // Main Page Navigation
     home: "Inicio",
-    monitor: "Monitorear", 
+    monitor: "Monitorear",
     chat: "Chat",
     calendar: "Calendario",
     profile: "Perfil",
-    
+
     // Main Page Content
     farmManagement: "Gestión de Finca",
     quickActions: "Acciones Rápidas",
@@ -1531,14 +1531,14 @@ const translations = {
     pendingNotifications: "notificaciones pendientes",
     dashboard: "Panel de Control",
     loading: "Cargando...",
-    
+
     // Alert Messages
     pestAlert: "🚨 IA detectó actividad potencial de plagas en Campo A. ¡Programa inspección hoy!",
-    
+
     // User Info
     locationNotSet: "Ubicación no establecida",
     user: "Usuario",
-    
+
     // Home Page
     welcomeBack: "Bienvenido de Vuelta",
     farmer: "Agricultor",
@@ -1586,7 +1586,7 @@ const translations = {
     notProvided: "No proporcionado",
     soilInformation: "Información del Suelo",
     texture: "Textura",
-    
+
     // Auth Options Page
     createAccount: "Crear Cuenta",
     welcomeBack: "Bienvenido de Vuelta",
@@ -1622,7 +1622,7 @@ const translations = {
     signingIn: "Iniciando sesión...",
     creatingAccount: "Creando cuenta...",
     createPassword: "Crear contraseña",
-    
+
     // Chat Page
     aiAssistantWelcome: "Hola! Soy tu asistente de agricultura de IA. ¿Cómo te puedo ayudar hoy? 🌱",
     aiAssistant: "Asistente de IA",
@@ -1667,7 +1667,7 @@ const translations = {
     unknownIssues: "problemas desconocidos",
     unknown: "desconocido",
     diagnosisMessageTemplate: "Acabo de analizar mi {crop} y encontré {problems}. La salud del cultivo es {health} con {severity} gravedad. ¿Puedes ayudarme a entender qué significa esto y qué debería hacer a continuación?",
-    
+
     // Monitor Page
     cropMonitor: "🌱 Monitor de Cultivos",
     addNewField: "+ Añadir nuevo campo",
@@ -1721,7 +1721,7 @@ const translations = {
     uploadOrCaptureImages: "Subir o capturar imágenes de tu cultivo, hoja o suelo para análisis",
     useCamera: "Usar cámara",
     fromGallery: "Desde galería",
-    
+
     // Calendar Page
     smartFarmingCalendar: "Calendario de Agricultura Inteligente",
     aiPoweredTaskManagement: "Administración de Tareas y Programación de Agricultura",
@@ -1753,7 +1753,7 @@ const translations = {
     october: "Oktober",
     november: "Noviembre",
     december: "Diciembre",
-    
+
     // Settings Page
     back: "Atrás",
     profileSettings: "Configuración de Perfil",
@@ -1782,13 +1782,13 @@ const translations = {
     selectFarmingExperience: "Por favor, selecciona tu experiencia agrícola",
     selectYearsExperience: "Por favor, selecciona años de experiencia",
     selectMainGoal: "Por favor, selecciona tu objetivo principal",
-    
+
     // Calendar Page Additional
     loading: "Cargando...",
     loadAITasks: "Cargar Tareas de IA",
     loadingAITasks: "Cargando Tareas de IA...",
     clearSky: "CIELO DESPEJADO",
-    
+
     // User Registration Page
     tellUsAboutFarming: "Cuéntanos sobre tu agricultura",
     helpPersonalizeExperience: "Ayúdanos a personalizar tu experiencia",
@@ -1814,7 +1814,7 @@ const translations = {
     cropName: "Nombre del Cultivo",
     continueToApp: "Continuar a la app",
     back: "Atrás",
-    
+
     // Settings Page Additional
     farmingInformation: "Información de Agricultura",
     yourCrops: "Tus Cultivos",
@@ -1831,14 +1831,14 @@ const translations = {
     solutions: "Solusi",
     aboutUs: "Tentang Kami",
     letsContact: "Hubungi Kami",
-    
+
     // Hero Section
     heroTitle: "Memberdayakan Petani dengan Solusi AI Cerdas",
     heroSubtitle: "Agrilo menyediakan artificial intelligence terkini untuk mengoptimalkan hasil panen, mengelola sumber daya, dan memprediksi tren pasar untuk masa depan yang lebih berkelanjutan dan menguntungkan.",
     getStarted: "Mulai",
     goToDashboard: "Pergi ke Dasbor",
     learnMore: "Pelajari Lebih Lanjut",
-    
+
     // Features Section
     keyFeatures: "Fitur Utama",
     featuresSubtitle: "Solusi AI kami dirancang untuk mengatasi tantangan paling mendesak yang dihadapi petani modern.",
@@ -1854,23 +1854,23 @@ const translations = {
     resourceOptimizationDesc: "Kelola konsumsi air, pupuk, dan energi secara efisien.",
     sustainablePractices: "Praktik Berkelanjutan",
     sustainablePracticesDesc: "Promosikan metode pertanian ramah lingkungan untuk kesehatan lingkungan jangka panjang.",
-    
+
     // Language Selection
     selectLanguage: "Pilih Bahasa",
     chooseYourLanguage: "Pilih bahasa yang Anda sukai",
     continue: "Lanjutkan",
-    
+
     // About Section
     about_Us: "Tentang Kami",
     aboutDescription: "Di Agrilo, kami percaya pada kekuatan teknologi untuk mengubah pertanian. Tim kami yang terdiri dari spesialis AI, agronom, dan ilmuwan data berdedikasi untuk membangun alat cerdas yang memberdayakan petani untuk membuat keputusan yang lebih cerdas, meningkatkan produktivitas, dan mendorong pertumbuhan berkelanjutan. Kami berkomitmen untuk mendukung komunitas pertanian global dengan solusi yang inovatif dan mudah diakses.",
-    
+
     // Main Page Navigation
     home: "Beranda",
-    monitor: "Monitor", 
+    monitor: "Monitor",
     chat: "Chat",
     calendar: "Kalender",
     profile: "Profil",
-    
+
     // Main Page Content
     farmManagement: "Manajemen Pertanian",
     quickActions: "Aksi Cepat",
@@ -1880,14 +1880,14 @@ const translations = {
     pendingNotifications: "notifikasi tertunda",
     dashboard: "Dasbor",
     loading: "Memuat...",
-    
+
     // Alert Messages
     pestAlert: "🚨 AI mendeteksi aktivitas hama potensial di Ladang A. Jadwalkan inspeksi hari ini!",
-    
+
     // User Info
     locationNotSet: "Lokasi belum diatur",
     user: "Pengguna",
-    
+
     // Home Page
     welcomeBack: "Selamat Datang Kembali",
     farmer: "Petani",
@@ -1935,7 +1935,7 @@ const translations = {
     notProvided: "Tidak disediakan",
     soilInformation: "Informasi Tanah",
     texture: "Tekstur",
-    
+
     // Auth Options Page
     createAccount: "Buat Akun",
     welcomeBack: "Selamat Datang Kembali",
@@ -1971,7 +1971,7 @@ const translations = {
     signingIn: "Masuk...",
     creatingAccount: "Membuat akun...",
     createPassword: "Membuat kata sandi",
-    
+
     // Chat Page
     aiAssistantWelcome: "Hallo! Saya adalah asisten pertanian AI Anda. Bagaimana saya bisa membantu Anda hari ini? ��",
     aiAssistant: "Asisten AI",
@@ -2016,7 +2016,7 @@ const translations = {
     unknownIssues: "masalah tidak diketahui",
     unknown: "tidak diketahui",
     diagnosisMessageTemplate: "Saya baru saja menganalisis {crop} saya dan menemukan {problems}. Kesehatan tanaman adalah {health} dengan {severity} tingkat keparahan. Dapatkah Anda membantu saya memahami apa artinya ini dan apa yang sebaiknya saya lakukan selanjutnya?",
-    
+
     // Monitor Page
     cropMonitor: "🌱 Monitor Tanaman",
     addNewField: "+ Tambahkan Lapangan Baru",
@@ -2070,7 +2070,7 @@ const translations = {
     uploadOrCaptureImages: "Unggah atau ambil gambar tanaman, daun, atau tanah untuk analisis",
     useCamera: "Gunakan kamera",
     fromGallery: "Dari galeri",
-    
+
     // Calendar Page
     smartFarmingCalendar: "Kalender Pertanian Cerdas",
     aiPoweredTaskManagement: "Manajemen Tugas dan Perencanaan Pertanian",
@@ -2102,7 +2102,7 @@ const translations = {
     october: "Oktober",
     november: "November",
     december: "Desember",
-    
+
     // Settings Page
     back: "Kembali",
     profileSettings: "Pengaturan Profil",
@@ -2131,13 +2131,13 @@ const translations = {
     selectFarmingExperience: "Silakan pilih pengalaman pertanian Anda",
     selectYearsExperience: "Silakan pilih tahun pengalaman",
     selectMainGoal: "Silakan pilih tujuan utama Anda",
-    
+
     // Calendar Page Additional
     loading: "Memuat...",
     loadAITasks: "Muat Tugas AI",
     loadingAITasks: "Memuat Tugas AI...",
     clearSky: "LANGIT CERAH",
-    
+
     // User Registration Page
     tellUsAboutFarming: "Ceritakan Tentang Pertanian Anda",
     helpPersonalizeExperience: "Bantu kami menyesuaikan pengalaman Anda",
@@ -2163,7 +2163,7 @@ const translations = {
     cropName: "Nama Tanaman",
     continueToApp: "Lanjutkan ke Aplikasi",
     back: "Kembali",
-    
+
     // Settings Page Additional
     farmingInformation: "Informasi Pertanian",
     yourCrops: "Tanaman Anda",
