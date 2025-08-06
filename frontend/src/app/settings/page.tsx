@@ -24,6 +24,7 @@ import {
 } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/contexts/AuthContext"
+import { useLanguage } from "@/contexts/LanguageContext"
 
 interface Crop {
   name: string
@@ -31,6 +32,7 @@ interface Crop {
 }
 
 export default function SettingsPage() {
+  const { t } = useLanguage()
   const [isEditing, setIsEditing] = useState(false)
   const [formData, setFormData] = useState({
     name: "",
@@ -74,19 +76,19 @@ export default function SettingsPage() {
     const newErrors: Record<string, string> = {}
     
     if (!formData.name.trim()) {
-      newErrors.name = "Name is required"
+      newErrors.name = t("nameRequired")
     }
     
     if (!formData.user_type) {
-      newErrors.user_type = "Please select your farming experience"
+      newErrors.user_type = t("selectFarmingExperience")
     }
     
     if (!formData.years_experience) {
-      newErrors.years_experience = "Please select years of experience"
+      newErrors.years_experience = t("selectYearsExperience")
     }
     
     if (!formData.main_goal) {
-      newErrors.main_goal = "Please select your main goal"
+      newErrors.main_goal = t("selectMainGoal")
     }
     
     setErrors(newErrors)
@@ -111,10 +113,10 @@ export default function SettingsPage() {
         await updateUser(userUpdateData)
         
         setIsEditing(false)
-        alert('Profile updated successfully!')
+        alert(t("changesSaved"))
       } catch (error) {
         console.error('Error updating profile:', error)
-        alert('Failed to update profile. Please try again.')
+        alert(t("errorSavingChanges"))
       }
     }
   }
@@ -159,21 +161,21 @@ export default function SettingsPage() {
 
   const getUserTypeName = (type: string) => {
     const types: Record<string, string> = {
-      aspiring: "Aspiring Farmer",
-      beginner: "Beginner (1-2 years)",
-      experienced: "Experienced (3-5 years)",
-      explorer: "Explorer (5+ years)"
+      aspiring: t("aspiringFarmer"),
+      beginner: t("beginnerFarmer"),
+      experienced: t("experiencedFarmer"),
+      explorer: t("explorerFarmer")
     }
     return types[type] || type
   }
 
   const getMainGoalName = (goal: string) => {
     const goals: Record<string, string> = {
-      increase_yield: "Increase Crop Yield",
-      reduce_costs: "Reduce Farming Costs",
-      sustainable_farming: "Sustainable Farming",
-      organic_farming: "Organic Farming",
-      market_access: "Better Market Access"
+      increase_yield: t("increaseCropYield"),
+      reduce_costs: t("reduceFarmingCosts"),
+      sustainable_farming: t("sustainableFarming"),
+      organic_farming: t("organicFarming"),
+      market_access: t("betterMarketAccess")
     }
     return goals[goal] || goal
   }
@@ -183,7 +185,7 @@ export default function SettingsPage() {
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500 mx-auto"></div>
-          <p className="mt-4 text-green-600">Loading profile...</p>
+          <p className="mt-4 text-green-600">{t("loadingProfile")}</p>
         </div>
       </div>
     )
@@ -202,11 +204,11 @@ export default function SettingsPage() {
               className="border-green-200 text-green-600 hover:bg-green-50"
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Back
+              {t("back")}
             </Button>
             <div className="flex items-center gap-2">
               <Settings className="h-6 w-6 text-green-600" />
-              <h1 className="text-2xl font-bold text-green-800">Profile Settings</h1>
+              <h1 className="text-2xl font-bold text-green-800">{t("profileSettings")}</h1>
             </div>
           </div>
           
@@ -216,7 +218,7 @@ export default function SettingsPage() {
             className={isEditing ? "border-green-200 text-green-600" : "bg-green-500 hover:bg-green-600"}
           >
             <Edit className="h-4 w-4 mr-2" />
-            {isEditing ? "Cancel" : "Edit Profile"}
+            {isEditing ? t("cancel") : t("editProfile")}
           </Button>
         </div>
 
@@ -226,14 +228,14 @@ export default function SettingsPage() {
             <CardHeader>
               <CardTitle className="text-green-700 flex items-center gap-2">
                 <User className="h-5 w-5" />
-                Personal Information
+                {t("personalInformation")}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               {/* Name */}
               <div className="space-y-2">
                 <Label htmlFor="name" className="text-green-700 font-medium">
-                  Full Name
+                  {t("fullName")}
                 </Label>
                 {isEditing ? (
                   <Input
@@ -244,7 +246,7 @@ export default function SettingsPage() {
                   />
                 ) : (
                   <div className="p-3 bg-green-50 rounded-xl border border-green-200">
-                    <p className="text-green-800">{formData.name || "Not provided"}</p>
+                    <p className="text-green-800">{formData.name || t("notProvided")}</p>
                   </div>
                 )}
                 {errors.name && (
@@ -255,29 +257,29 @@ export default function SettingsPage() {
                              {/* Email */}
                <div className="space-y-2">
                  <Label htmlFor="email" className="text-green-700 font-medium">
-                   Email Address
+                   {t("emailAddress")}
                  </Label>
                  <div className="p-3 bg-green-50 rounded-xl border border-green-200">
-                   <p className="text-green-800">{formData.email || "Not provided"}</p>
+                                        <p className="text-green-800">{formData.email || t("notProvided")}</p>
                  </div>
                </div>
 
                {/* Location */}
                <div className="space-y-2">
                  <Label htmlFor="location" className="text-green-700 font-medium">
-                   Location
+                   {t("location")}
                  </Label>
                  {isEditing ? (
                    <Input
                      id="location"
                      value={formData.location}
                      onChange={(e) => setFormData({...formData, location: e.target.value})}
-                     placeholder="Enter your location (e.g., coordinates or city)"
+                     placeholder={t("enterLocation")}
                      className="rounded-xl border-green-200 focus:border-green-500"
                    />
                  ) : (
                    <div className="p-3 bg-green-50 rounded-xl border border-green-200">
-                     <p className="text-green-800">{formData.location || "Not provided"}</p>
+                     <p className="text-green-800">{formData.location || t("notProvided")}</p>
                    </div>
                  )}
                </div>
@@ -285,7 +287,7 @@ export default function SettingsPage() {
               {/* Preferred Language */}
               <div className="space-y-2">
                 <Label htmlFor="preferred_language" className="text-green-700 font-medium">
-                  Preferred Language
+                  {t("preferredLanguage")}
                 </Label>
                 {isEditing ? (
                   <Select
@@ -318,14 +320,14 @@ export default function SettingsPage() {
             <CardHeader>
               <CardTitle className="text-green-700 flex items-center gap-2">
                 <Leaf className="h-5 w-5" />
-                Farming Information
+                {t("farmingInformation")}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               {/* User Type */}
               <div className="space-y-2">
                 <Label htmlFor="user_type" className="text-green-700 font-medium">
-                  Farming Experience
+                  {t("farmingExperience")}
                 </Label>
                 {isEditing ? (
                   <Select
@@ -336,10 +338,10 @@ export default function SettingsPage() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="aspiring">Aspiring Farmer</SelectItem>
-                      <SelectItem value="beginner">Beginner (1-2 years)</SelectItem>
-                      <SelectItem value="experienced">Experienced (3-5 years)</SelectItem>
-                      <SelectItem value="explorer">Explorer (5+ years)</SelectItem>
+                      <SelectItem value="aspiring">{t("aspiringFarmer")}</SelectItem>
+                      <SelectItem value="beginner">{t("beginnerFarmer")}</SelectItem>
+                      <SelectItem value="experienced">{t("experiencedFarmer")}</SelectItem>
+                      <SelectItem value="explorer">{t("explorerFarmer")}</SelectItem>
                     </SelectContent>
                   </Select>
                 ) : (
@@ -355,7 +357,7 @@ export default function SettingsPage() {
               {/* Years Experience */}
               <div className="space-y-2">
                 <Label htmlFor="years_experience" className="text-green-700 font-medium">
-                  Years of Experience
+                  {t("yearsOfExperience")}
                 </Label>
                 {isEditing ? (
                   <Select
@@ -368,14 +370,14 @@ export default function SettingsPage() {
                     <SelectContent>
                       {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 25, 30].map((years) => (
                         <SelectItem key={years} value={years.toString()}>
-                          {years} {years === 1 ? 'year' : 'years'}
+                          {years} {years === 1 ? t("year") : t("years")}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 ) : (
                   <div className="p-3 bg-green-50 rounded-xl border border-green-200">
-                    <p className="text-green-800">{formData.years_experience} {formData.years_experience === "1" ? "year" : "years"}</p>
+                    <p className="text-green-800">{formData.years_experience} {formData.years_experience === "1" ? t("year") : t("years")}</p>
                   </div>
                 )}
                 {errors.years_experience && (
@@ -386,7 +388,7 @@ export default function SettingsPage() {
               {/* Main Goal */}
               <div className="space-y-2">
                 <Label htmlFor="main_goal" className="text-green-700 font-medium">
-                  Main Goal
+                  {t("mainGoal")}
                 </Label>
                 {isEditing ? (
                   <Select
@@ -397,11 +399,11 @@ export default function SettingsPage() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="increase_yield">Increase Crop Yield</SelectItem>
-                      <SelectItem value="reduce_costs">Reduce Farming Costs</SelectItem>
-                      <SelectItem value="sustainable_farming">Sustainable Farming</SelectItem>
-                      <SelectItem value="organic_farming">Organic Farming</SelectItem>
-                      <SelectItem value="market_access">Better Market Access</SelectItem>
+                      <SelectItem value="increase_yield">{t("increaseCropYield")}</SelectItem>
+                      <SelectItem value="reduce_costs">{t("reduceFarmingCosts")}</SelectItem>
+                      <SelectItem value="sustainable_farming">{t("sustainableFarming")}</SelectItem>
+                      <SelectItem value="organic_farming">{t("organicFarming")}</SelectItem>
+                      <SelectItem value="market_access">{t("betterMarketAccess")}</SelectItem>
                     </SelectContent>
                   </Select>
                 ) : (
@@ -421,7 +423,7 @@ export default function SettingsPage() {
              <CardHeader>
                <CardTitle className="text-green-700 flex items-center gap-2">
                  <Crop className="h-5 w-5" />
-                 Your Crops
+                 {t("yourCrops")}
                </CardTitle>
              </CardHeader>
              <CardContent>
@@ -430,7 +432,7 @@ export default function SettingsPage() {
                  <div className="space-y-3">
                    <h3 className="text-lg font-semibold text-green-800 flex items-center gap-2">
                      <Leaf className="h-4 w-4" />
-                     Currently Growing
+                     {t("currentlyGrowing")}
                    </h3>
                    <div className="space-y-2">
                      {formData.crops_grown
@@ -443,7 +445,7 @@ export default function SettingsPage() {
                            </div>
                            <div className="flex items-center gap-2">
                              <Badge variant="secondary" className="bg-green-100 text-green-700">
-                               Current
+                               {t("current")}
                              </Badge>
                              {isEditing && (
                                <Button
@@ -460,7 +462,7 @@ export default function SettingsPage() {
                        ))}
                      {formData.crops_grown.filter(crop => crop.status === "current").length === 0 && (
                        <div className="text-center py-4 text-green-600">
-                         <p className="text-sm">No crops currently growing</p>
+                         <p className="text-sm">{t("noCropsCurrentlyGrowing")}</p>
                        </div>
                      )}
                    </div>
@@ -470,7 +472,7 @@ export default function SettingsPage() {
                  <div className="space-y-3">
                    <h3 className="text-lg font-semibold text-blue-800 flex items-center gap-2">
                      <Calendar className="h-4 w-4" />
-                     Planning to Grow
+                     {t("planningToGrow")}
                    </h3>
                    <div className="space-y-2">
                      {formData.crops_grown
@@ -483,7 +485,7 @@ export default function SettingsPage() {
                            </div>
                            <div className="flex items-center gap-2">
                              <Badge variant="secondary" className="bg-blue-100 text-blue-700">
-                               Planned
+                               {t("planned")}
                              </Badge>
                              {isEditing && (
                                <Button
@@ -500,7 +502,7 @@ export default function SettingsPage() {
                        ))}
                      {formData.crops_grown.filter(crop => crop.status === "planned").length === 0 && (
                        <div className="text-center py-4 text-blue-600">
-                         <p className="text-sm">No crops planned</p>
+                         <p className="text-sm">{t("noCropsPlanned")}</p>
                        </div>
                      )}
                    </div>
@@ -510,12 +512,12 @@ export default function SettingsPage() {
                {/* Add New Crop Section */}
                {isEditing && (
                  <div className="mt-6 p-4 bg-gray-50 rounded-xl border border-gray-200">
-                   <h4 className="text-lg font-semibold text-gray-800 mb-3">Add New Crop</h4>
+                   <h4 className="text-lg font-semibold text-gray-800 mb-3">{t("addNewCrop")}</h4>
                    <div className="flex flex-col sm:flex-row gap-3">
                      <Input
                        value={newCropName}
                        onChange={(e) => setNewCropName(e.target.value)}
-                       placeholder="Enter crop name"
+                       placeholder={t("enterCropName")}
                        className="flex-1 rounded-xl border-gray-200 focus:border-green-500"
                      />
                      <Select
@@ -526,8 +528,8 @@ export default function SettingsPage() {
                          <SelectValue />
                        </SelectTrigger>
                        <SelectContent>
-                         <SelectItem value="current">Currently Growing</SelectItem>
-                         <SelectItem value="planned">Planning to Grow</SelectItem>
+                         <SelectItem value="current">{t("currentlyGrowing")}</SelectItem>
+                         <SelectItem value="planned">{t("planningToGrow")}</SelectItem>
                        </SelectContent>
                      </Select>
                      <Button
@@ -535,7 +537,7 @@ export default function SettingsPage() {
                        disabled={!newCropName.trim()}
                        className="bg-green-500 hover:bg-green-600 text-white rounded-xl"
                      >
-                       Add Crop
+                       {t("addCrop")}
                      </Button>
                    </div>
                  </div>
@@ -552,7 +554,7 @@ export default function SettingsPage() {
               className="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-8 rounded-xl"
             >
               <Save className="mr-2 h-4 w-4" />
-              Save Changes
+              {t("saveChanges")}
             </Button>
           </div>
         )}

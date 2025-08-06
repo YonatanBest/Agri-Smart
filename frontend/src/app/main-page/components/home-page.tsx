@@ -332,27 +332,27 @@ export default function HomePage() {
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center gap-2">
-                  <Map className="h-5 w-5 text-green-600" />
-                  {t("yourLocation")} - Detailed View
-              </CardTitle>
-                                                   <div className="flex gap-2">
+                                  <CardTitle className="flex items-center gap-2">
+                    <Map className="h-5 w-5 text-green-600" />
+                    {t("yourLocation")} - {t("detailedView")}
+                  </CardTitle>
+                  <div className="flex gap-2">
                     <Button
                       variant={currentMapView === "satellite" ? "default" : "outline"}
                       size="sm"
                       onClick={() => setCurrentMapView("satellite")}
                       className="text-xs"
                     >
-                      🛰️ Satellite
+                      🛰️ {t("satellite")}
                     </Button>
-              <Button
+                    <Button
                       variant={currentMapView === "roadmap" ? "default" : "outline"}
                       size="sm"
                       onClick={() => setCurrentMapView("roadmap")}
                       className="text-xs"
                     >
-                      🗺️ Roadmap
-              </Button>
+                      🗺️ {t("roadmap")}
+                    </Button>
                   </div>
               </div>
             </CardHeader>
@@ -377,7 +377,7 @@ export default function HomePage() {
                         <div className="text-center">
                           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-500 mx-auto mb-2"></div>
                           <p className="text-gray-600">
-                            {isLoadingMap ? "Loading detailed view..." : "Loading map..."}
+                            {isLoadingMap ? t("loadingDetailedView") : t("loadingMap")}
                           </p>
                         </div>
                       </div>
@@ -385,18 +385,18 @@ export default function HomePage() {
                     <div className="absolute top-2 left-2 bg-white px-3 py-1 rounded-lg shadow-md text-sm font-medium text-gray-700">
                       📍 {locationData.lat.toFixed(6)}, {locationData.lon.toFixed(6)}
                     </div>
-                                         <div className="absolute top-2 right-2 bg-white px-3 py-1 rounded-lg shadow-md text-sm font-medium text-gray-700">
-                       {currentMapView === "satellite" && "🛰️ Satellite View"}
-                       {currentMapView === "roadmap" && "🗺️ Roadmap View"}
+                                                             <div className="absolute top-2 right-2 bg-white px-3 py-1 rounded-lg shadow-md text-sm font-medium text-gray-700">
+                      {currentMapView === "satellite" && t("satelliteView")}
+                      {currentMapView === "roadmap" && t("roadmapView")}
                     </div>
                   </div>
-                  <div className="text-center space-y-2">
+                                    <div className="text-center space-y-2">
                     <p className="text-sm text-gray-600">
-                      <strong>High-Detail Farm View:</strong> Explore your farm location with maximum detail.
+                      <strong>{t("highDetailFarmView")}</strong> {t("exploreFarmLocation")}
                     </p>
-                                         <div className="flex justify-center gap-4 text-xs text-gray-500">
-                       <span>🛰️ <strong>Satellite:</strong> Aerial imagery</span>
-                       <span>🗺️ <strong>Roadmap:</strong> Standard map view</span>
+                    <div className="flex justify-center gap-4 text-xs text-gray-500">
+                      <span>🛰️ <strong>{t("satellite")}:</strong> {t("aerialImagery")}</span>
+                      <span>🗺️ <strong>{t("roadmap")}:</strong> {t("standardMapView")}</span>
                     </div>
                   </div>
                 </div>
@@ -459,12 +459,12 @@ export default function HomePage() {
              <div className="flex items-center justify-between">
                <CardTitle className="flex items-center gap-2">
                  <Zap className="h-5 w-5 text-blue-600" />
-                 Fertilizer Recommendations
+                 {t("fertilizerRecommendations")}
                </CardTitle>
                <div className="flex gap-2">
                  <input
                    type="text"
-                   placeholder="Enter crop name (e.g., maize, wheat, rice)"
+                   placeholder={t("enterCropName")}
                    value={selectedCropForFertilizer}
                    onChange={(e) => setSelectedCropForFertilizer(e.target.value)}
                    className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-64"
@@ -479,7 +479,7 @@ export default function HomePage() {
                    ) : (
                      <Zap className="h-4 w-4 mr-2" />
                    )}
-                   Get Fertilizer Plan
+                   {t("getFertilizerPlan")}
                  </Button>
                </div>
             </div>
@@ -495,8 +495,8 @@ export default function HomePage() {
              ) : (
                <div className="text-center py-8 text-gray-500">
                  <Zap className="h-12 w-12 mx-auto mb-3 text-gray-300" />
-                 <p>Enter a crop name and click "Get Fertilizer Plan" to get recommendations</p>
-                 <p className="text-sm mt-1">Examples: maize, wheat, rice, beans, tomatoes</p>
+                 <p>{t("enterCropNameAndClick")}</p>
+                 <p className="text-sm mt-1">{t("cropExamples")}</p>
             </div>
              )}
           </CardContent>
@@ -601,12 +601,12 @@ export default function HomePage() {
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center gap-2">
               <Zap className="h-5 w-5 text-blue-600" />
-              Fertilizer Recommendations
+              {t("fertilizerRecommendations")}
             </CardTitle>
             <div className="flex gap-2">
               <input
                 type="text"
-                placeholder="Enter crop name (e.g., maize, wheat, rice)"
+                placeholder={t("enterCropName")}
                 value={selectedCropForFertilizer}
                 onChange={(e) => setSelectedCropForFertilizer(e.target.value)}
                 className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-64"
@@ -621,7 +621,7 @@ export default function HomePage() {
                 ) : (
                   <Zap className="h-4 w-4 mr-2" />
                 )}
-                Get Fertilizer Plan
+                {t("getFertilizerPlan")}
               </Button>
             </div>
           </div>
@@ -637,8 +637,8 @@ export default function HomePage() {
           ) : (
             <div className="text-center py-8 text-gray-500">
               <Zap className="h-12 w-12 mx-auto mb-3 text-gray-300" />
-              <p>Enter a crop name and click "Get Fertilizer Plan" to get recommendations</p>
-              <p className="text-sm mt-1">Examples: maize, wheat, rice, beans, tomatoes</p>
+              <p>{t("enterCropNameAndClick")}</p>
+              <p className="text-sm mt-1">{t("cropExamples")}</p>
             </div>
           )}
         </CardContent>

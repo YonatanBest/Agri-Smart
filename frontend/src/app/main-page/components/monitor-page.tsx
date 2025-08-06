@@ -27,9 +27,11 @@ import {
 } from "lucide-react"
 import { apiService } from "@/lib/api"
 import { useDiagnosis } from "@/contexts/DiagnosisContext"
+import { useLanguage } from "@/contexts/LanguageContext"
 
 export default function MonitorPage() {
   const { setDiagnosisData } = useDiagnosis()
+  const { t } = useLanguage()
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [diagnosisResult, setDiagnosisResult] = useState<any>(null)
   const [selectedImage, setSelectedImage] = useState<string | null>(null)
@@ -153,19 +155,19 @@ export default function MonitorPage() {
   return (
     <div className="space-y-6">
             <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-green-700">🌱 Crop Monitor</h1>
+        <h1 className="text-2xl font-bold text-green-700">{t("cropMonitor")}</h1>
         <Button className="bg-green-500 hover:bg-green-600 rounded-xl">
-          + Add New Field
+          {t("addNewField")}
         </Button>
       </div>
     
       <Tabs defaultValue="diagnosis" className="space-y-6">
         <TabsList className="grid w-full grid-cols-2 bg-green-50">
           <TabsTrigger value="diagnosis" className="data-[state=active]:bg-green-500 data-[state=active]:text-white">
-            🔬 Health Diagnosis
+            {t("healthDiagnosis")}
           </TabsTrigger>
           <TabsTrigger value="tracker" className="data-[state=active]:bg-green-500 data-[state=active]:text-white">
-            📊 Treatment Tracker
+            {t("treatmentTracker")}
           </TabsTrigger>
         </TabsList>
 
@@ -175,7 +177,7 @@ export default function MonitorPage() {
             <Card className="rounded-2xl border-2 border-green-100 shadow-lg animate-in slide-in-from-bottom duration-500">
               <CardHeader>
                 <CardTitle className="text-green-700 flex items-center gap-2">
-                  🔬 AI Diagnosis Result
+                  {t("aiDiagnosisResult")}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
@@ -198,7 +200,7 @@ export default function MonitorPage() {
                                 variant={diagnosisResult.structured_insight.overall_health === 'healthy' ? "default" : "destructive"} 
                                 className="bg-white/90"
                               >
-                                {diagnosisResult.structured_insight.overall_health === 'healthy' ? "Healthy" : "Unhealthy"}
+                                {diagnosisResult.structured_insight.overall_health === 'healthy' ? t("healthy") : t("unhealthy")}
                               </Badge>
                             </div>
                           </div>
@@ -206,16 +208,16 @@ export default function MonitorPage() {
 
                         {/* Health Assessment */}
                         <div className="bg-green-50 p-4 rounded-xl">
-                          <h4 className="font-semibold text-green-800 mb-2">Health Assessment:</h4>
+                          <h4 className="font-semibold text-green-800 mb-2">{t("healthAssessment")}</h4>
                           <div className="space-y-2">
                             <div className="flex justify-between items-center">
-                              <span className="text-sm text-green-700">Confidence:</span>
+                              <span className="text-sm text-green-700">{t("confidence")}:</span>
                               <Badge variant="default" className="text-xs bg-green-500">
                                 {diagnosisResult.structured_insight.confidence_level.toUpperCase()}
                               </Badge>
                             </div>
                             <div className="flex justify-between items-center">
-                              <span className="text-sm text-green-700">Severity:</span>
+                              <span className="text-sm text-green-700">{t("severity")}:</span>
                               <Badge 
                                 variant={diagnosisResult.structured_insight.severity_level === 'critical' ? "destructive" : 
                                          diagnosisResult.structured_insight.severity_level === 'high' ? "destructive" :
@@ -236,17 +238,17 @@ export default function MonitorPage() {
                         <Alert className={diagnosisResult.structured_insight.overall_health === 'healthy' ? "border-green-200 bg-green-50" : "border-red-200 bg-red-50"}>
                           <AlertTriangle className={`h-4 w-4 ${diagnosisResult.structured_insight.overall_health === 'healthy' ? "text-green-600" : "text-red-600"}`} />
                           <AlertDescription className={diagnosisResult.structured_insight.overall_health === 'healthy' ? "text-green-700" : "text-red-700"}>
-                            <strong>Status:</strong> {diagnosisResult.structured_insight.overall_health === 'healthy' ? "Crop Appears Healthy" : "Issues Detected"}
+                            <strong>{t("status")}:</strong> {diagnosisResult.structured_insight.overall_health === 'healthy' ? t("cropAppearsHealthy") : t("issuesDetected")}
                           </AlertDescription>
                         </Alert>
 
                         <div className="bg-green-50 p-4 rounded-xl">
-                          <h4 className="font-semibold text-green-800 mb-2">Crop Information:</h4>
+                          <h4 className="font-semibold text-green-800 mb-2">{t("cropInformation")}:</h4>
                           <div className="space-y-2">
                             <div className="flex items-center gap-2">
                               <Leaf className="h-4 w-4 text-green-600" />
                               <span className="text-sm text-green-700">
-                                <strong>Crop:</strong> {diagnosisResult.structured_insight.crop_identified}
+                                <strong>{t("crop")}:</strong> {diagnosisResult.structured_insight.crop_identified}
                               </span>
                             </div>
                           </div>
@@ -254,18 +256,18 @@ export default function MonitorPage() {
 
                         {/* Quick Actions */}
                         <div className="bg-green-50 p-4 rounded-xl">
-                          <h4 className="font-semibold text-green-800 mb-2">Quick Actions:</h4>
+                          <h4 className="font-semibold text-green-800 mb-2">{t("quickActions")}:</h4>
                           <div className="space-y-2">
                             <Button 
                               className="w-full bg-green-500 hover:bg-green-600 rounded-xl flex items-center gap-2"
                               onClick={handleAskAIExpert}
                             >
                               <MessageCircle className="h-4 w-4" />
-                              Ask AI Expert
+                              {t("askAIExpert")}
                             </Button>
                             <Button variant="outline" className="w-full rounded-xl border-2 bg-transparent">
                               <Calendar className="h-4 w-4 mr-2" />
-                              Schedule Treatment
+                              {t("scheduleTreatment")}
                             </Button>
                             <Button 
                               variant="outline" 
@@ -273,7 +275,7 @@ export default function MonitorPage() {
                               onClick={() => setShowSimilarCases(true)}
                             >
                               <ImageIcon className="h-4 w-4 mr-2" />
-                              View Similar Cases
+                              {t("viewSimilarCases")}
                             </Button>
                           </div>
                         </div>
@@ -284,15 +286,15 @@ export default function MonitorPage() {
                         <Alert className={diagnosisResult.raw_results.openepi.not_healthy > 0.5 ? "border-red-200 bg-red-50" : "border-green-200 bg-green-50"}>
                           <AlertTriangle className={`h-4 w-4 ${diagnosisResult.raw_results.openepi.not_healthy > 0.5 ? "text-red-600" : "text-green-600"}`} />
                           <AlertDescription className={diagnosisResult.raw_results.openepi.not_healthy > 0.5 ? "text-red-700" : "text-green-700"}>
-                            <strong>AI Analysis:</strong> {diagnosisResult.raw_results.openepi.not_healthy > 0.5 ? "Issues Detected" : "Crop Appears Healthy"}
+                            <strong>{t("aiAnalysis")}:</strong> {diagnosisResult.raw_results.openepi.not_healthy > 0.5 ? t("issuesDetected") : t("cropAppearsHealthy")}
                       </AlertDescription>
                     </Alert>
 
                     <div className="bg-green-50 p-4 rounded-xl">
-                          <h4 className="font-semibold text-green-800 mb-2">Health Score:</h4>
+                          <h4 className="font-semibold text-green-800 mb-2">{t("healthScore")}:</h4>
                           <div className="space-y-2">
                             <div className="flex justify-between items-center">
-                              <span className="text-sm text-green-700">Healthy Probability:</span>
+                              <span className="text-sm text-green-700">{t("healthyProbability")}:</span>
                               <span className="text-sm font-semibold text-green-800">
                                 {(diagnosisResult.raw_results.openepi.healthy * 100).toFixed(1)}%
                               </span>
@@ -641,11 +643,11 @@ export default function MonitorPage() {
             {/* Image Upload Section */}
             <Card className="rounded-1xl border-2 border-green-100 shadow-lg">
               <CardHeader>
-                <CardTitle className="text-green-700 flex items-center gap-2">📱 Crop Health Diagnosis</CardTitle>
+                <CardTitle className="text-green-700 flex items-center gap-2">📱 {t("cropHealthDiagnosis")}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <p className="text-gray-600 text-sm">
-                  Upload or capture images of your crop, leaf, or soil for AI analysis
+                  {t("uploadOrCaptureImages")}
                 </p>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -660,9 +662,9 @@ export default function MonitorPage() {
                     <Camera className="h-12 w-12" />
                     )}
                     <span className="text-sm font-medium">
-                      {isAnalyzing ? "Analyzing..." : "Capture Image"}
+                      {isAnalyzing ? t("analyzingImage") : t("takePhoto")}
                     </span>
-                    <span className="text-xs opacity-80">Use camera</span>
+                    <span className="text-xs opacity-80">{t("useCamera")}</span>
                   </Button>
                   
                   <Button
@@ -677,9 +679,9 @@ export default function MonitorPage() {
                     <Upload className="h-12 w-12 text-green-600" />
                     )}
                     <span className="text-sm font-medium text-green-600">
-                      {isAnalyzing ? "Analyzing..." : "Upload Image"}
+                      {isAnalyzing ? t("analyzingImage") : t("uploadImage")}
                     </span>
-                    <span className="text-xs text-green-600 opacity-80">From gallery</span>
+                    <span className="text-xs text-green-600 opacity-80">{t("fromGallery")}</span>
                   </Button>
                 </div>
 

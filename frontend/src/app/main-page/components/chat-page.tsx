@@ -14,7 +14,7 @@ import ReactMarkdown from "react-markdown"
 
 export default function ChatPage() {
   const { user, isAuthenticated } = useAuth()
-  const { selectedLanguage, setSelectedLanguage } = useLanguage()
+  const { selectedLanguage, setSelectedLanguage, t } = useLanguage()
   const { diagnosisData, clearDiagnosisData } = useDiagnosis()
   
   // Helper function to get current language info
@@ -66,30 +66,17 @@ export default function ChatPage() {
     {
       id: 1,
       type: "bot",
-      content: "Hello! I'm your AI farming assistant. How can I help you today? 🌱",
+      content: t("aiAssistantWelcome"),
       time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
     },
   ])
 
   // Update welcome message when language changes
   useEffect(() => {
-    if (selectedLanguage !== 'en') {
-      const welcomeMessages = {
-        'am': 'ሰላም! እኔ የእርስዎ AI የግብርና አገልግሎት ነኝ። ዛሬ እንዴት ልረዳዎት እችላለሁ? 🌱',
-        'no': 'Hei! Jeg er din AI-landbruksassistent. Hvordan kan jeg hjelpe deg i dag? 🌱',
-        'sw': 'Hujambo! Mimi ni msaidizi wako wa kilimo wa AI. Ninawezaje kukusaidia leo? 🌱',
-        'es': '¡Hola! Soy tu asistente agrícola de IA. ¿Cómo puedo ayudarte hoy? 🌱',
-        'id': 'Halo! Saya adalah asisten pertanian AI Anda. Bagaimana saya bisa membantu Anda hari ini? 🌱'
-      };
-      
-      const welcomeMessage = welcomeMessages[selectedLanguage as keyof typeof welcomeMessages] || 
-        "Hello! I'm your AI farming assistant. How can I help you today? 🌱";
-      
-      setMessages(prev => prev.map(msg => 
-        msg.id === 1 ? { ...msg, content: welcomeMessage } : msg
-      ));
-    }
-  }, [selectedLanguage]);
+    setMessages(prev => prev.map(msg => 
+      msg.id === 1 ? { ...msg, content: t("aiAssistantWelcome") } : msg
+    ));
+  }, [selectedLanguage, t]);
 
   // Initialize chat session and load preferred language when component mounts
   useEffect(() => {
@@ -123,12 +110,12 @@ export default function ChatPage() {
   useEffect(() => {
     if (diagnosisData && sessionId) {
       const createDiagnosisMessage = () => {
-        const crop = diagnosisData.cropIdentified || 'unknown crop'
-        const problems = diagnosisData.identifiedProblems?.join(', ') || 'unknown issues'
-        const health = diagnosisData.overallHealth || 'unknown'
-        const severity = diagnosisData.severityLevel || 'unknown'
+        const crop = diagnosisData.cropIdentified || t("unknownCrop")
+        const problems = diagnosisData.identifiedProblems?.join(', ') || t("unknownIssues")
+        const health = diagnosisData.overallHealth || t("unknown")
+        const severity = diagnosisData.severityLevel || t("unknown")
         
-        return `I just analyzed my ${crop} and found ${problems}. The crop health is ${health} with ${severity} severity. Can you help me understand what this means and what I should do next?`
+        return t("diagnosisMessageTemplate", { crop, problems, health, severity })
       }
 
       const diagnosisMessage = createDiagnosisMessage()
@@ -172,7 +159,7 @@ export default function ChatPage() {
       
       sendDiagnosisMessage()
     }
-  }, [diagnosisData, sessionId, selectedLanguage, clearDiagnosisData])
+  }, [diagnosisData, sessionId, selectedLanguage, clearDiagnosisData, t])
 
   const playAudioResponse = async (audioBase64: string) => {
     try {
@@ -258,7 +245,7 @@ export default function ChatPage() {
       const errorMessage = {
         id: messages.length + 2,
         type: "bot" as const,
-        content: "Sorry, I'm having trouble connecting right now. Please try again later.",
+        content: t("connectionError"),
         time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
       }
       setMessages(prev => [...prev, errorMessage])
@@ -269,44 +256,44 @@ export default function ChatPage() {
 
   const quickQuestions = [
     {
-      text: "What fertilizer for wheat?",
+      text: t("fertilizerForWheat"),
       icon: <Leaf className="h-3 w-3" />,
-      question: "What fertilizer should I use for wheat crops?"
+      question: t("fertilizerForWheatQuestion")
     },
     {
-      text: "Best time to plant rice",
+      text: t("bestTimeToPlantRice"),
       icon: <Clock className="h-3 w-3" />,
-      question: "When is the best time to plant rice in my region?"
+      question: t("bestTimeToPlantRiceQuestion")
     },
     {
-      text: "Natural pest control",
+      text: t("naturalPestControl"),
       icon: <Bug className="h-3 w-3" />,
-      question: "How can I control pests naturally without chemicals?"
+      question: t("naturalPestControlQuestion")
     },
     {
-      text: "Soil pH testing",
+      text: t("soilPhTesting"),
       icon: <Thermometer className="h-3 w-3" />,
-      question: "What are the best methods for testing soil pH?"
+      question: t("soilPhTestingQuestion")
     },
     {
-      text: "Irrigation tips",
+      text: t("irrigationTips"),
       icon: <Droplets className="h-3 w-3" />,
-      question: "What are the best irrigation scheduling tips for my crops?"
+      question: t("irrigationTipsQuestion")
     },
     {
-      text: "Crop rotation",
+      text: t("cropRotation"),
       icon: <Leaf className="h-3 w-3" />,
-      question: "What are the benefits of crop rotation and how should I plan it?"
+      question: t("cropRotationQuestion")
     },
     {
-      text: "Disease prevention",
+      text: t("diseasePrevention"),
       icon: <Bug className="h-3 w-3" />,
-      question: "How can I prevent common crop diseases?"
+      question: t("diseasePreventionQuestion")
     },
     {
-      text: "Weather impact",
+      text: t("weatherImpact"),
       icon: <Thermometer className="h-3 w-3" />,
-      question: "How does weather affect my crop growth and what should I do?"
+      question: t("weatherImpactQuestion")
     }
   ]
 
@@ -321,7 +308,7 @@ export default function ChatPage() {
       
       // Check if MediaRecorder is supported
       if (!window.MediaRecorder) {
-        throw new Error('MediaRecorder not supported in this browser')
+        throw new Error(t("mediaRecorderNotSupported"))
       }
       
       // Request microphone access
@@ -353,7 +340,7 @@ export default function ChatPage() {
       }
       
       if (!selectedMimeType) {
-        throw new Error('No supported audio format found')
+        throw new Error(t("noSupportedAudioFormat"))
       }
       
       const recorder = new MediaRecorder(stream, {
@@ -404,8 +391,8 @@ export default function ChatPage() {
       ;(recorder as any).timer = timer
     } catch (error) {
       console.error('🎤 Error starting recording:', error)
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
-      alert(`Error accessing microphone: ${errorMessage}. Please check permissions and try again.`)
+      const errorMessage = error instanceof Error ? error.message : t("unknownError")
+      alert(t("microphoneAccessError", { error: errorMessage }))
     }
   }
 
@@ -482,15 +469,15 @@ export default function ChatPage() {
       console.error('Failed to send audio message:', error)
       
       // Provide more helpful error messages for farmers
-      let errorContent = "Sorry, I couldn't process your audio message. Please try again or type your message."
+      let errorContent = t("audioProcessingError")
       
       if (error instanceof Error) {
         if (error.message.includes("Audio quality too low")) {
-          errorContent = "Please speak more clearly and try again. Make sure you're close to your microphone."
+          errorContent = t("speakMoreClearly")
         } else if (error.message.includes("No speech detected")) {
-          errorContent = "I didn't hear anything. Please speak louder and try again."
+          errorContent = t("noSpeechDetected")
         } else if (error.message.includes("400")) {
-          errorContent = "Please speak more clearly and try again. Make sure you're close to your microphone."
+          errorContent = t("speakMoreClearly")
         }
       }
       
@@ -512,7 +499,7 @@ export default function ChatPage() {
       <div className="flex items-center justify-center h-full">
         <div className="text-center">
           <Bot className="h-12 w-12 text-green-500 mx-auto mb-4" />
-          <p className="text-green-700 font-medium">Please log in to start chatting with the AI assistant</p>
+          <p className="text-green-700 font-medium">{t("pleaseLoginToChat")}</p>
         </div>
       </div>
     )
@@ -520,7 +507,6 @@ export default function ChatPage() {
 
   return (
     <>
-
 
       {/* Mobile Layout */}
       <div className="md:hidden p-4 space-y-4 h-[calc(100vh-140px)] flex flex-col">
@@ -531,7 +517,7 @@ export default function ChatPage() {
             <div className="flex items-center justify-between">
               <CardTitle className="text-green-700 flex items-center gap-2 text-sm">
                 <Bot className="h-4 w-4" />
-                AI Assistant
+                {t("aiAssistant")}
                 {selectedLanguage !== 'en' && (
                   <Badge variant="outline" className="ml-2 text-xs">
                     {SUPPORTED_LANGUAGES.find(lang => lang.code === selectedLanguage)?.flag} {SUPPORTED_LANGUAGES.find(lang => lang.code === selectedLanguage)?.name}
@@ -597,9 +583,9 @@ export default function ChatPage() {
                     <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" style={{animationDelay: '0.4s'}}></div>
                   </div>
                   <span className="text-sm font-medium text-red-700">
-                    Recording... {Math.floor(recordingTime / 60)}:{(recordingTime % 60).toString().padStart(2, '0')}
+                    {t("recording")} {Math.floor(recordingTime / 60)}:{(recordingTime % 60).toString().padStart(2, '0')}
                   </span>
-                  <span className="text-xs text-red-600">Tap the red STOP button</span>
+                  <span className="text-xs text-red-600">{t("tapStopButton")}</span>
                 </div>
               )}
               
@@ -610,9 +596,9 @@ export default function ChatPage() {
                   placeholder={
                     isOnline 
                       ? selectedLanguage === 'en' 
-                        ? "Type your farming question..." 
-                        : `Type your question in ${SUPPORTED_LANGUAGES.find(lang => lang.code === selectedLanguage)?.name}...`
-                      : "You're offline"
+                        ? t("typeFarmingQuestion") 
+                        : t("typeQuestionInLanguage", { language: SUPPORTED_LANGUAGES.find(lang => lang.code === selectedLanguage)?.name })
+                      : t("youreOffline")
                   }
                   disabled={!isOnline}
                   onKeyPress={(e) => e.key === "Enter" && sendMessage()}
@@ -647,22 +633,22 @@ export default function ChatPage() {
                     {isRecording ? (
                       <>
                         <div className="w-3 h-3 bg-white rounded-full animate-pulse"></div>
-                        <span className="font-semibold">STOP</span>
+                        <span className="font-semibold">{t("stop")}</span>
                       </>
                     ) : isLoading ? (
                       <>
                         <div className="w-4 h-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
-                        <span className="font-semibold">Processing...</span>
+                        <span className="font-semibold">{t("processing")}</span>
                       </>
                     ) : isPlayingAudio ? (
                       <>
                         <Volume2 className="w-4 h-4 animate-pulse" />
-                        <span className="font-semibold">Playing...</span>
+                        <span className="font-semibold">{t("playing")}</span>
                       </>
                     ) : (
                       <>
                         <Mic className="w-4 h-4" />
-                        <span className="font-semibold">Live Chat</span>
+                        <span className="font-semibold">{t("liveChat")}</span>
                       </>
                     )}
                   </div>
@@ -687,7 +673,7 @@ export default function ChatPage() {
                   {/* Language Dropdown */}
                   {showMobileDropdown && (
                     <div className="absolute top-full left-0 mt-1 bg-white border border-green-200 rounded-lg shadow-xl z-[9999] min-w-[200px] max-h-60 overflow-y-auto">
-                      <div className="p-2 text-xs text-gray-500 border-b bg-white">Available Languages ({SUPPORTED_LANGUAGES.length}):</div>
+                      <div className="p-2 text-xs text-gray-500 border-b bg-white">{t("availableLanguages", { count: SUPPORTED_LANGUAGES.length })}:</div>
                       {SUPPORTED_LANGUAGES.map((lang) => (
                         <button
                           key={lang.code}
@@ -712,7 +698,7 @@ export default function ChatPage() {
               <div className="space-y-2">
                 <div className="flex items-center gap-2 text-xs text-green-600">
                   <Lightbulb className="h-3 w-3" />
-                  <span className="font-medium">Quick Questions:</span>
+                  <span className="font-medium">{t("quickQuestions")}:</span>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {quickQuestions.slice(0, 4).map((item, index) => (
@@ -750,7 +736,6 @@ export default function ChatPage() {
       <div className="hidden md:block p-4 lg:p-6 h-[calc(100vh-120px)] flex flex-col gap-6">
         
 
-
         <div className="flex-1 grid grid-cols-1 lg:grid-cols-1 gap-6">
           {/* Desktop Chat Messages */}
           <Card className="lg:col-span-3 rounded-2xl border-2 border-green-100 shadow-lg overflow-visible flex flex-col">
@@ -758,7 +743,7 @@ export default function ChatPage() {
               <div className="flex items-center justify-between">
                 <CardTitle className="text-green-700 flex items-center gap-2">
                   <Bot className="h-5 w-5" />
-                  AI Assistant
+                  {t("aiAssistant")}
                   {selectedLanguage !== 'en' && (
                     <Badge variant="outline" className="ml-2 text-xs">
                       {SUPPORTED_LANGUAGES.find(lang => lang.code === selectedLanguage)?.flag} {SUPPORTED_LANGUAGES.find(lang => lang.code === selectedLanguage)?.name}
@@ -838,9 +823,9 @@ export default function ChatPage() {
                         <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" style={{animationDelay: '0.4s'}}></div>
                       </div>
                       <span className="text-sm font-medium text-red-700">
-                        Recording... {Math.floor(recordingTime / 60)}:{(recordingTime % 60).toString().padStart(2, '0')}
+                        {t("recording")} {Math.floor(recordingTime / 60)}:{(recordingTime % 60).toString().padStart(2, '0')}
                       </span>
-                      <span className="text-xs text-red-600">Click the red STOP button</span>
+                      <span className="text-xs text-red-600">{t("clickStopButton")}</span>
                     </div>
                   )}
                   
@@ -868,7 +853,7 @@ export default function ChatPage() {
                       {/* Language Dropdown */}
                       {showDesktopDropdown && (
                         <div className="absolute top-full left-0 mt-1 bg-white border border-green-200 rounded-lg shadow-xl z-[9999] min-w-[200px] max-h-60 overflow-y-auto">
-                          <div className="p-2 text-xs text-gray-500 border-b bg-white">Available Languages ({SUPPORTED_LANGUAGES.length}):</div>
+                          <div className="p-2 text-xs text-gray-500 border-b bg-white">{t("availableLanguages", { count: SUPPORTED_LANGUAGES.length })}:</div>
                           {SUPPORTED_LANGUAGES.map((lang) => (
                             <button
                               key={lang.code}
@@ -894,9 +879,9 @@ export default function ChatPage() {
                       placeholder={
                         isOnline 
                           ? selectedLanguage === 'en' 
-                            ? "Type your farming question..." 
-                            : `Type your question in ${SUPPORTED_LANGUAGES.find(lang => lang.code === selectedLanguage)?.name}...`
-                          : "You're offline"
+                            ? t("typeFarmingQuestion") 
+                            : t("typeQuestionInLanguage", { language: SUPPORTED_LANGUAGES.find(lang => lang.code === selectedLanguage)?.name })
+                          : t("youreOffline")
                       }
                       disabled={!isOnline}
                       onKeyPress={(e) => e.key === "Enter" && sendMessage()}
@@ -931,22 +916,22 @@ export default function ChatPage() {
                         {isRecording ? (
                           <>
                             <div className="w-3 h-3 bg-white rounded-full animate-pulse"></div>
-                            <span className="font-semibold">STOP</span>
+                            <span className="font-semibold">{t("stop")}</span>
                           </>
                         ) : isLoading ? (
                           <>
                             <div className="w-4 h-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
-                            <span className="font-semibold">Processing...</span>
+                            <span className="font-semibold">{t("processing")}</span>
                           </>
                         ) : isPlayingAudio ? (
                           <>
                             <Volume2 className="w-4 h-4 animate-pulse" />
-                            <span className="font-semibold">Playing...</span>
+                            <span className="font-semibold">{t("playing")}</span>
                           </>
                         ) : (
                           <>
                             <Mic className="w-4 h-4" />
-                            <span className="font-semibold">Live Chat</span>
+                            <span className="font-semibold">{t("liveChat")}</span>
                           </>
                         )}
                       </div>
@@ -957,7 +942,7 @@ export default function ChatPage() {
                   <div className="space-y-2">
                     <div className="flex items-center gap-2 text-sm text-green-600">
                       <Lightbulb className="h-4 w-4" />
-                      <span className="font-medium">Quick Questions:</span>
+                      <span className="font-medium">{t("quickQuestions")}:</span>
                     </div>
                     <div className="flex flex-wrap gap-2">
                       {quickQuestions.map((item, index) => (

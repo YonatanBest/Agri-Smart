@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/contexts/AuthContext"
+import { useLanguage } from "@/contexts/LanguageContext"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -20,6 +21,7 @@ export default function AuthOptionsPage() {
   const [error, setError] = useState("")
   const router = useRouter()
   const { login, initiateRegistration, isAuthenticated, isLoading, error: authError, clearError } = useAuth()
+  const { t } = useLanguage()
 
   // Redirect authenticated users to main page (only for existing users, not new registrations)
   useEffect(() => {
@@ -42,20 +44,20 @@ export default function AuthOptionsPage() {
   const validateForm = () => {
     if (isSignUp) {
       if (!formData.name || !formData.email || !formData.password || !formData.confirmPassword) {
-        setError("All fields are required")
+        setError(t("allFieldsRequired"))
         return false
       }
       if (formData.password !== formData.confirmPassword) {
-        setError("Passwords do not match")
+        setError(t("passwordsDoNotMatch"))
         return false
       }
       if (formData.password.length < 6) {
-        setError("Password must be at least 6 characters")
+        setError(t("passwordMinLength"))
         return false
       }
     } else {
       if (!formData.email || !formData.password) {
-        setError("Email and password are required")
+        setError(t("emailAndPasswordRequired"))
         return false
       }
     }
@@ -97,7 +99,7 @@ export default function AuthOptionsPage() {
         // Error is handled by the auth context
         console.error("Authentication error:", err)
         if (isSignUp && err.message && err.message.includes('Email already registered')) {
-          alert('This email is already registered. Please sign in instead.')
+          alert(t("emailAlreadyRegistered"))
           setIsSignUp(false)
           setFormData({ name: "", email: formData.email, password: "", confirmPassword: "" })
         }
@@ -117,37 +119,37 @@ export default function AuthOptionsPage() {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold text-gray-900">
-            {isSignUp ? "Create Account" : "Welcome Back"}
+            {isSignUp ? t("createAccount") : t("welcomeBack")}
           </CardTitle>
           <CardDescription className="text-gray-600">
-            {isSignUp ? "Join AgriLo to get started" : "Sign in to your account"}
+            {isSignUp ? t("joinAgrilo") : t("signInToContinue")}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Tabs value={isSignUp ? "signup" : "signin"} onValueChange={(value) => setIsSignUp(value === "signup")}>
             <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="signin">Sign In</TabsTrigger>
-              <TabsTrigger value="signup">Sign Up</TabsTrigger>
+              <TabsTrigger value="signin">{t("signIn")}</TabsTrigger>
+              <TabsTrigger value="signup">{t("signUp")}</TabsTrigger>
             </TabsList>
             
             <TabsContent value="signin">
               <div className="space-y-4">
                 <div>
-                  <Label htmlFor="email">Email</Label>
+                  <Label htmlFor="email">{t("emailAddress")}</Label>
                   <Input
                     id="email"
                     type="email"
-                    placeholder="Enter your email"
+                    placeholder={t("enterEmailAddress")}
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   />
           </div>
                 <div>
-                  <Label htmlFor="password">Password</Label>
+                  <Label htmlFor="password">{t("password")}</Label>
                   <Input
                     id="password"
                     type="password"
-                    placeholder="Enter your password"
+                    placeholder={t("enterPassword")}
                     value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   />
@@ -157,7 +159,7 @@ export default function AuthOptionsPage() {
                   className="w-full"
                   disabled={isLoading}
                 >
-                  {isLoading ? "Signing In..." : "Sign In"}
+                  {isLoading ? t("signingIn") : t("signInButton")}
               </Button>
             </div>
             </TabsContent>
@@ -165,41 +167,41 @@ export default function AuthOptionsPage() {
             <TabsContent value="signup">
             <div className="space-y-4">
                 <div>
-                  <Label htmlFor="name">Full Name</Label>
+                  <Label htmlFor="name">{t("fullName")}</Label>
                   <Input
                     id="name"
                     type="text"
-                    placeholder="Enter your full name"
+                    placeholder={t("enterFullName")}
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   />
                 </div>
                 <div>
-                  <Label htmlFor="signup-email">Email</Label>
+                  <Label htmlFor="signup-email">{t("emailAddress")}</Label>
                 <Input
                     id="signup-email"
                   type="email"
-                    placeholder="Enter your email"
+                    placeholder={t("enterEmailAddress")}
                   value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 />
               </div>
                 <div>
-                  <Label htmlFor="signup-password">Password</Label>
+                  <Label htmlFor="signup-password">{t("password")}</Label>
                 <Input
                     id="signup-password"
                   type="password"
-                    placeholder="Create a password"
+                    placeholder={t("createPassword")}
                   value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 />
               </div>
                 <div>
-                  <Label htmlFor="confirm-password">Confirm Password</Label>
+                  <Label htmlFor="confirm-password">{t("confirmPassword")}</Label>
                   <Input
                     id="confirm-password"
                     type="password"
-                    placeholder="Confirm your password"
+                    placeholder={t("confirmYourPassword")}
                     value={formData.confirmPassword}
                     onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
                   />
@@ -209,7 +211,7 @@ export default function AuthOptionsPage() {
                   className="w-full"
                   disabled={isLoading}
               >
-                  {isLoading ? "Creating Account..." : "Create Account"}
+                  {isLoading ? t("creatingAccount") : t("createAccountButton")}
               </Button>
               </div>
             </TabsContent>

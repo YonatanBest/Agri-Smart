@@ -79,8 +79,8 @@ export default function CalendarPage() {
   const [lastLoadedDate, setLastLoadedDate] = useState<number | null>(null)
 
   const months = [
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December"
+    t("january"), t("february"), t("march"), t("april"), t("may"), t("june"),
+    t("july"), t("august"), t("september"), t("october"), t("november"), t("december")
   ]
 
   // Parse user location from user.location field
@@ -400,8 +400,8 @@ export default function CalendarPage() {
       {/* Header */}
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-green-800">Smart Farming Calendar</h1>
-          <p className="text-green-600">AI-powered task management and scheduling</p>
+          <h1 className="text-2xl font-bold text-green-800">{t("smartFarmingCalendar")}</h1>
+          <p className="text-green-600">{t("aiPoweredTaskManagement")}</p>
         </div>
         <div className="flex items-center gap-2">
           <Button
@@ -415,7 +415,7 @@ export default function CalendarPage() {
             disabled={isLoadingWeather}
           >
             <Cloud className="h-4 w-4 mr-1" />
-            {isLoadingWeather ? "Refreshing..." : "Refresh Weather"}
+            {isLoadingWeather ? t("refreshing") : t("refreshWeather")}
           </Button>
         </div>
       </div>
@@ -427,27 +427,27 @@ export default function CalendarPage() {
            <AlertDescription>
              {user?.location && user.location !== "unknown" ? (
                <>
-                 <span className="font-medium">Weather data for your location: {user.location}</span>
+                 <span className="font-medium">{t("weatherDataForLocation").replace("{location}", user.location)}</span>
                  <br />
-                 <span className="text-sm text-green-600">Coordinates: {locationData.lat.toFixed(4)}, {locationData.lon.toFixed(4)}</span>
+                 <span className="text-sm text-green-600">{t("coordinates").replace("{lat}", locationData.lat.toFixed(4)).replace("{lon}", locationData.lon.toFixed(4))}</span>
                </>
              ) : (
                <>
-                 <span className="font-medium text-yellow-700">Using default location (Ethiopia)</span>
+                 <span className="font-medium text-yellow-700">{t("usingDefaultLocation")}</span>
                  <br />
-                 <span className="text-sm text-yellow-600">Please update your location in settings for personalized weather data</span>
+                 <span className="text-sm text-yellow-600">{t("updateLocationSettings")}</span>
                  <br />
-                 <span className="text-sm text-green-600">Coordinates: {locationData.lat.toFixed(4)}, {locationData.lon.toFixed(4)}</span>
+                 <span className="text-sm text-green-600">{t("coordinates").replace("{lat}", locationData.lat.toFixed(4)).replace("{lon}", locationData.lon.toFixed(4))}</span>
                </>
              )}
-             {isLoadingWeather && " - Loading weather data..."}
+             {isLoadingWeather && ` - ${t("loadingWeatherData")}`}
              <br />
              <span className="text-sm text-green-600">
-               Note: Weather forecast is limited to 14 days due to API constraints
+               {t("weatherForecastLimited")}
              </span>
              <br />
              <span className="text-xs text-green-500">
-               💾 Data is cached for faster loading
+               {t("dataCached")}
              </span>
            </AlertDescription>
          </Alert>
@@ -485,7 +485,7 @@ export default function CalendarPage() {
             <CardContent>
               {/* Calendar Grid */}
               <div className="grid grid-cols-7 gap-1 mb-4">
-                {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
+                {[t("sun"), t("mon"), t("tue"), t("wed"), t("thu"), t("fri"), t("sat")].map((day) => (
                   <div key={day} className="p-2 text-center text-sm font-semibold text-green-700">
                     {day}
                   </div>
@@ -569,7 +569,7 @@ export default function CalendarPage() {
                     disabled={isLoadingTasks || !selectedDayData}
                   >
                     <Plus className="h-4 w-4 mr-1" />
-                    {isLoadingTasks ? "Loading..." : "Load AI Tasks"}
+                    {isLoadingTasks ? t("loading") : t("loadAITasks")}
                   </Button>
                 </div>
               </CardHeader>
@@ -642,7 +642,7 @@ export default function CalendarPage() {
                         disabled={isLoadingTasks}
                       >
                         <Plus className="h-4 w-4 mr-1" />
-                        {isLoadingTasks ? "Loading AI Tasks..." : "Load AI Tasks"}
+                        {isLoadingTasks ? t("loadingAITasks") : t("loadAITasks")}
                       </Button>
                     )}
                   </div>
@@ -662,7 +662,7 @@ export default function CalendarPage() {
               </div>
               <p className="text-sm text-green-600 font-medium">Weather Forecast</p>
               <p className="font-bold text-green-800 text-xl">
-                 {selectedDayData?.weather?.weather_description?.toUpperCase() || "CLEAR SKY"}
+                 {selectedDayData?.weather?.weather_description?.toUpperCase() || t("clearSky")}
                </p>
                <p className="text-sm text-green-600 mt-1">
                  {selectedDayData?.weather?.temperature_max 
