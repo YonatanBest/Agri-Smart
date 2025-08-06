@@ -44,6 +44,15 @@ This web app is especially targeted for **small scale farmers** who use traditio
 ### **Large Enterprise Farms**
 This app can also be used to manage and plan **enterprise grade farms** that might be difficult to manage without digital management means.
 
+## How It Works / Hands-On with the Production
+
+To explore the web app, visit this link:  
+[https://agri-smart-pi.vercel.app](https://agri-smart-pi.vercel.app)  
+
+Follow this guideline document to navigate the web app effectively:  
+[User Guide](https://docs.google.com/document/d/e/2PACX-1vRU3JepnuOAvJMDdPzwCaxM81nuttMNrVpFQouQnxJzOCtis7a6e9AqmPD9el67K6Tjlq-_NqCqyd3C/pub)
+
+
 ## 🚀 Further technical development/scale (already started)
 
 We tried to implement a user-friendly approach for farmers to input their land boundaries. This is a **GPS-based land mapping feature** that uses the phone's sensors to automatically trace the farmland perimeter, area and location. So no need for map drawing on the phone. But we faced a time shortage for the integration of the system to the current project. So we have a plan to continue in the integration of this important feature, but it is still accessible for testing in the `location_setter` branch in the GitHub. (Screenshot of the implementation test is available.)
