@@ -622,8 +622,8 @@ export default function ChatPage() {
                   onClick={isRecording ? stopRecording : startRecording}
                   disabled={isLoading || isPlayingAudio}
                   className={`rounded-xl transition-all duration-200 ${isRecording
-                      ? 'bg-red-500 hover:bg-red-600 text-white shadow-lg scale-105'
-                      : 'bg-blue-500 hover:bg-blue-600 text-white'
+                    ? 'bg-red-500 hover:bg-red-600 text-white shadow-lg scale-105'
+                    : 'bg-blue-500 hover:bg-blue-600 text-white'
                     } ${isLoading || isPlayingAudio ? 'opacity-50 cursor-not-allowed' : ''}`}
                   size="sm"
                 >
@@ -759,8 +759,8 @@ export default function ChatPage() {
                   <div key={msg.id} className={`flex ${msg.type === "user" ? "justify-end" : "justify-start"}`}>
                     <div
                       className={`max-w-[80%] lg:max-w-[70%] p-4 rounded-2xl ${msg.type === "user"
-                          ? "bg-green-500 text-white"
-                          : "bg-green-50 text-green-800 border border-green-200"
+                        ? "bg-green-500 text-white"
+                        : "bg-green-50 text-green-800 border border-green-200"
                         }`}
                     >
                       <div className="flex items-start gap-3">
@@ -901,8 +901,8 @@ export default function ChatPage() {
                       onClick={isRecording ? stopRecording : startRecording}
                       disabled={isLoading || isPlayingAudio}
                       className={`rounded-xl transition-all duration-200 ${isRecording
-                          ? 'bg-red-500 hover:bg-red-600 text-white shadow-lg scale-105'
-                          : 'bg-blue-500 hover:bg-blue-600 text-white'
+                        ? 'bg-red-500 hover:bg-red-600 text-white shadow-lg scale-105'
+                        : 'bg-blue-500 hover:bg-blue-600 text-white'
                         } ${isLoading || isPlayingAudio ? 'opacity-50 cursor-not-allowed' : ''}`}
                       size="sm"
                     >

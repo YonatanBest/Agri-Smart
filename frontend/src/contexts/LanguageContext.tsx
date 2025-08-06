@@ -14,7 +14,7 @@ export const SUPPORTED_LANGUAGES = [
 interface LanguageContextType {
   selectedLanguage: string
   setSelectedLanguage: (language: string) => void
-  t: (key: string, variables?: Record<string, string>) => string
+  t: (key: string, variables?: Record<string, string | number>) => string
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined)
@@ -2192,7 +2192,7 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     localStorage.setItem('agrilo_preferred_language', language)
   }
 
-  const t = (key: string, variables?: Record<string, string>): string => {
+  const t = (key: string, variables?: Record<string, string | number>): string => {
     const currentTranslations = translations[selectedLanguage as keyof typeof translations] || translations.en
     let translation = currentTranslations[key as keyof typeof currentTranslations] || key
 
@@ -2200,7 +2200,7 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     if (variables) {
       Object.entries(variables).forEach(([variable, value]) => {
         const placeholder = `{${variable}}`
-        translation = translation.replace(new RegExp(placeholder, 'g'), value || '')
+        translation = translation.replace(new RegExp(placeholder, 'g'), String(value) || '')
       })
     }
 
