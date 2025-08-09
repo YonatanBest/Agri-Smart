@@ -16,15 +16,15 @@ export default function ChatPage() {
   const { user, isAuthenticated } = useAuth()
   const { selectedLanguage, setSelectedLanguage, t } = useLanguage()
   const { diagnosisData, clearDiagnosisData } = useDiagnosis()
-  
+
   // Helper function to get current language info
   const getCurrentLanguage = () => SUPPORTED_LANGUAGES.find(lang => lang.code === selectedLanguage)
-  
+
   // Debug: Log language changes and persist to session
   useEffect(() => {
     console.log('🌍 Language changed to:', selectedLanguage)
     console.log('🌍 Available languages:', SUPPORTED_LANGUAGES.map(l => l.code))
-    
+
     // Store language preference in session storage
     if (typeof window !== 'undefined') {
       sessionStorage.setItem('agrilo_preferred_language', selectedLanguage)
@@ -33,7 +33,7 @@ export default function ChatPage() {
   const [isOnline, setIsOnline] = useState(true)
   const [showMobileDropdown, setShowMobileDropdown] = useState(false)
   const [showDesktopDropdown, setShowDesktopDropdown] = useState(false)
-  
+
   // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -73,7 +73,7 @@ export default function ChatPage() {
 
   // Update welcome message when language changes
   useEffect(() => {
-    setMessages(prev => prev.map(msg => 
+    setMessages(prev => prev.map(msg =>
       msg.id === 1 ? { ...msg, content: t("aiAssistantWelcome") } : msg
     ));
   }, [selectedLanguage, t]);
@@ -114,22 +114,22 @@ export default function ChatPage() {
         const problems = diagnosisData.identifiedProblems?.join(', ') || t("unknownIssues")
         const health = diagnosisData.overallHealth || t("unknown")
         const severity = diagnosisData.severityLevel || t("unknown")
-        
+
         return t("diagnosisMessageTemplate", { crop, problems, health, severity })
       }
 
       const diagnosisMessage = createDiagnosisMessage()
-      
+
       // Add the diagnosis message to the chat
-    const newMessage = {
+      const newMessage = {
         id: Date.now(),
         type: "user" as const,
         content: diagnosisMessage,
         time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
       }
-      
+
       setMessages(prev => [...prev, newMessage])
-      
+
       // Send the message to the AI
       const sendDiagnosisMessage = async () => {
         setIsLoading(true)
@@ -139,14 +139,14 @@ export default function ChatPage() {
             diagnosisMessage,
             selectedLanguage
           )
-          
+
           const botMessage = {
             id: Date.now() + 1,
             type: "bot" as const,
             content: response.response,
             time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
           }
-          
+
           setMessages(prev => [...prev, botMessage])
         } catch (error) {
           console.error('Failed to send diagnosis message:', error)
@@ -156,7 +156,7 @@ export default function ChatPage() {
           clearDiagnosisData()
         }
       }
-      
+
       sendDiagnosisMessage()
     }
   }, [diagnosisData, sessionId, selectedLanguage, clearDiagnosisData, t])
@@ -165,34 +165,34 @@ export default function ChatPage() {
     try {
       console.log('🔊 Starting audio playback...')
       setIsPlayingAudio(true)
-      
+
       // Convert base64 to audio blob
       const audioData = atob(audioBase64)
       console.log('🔊 Audio data decoded, length:', audioData.length)
-      
+
       const audioArray = new Uint8Array(audioData.length)
       for (let i = 0; i < audioData.length; i++) {
         audioArray[i] = audioData.charCodeAt(i)
       }
-      
+
       const audioBlob = new Blob([audioArray], { type: 'audio/mp3' })
       console.log('🔊 Audio blob created, size:', audioBlob.size)
-      
+
       const audioUrl = URL.createObjectURL(audioBlob)
       const audio = new Audio(audioUrl)
-      
+
       audio.onended = () => {
         console.log('🔊 Audio playback ended')
         setIsPlayingAudio(false)
         URL.revokeObjectURL(audioUrl)
       }
-      
+
       audio.onerror = (error) => {
         console.error('🔊 Audio playback error:', error)
         setIsPlayingAudio(false)
         URL.revokeObjectURL(audioUrl)
       }
-      
+
       console.log('🔊 Starting audio play...')
       await audio.play()
       console.log('🔊 Audio play started successfully')
@@ -221,7 +221,7 @@ export default function ChatPage() {
       if (isVoiceMode) {
         // Send voice message and get audio response
         response = await apiService.sendVoiceMessage(sessionId, message, selectedLanguage)
-        
+
         // Play audio response if available
         if (response.audio_base64 && response.tts_success) {
           await playAudioResponse(response.audio_base64)
@@ -230,14 +230,14 @@ export default function ChatPage() {
         // Send regular text message
         response = await apiService.sendChatMessage(sessionId, message, selectedLanguage)
       }
-      
+
       const botResponse = {
         id: messages.length + 2,
         type: "bot" as const,
         content: response.response,
         time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
       }
-      
+
       setMessages(prev => [...prev, botResponse])
     } catch (error) {
       console.error('Failed to send message:', error)
@@ -305,23 +305,23 @@ export default function ChatPage() {
   const startRecording = async () => {
     try {
       console.log('🎤 Starting recording...')
-      
+
       // Check if MediaRecorder is supported
       if (!window.MediaRecorder) {
         throw new Error(t("mediaRecorderNotSupported"))
       }
-      
+
       // Request microphone access
-      const stream = await navigator.mediaDevices.getUserMedia({ 
+      const stream = await navigator.mediaDevices.getUserMedia({
         audio: {
           echoCancellation: true,
           noiseSuppression: true,
           sampleRate: 48000
-        } 
+        }
       })
-      
+
       console.log('🎤 Microphone access granted')
-      
+
       // Check available MIME types
       const mimeTypes = [
         'audio/webm;codecs=opus',
@@ -329,7 +329,7 @@ export default function ChatPage() {
         'audio/mp4',
         'audio/wav'
       ]
-      
+
       let selectedMimeType = null
       for (const mimeType of mimeTypes) {
         if (MediaRecorder.isTypeSupported(mimeType)) {
@@ -338,57 +338,57 @@ export default function ChatPage() {
           break
         }
       }
-      
+
       if (!selectedMimeType) {
         throw new Error(t("noSupportedAudioFormat"))
       }
-      
+
       const recorder = new MediaRecorder(stream, {
         mimeType: selectedMimeType
       })
-      
+
       const chunks: Blob[] = []
-      
+
       recorder.ondataavailable = (event) => {
         console.log('🎤 Data available:', event.data.size, 'bytes')
         if (event.data.size > 0) {
           chunks.push(event.data)
         }
       }
-      
+
       recorder.onstop = async () => {
         console.log('🎤 Recording stopped, chunks:', chunks.length)
         const audioBlob = new Blob(chunks, { type: selectedMimeType })
         console.log('🎤 Audio blob size:', audioBlob.size, 'bytes')
-        
+
         const audioFile = new File([audioBlob], 'audio.webm', { type: selectedMimeType })
         console.log('🎤 Audio file created:', audioFile.size, 'bytes')
-        
+
         // Send audio message
         await sendAudioMessage(audioFile)
-        
+
         // Stop all tracks
         stream.getTracks().forEach(track => track.stop())
       }
-      
+
       recorder.onerror = (event) => {
         console.error('🎤 Recording error:', event)
       }
-      
+
       recorder.start(1000) // Collect data every second
       console.log('🎤 Recording started')
-      
+
       setMediaRecorder(recorder)
       setIsRecording(true)
       setRecordingTime(0)
-      
+
       // Start recording timer
       const timer = setInterval(() => {
         setRecordingTime(prev => prev + 1)
       }, 1000)
-      
-      // Store timer reference
-      ;(recorder as any).timer = timer
+
+        // Store timer reference
+        ; (recorder as any).timer = timer
     } catch (error) {
       console.error('🎤 Error starting recording:', error)
       const errorMessage = error instanceof Error ? error.message : t("unknownError")
@@ -403,12 +403,12 @@ export default function ChatPage() {
       mediaRecorder.stop()
       setIsRecording(false)
       setRecordingTime(0)
-      
+
       // Clear timer
       if ((mediaRecorder as any).timer) {
         clearInterval((mediaRecorder as any).timer)
       }
-      
+
       setMediaRecorder(null)
       console.log('🎤 Recording stopped successfully')
     } else {
@@ -427,7 +427,7 @@ export default function ChatPage() {
     try {
       // Use voice conversation for real-time voice-to-voice chat
       const response = await apiService.voiceConversation(sessionId, audioFile, selectedLanguage)
-      
+
       // Add transcribed message
       const transcribedMessage = {
         id: messages.length + 1,
@@ -435,9 +435,9 @@ export default function ChatPage() {
         content: response.transcribed_text,
         time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
       }
-      
+
       setMessages(prev => [...prev, transcribedMessage])
-      
+
       // Add AI response
       const botResponse = {
         id: messages.length + 2,
@@ -445,9 +445,9 @@ export default function ChatPage() {
         content: response.response,
         time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
       }
-      
+
       setMessages(prev => [...prev, botResponse])
-      
+
       // Play audio response if available
       console.log('🔊 Audio response received:', {
         hasAudio: !!response.audio_base64,
@@ -455,7 +455,7 @@ export default function ChatPage() {
         audioLength: response.audio_base64?.length || 0,
         language: response.original_language
       })
-      
+
       if (response.audio_base64 && response.tts_success) {
         console.log('🔊 Playing audio response...')
         await playAudioResponse(response.audio_base64)
@@ -467,10 +467,10 @@ export default function ChatPage() {
       }
     } catch (error) {
       console.error('Failed to send audio message:', error)
-      
+
       // Provide more helpful error messages for farmers
       let errorContent = t("audioProcessingError")
-      
+
       if (error instanceof Error) {
         if (error.message.includes("Audio quality too low")) {
           errorContent = t("speakMoreClearly")
@@ -480,7 +480,7 @@ export default function ChatPage() {
           errorContent = t("speakMoreClearly")
         }
       }
-      
+
       const errorMessage = {
         id: messages.length + 1,
         type: "bot" as const,
@@ -532,9 +532,8 @@ export default function ChatPage() {
               {messages.map((msg) => (
                 <div key={msg.id} className={`flex ${msg.type === "user" ? "justify-end" : "justify-start"}`}>
                   <div
-                    className={`max-w-[85%] p-3 rounded-2xl ${
-                      msg.type === "user" ? "bg-green-500 text-white" : "bg-green-50 text-green-800"
-                    }`}
+                    className={`max-w-[85%] p-3 rounded-2xl ${msg.type === "user" ? "bg-green-500 text-white" : "bg-green-50 text-green-800"
+                      }`}
                   >
                     <div className="flex items-start gap-2">
                       {msg.type === "bot" && <Bot className="h-4 w-4 mt-0.5 text-green-600" />}
@@ -560,7 +559,7 @@ export default function ChatPage() {
                             </ReactMarkdown>
                           </div>
                         ) : (
-                        <p className="text-sm">{msg.content}</p>
+                          <p className="text-sm">{msg.content}</p>
                         )}
                         <p className={`text-xs mt-1 ${msg.type === "user" ? "text-green-100" : "text-green-500"}`}>
                           {msg.time}
@@ -579,8 +578,8 @@ export default function ChatPage() {
                 <div className="flex items-center justify-center gap-2 p-2 bg-red-50 border border-red-200 rounded-lg">
                   <div className="flex items-center gap-1">
                     <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
-                    <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" style={{animationDelay: '0.2s'}}></div>
-                    <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" style={{animationDelay: '0.4s'}}></div>
+                    <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
+                    <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
                   </div>
                   <span className="text-sm font-medium text-red-700">
                     {t("recording")} {Math.floor(recordingTime / 60)}:{(recordingTime % 60).toString().padStart(2, '0')}
@@ -588,16 +587,16 @@ export default function ChatPage() {
                   <span className="text-xs text-red-600">{t("tapStopButton")}</span>
                 </div>
               )}
-              
+
               <div className="flex gap-2">
                 <Input
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   placeholder={
-                    isOnline 
-                      ? selectedLanguage === 'en' 
-                        ? t("typeFarmingQuestion") 
-                        : t("typeQuestionInLanguage", { language: SUPPORTED_LANGUAGES.find(lang => lang.code === selectedLanguage)?.name })
+                    isOnline
+                      ? selectedLanguage === 'en'
+                        ? t("typeFarmingQuestion")
+                        : t("typeQuestionInLanguage", { language: SUPPORTED_LANGUAGES.find(lang => lang.code === selectedLanguage)?.name || selectedLanguage })
                       : t("youreOffline")
                   }
                   disabled={!isOnline}
@@ -614,19 +613,18 @@ export default function ChatPage() {
                   ) : isPlayingAudio ? (
                     <Volume2 className="h-4 w-4 animate-pulse" />
                   ) : (
-                  <Send className="h-4 w-4" />
+                    <Send className="h-4 w-4" />
                   )}
                 </Button>
-                
+
                 {/* Mobile Live Chat Button */}
                 <Button
                   onClick={isRecording ? stopRecording : startRecording}
                   disabled={isLoading || isPlayingAudio}
-                  className={`rounded-xl transition-all duration-200 ${
-                    isRecording 
-                      ? 'bg-red-500 hover:bg-red-600 text-white shadow-lg scale-105' 
-                      : 'bg-blue-500 hover:bg-blue-600 text-white'
-                  } ${isLoading || isPlayingAudio ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  className={`rounded-xl transition-all duration-200 ${isRecording
+                    ? 'bg-red-500 hover:bg-red-600 text-white shadow-lg scale-105'
+                    : 'bg-blue-500 hover:bg-blue-600 text-white'
+                    } ${isLoading || isPlayingAudio ? 'opacity-50 cursor-not-allowed' : ''}`}
                   size="sm"
                 >
                   <div className="flex items-center gap-2">
@@ -653,7 +651,7 @@ export default function ChatPage() {
                     )}
                   </div>
                 </Button>
-                
+
                 {/* Mobile Language Selector */}
                 <div className="relative language-dropdown-container">
                   <Button
@@ -669,7 +667,7 @@ export default function ChatPage() {
                     {SUPPORTED_LANGUAGES.find(lang => lang.code === selectedLanguage)?.flag}
                     <span className="ml-1 text-xs">({selectedLanguage})</span>
                   </Button>
-                  
+
                   {/* Language Dropdown */}
                   {showMobileDropdown && (
                     <div className="absolute top-full left-0 mt-1 bg-white border border-green-200 rounded-lg shadow-xl z-[9999] min-w-[200px] max-h-60 overflow-y-auto">
@@ -681,9 +679,8 @@ export default function ChatPage() {
                             setSelectedLanguage(lang.code);
                             setShowMobileDropdown(false);
                           }}
-                          className={`w-full text-left px-3 py-2 hover:bg-green-50 flex items-center gap-2 bg-white ${
-                            selectedLanguage === lang.code ? 'bg-green-100 text-green-700' : 'text-gray-700'
-                          }`}
+                          className={`w-full text-left px-3 py-2 hover:bg-green-50 flex items-center gap-2 bg-white ${selectedLanguage === lang.code ? 'bg-green-100 text-green-700' : 'text-gray-700'
+                            }`}
                         >
                           <span>{lang.flag}</span>
                           <span className="text-sm">{lang.name}</span>
@@ -734,7 +731,7 @@ export default function ChatPage() {
 
       {/* Desktop Layout */}
       <div className="hidden md:block p-4 lg:p-6 h-[calc(100vh-120px)] flex flex-col gap-6">
-        
+
 
         <div className="flex-1 grid grid-cols-1 lg:grid-cols-1 gap-6">
           {/* Desktop Chat Messages */}
@@ -761,11 +758,10 @@ export default function ChatPage() {
                 {messages.map((msg) => (
                   <div key={msg.id} className={`flex ${msg.type === "user" ? "justify-end" : "justify-start"}`}>
                     <div
-                      className={`max-w-[80%] lg:max-w-[70%] p-4 rounded-2xl ${
-                        msg.type === "user"
-                          ? "bg-green-500 text-white"
-                          : "bg-green-50 text-green-800 border border-green-200"
-                      }`}
+                      className={`max-w-[80%] lg:max-w-[70%] p-4 rounded-2xl ${msg.type === "user"
+                        ? "bg-green-500 text-white"
+                        : "bg-green-50 text-green-800 border border-green-200"
+                        }`}
                     >
                       <div className="flex items-start gap-3">
                         {msg.type === "bot" && (
@@ -799,7 +795,7 @@ export default function ChatPage() {
                               </ReactMarkdown>
                             </div>
                           ) : (
-                          <p className="text-sm leading-relaxed">{msg.content}</p>
+                            <p className="text-sm leading-relaxed">{msg.content}</p>
                           )}
                           <p className={`text-xs mt-2 ${msg.type === "user" ? "text-green-100" : "text-green-500"}`}>
                             {msg.time}
@@ -819,8 +815,8 @@ export default function ChatPage() {
                     <div className="flex items-center justify-center gap-3 p-3 bg-red-50 border border-red-200 rounded-lg">
                       <div className="flex items-center gap-1">
                         <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
-                        <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" style={{animationDelay: '0.2s'}}></div>
-                        <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" style={{animationDelay: '0.4s'}}></div>
+                        <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
+                        <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
                       </div>
                       <span className="text-sm font-medium text-red-700">
                         {t("recording")} {Math.floor(recordingTime / 60)}:{(recordingTime % 60).toString().padStart(2, '0')}
@@ -828,12 +824,12 @@ export default function ChatPage() {
                       <span className="text-xs text-red-600">{t("clickStopButton")}</span>
                     </div>
                   )}
-                  
+
                   <div className="flex gap-3">
                     <Button variant="outline" size="sm" className="rounded-xl bg-transparent">
                       <Paperclip className="h-4 w-4" />
                     </Button>
-                    
+
                     {/* Desktop Language Selector */}
                     <div className="relative language-dropdown-container">
                       <Button
@@ -849,7 +845,7 @@ export default function ChatPage() {
                         {SUPPORTED_LANGUAGES.find(lang => lang.code === selectedLanguage)?.flag}
                         <span className="ml-1 text-xs">({selectedLanguage})</span>
                       </Button>
-                      
+
                       {/* Language Dropdown */}
                       {showDesktopDropdown && (
                         <div className="absolute top-full left-0 mt-1 bg-white border border-green-200 rounded-lg shadow-xl z-[9999] min-w-[200px] max-h-60 overflow-y-auto">
@@ -861,9 +857,8 @@ export default function ChatPage() {
                                 setSelectedLanguage(lang.code);
                                 setShowDesktopDropdown(false);
                               }}
-                              className={`w-full text-left px-3 py-2 hover:bg-green-50 flex items-center gap-2 bg-white ${
-                                selectedLanguage === lang.code ? 'bg-green-100 text-green-700' : 'text-gray-700'
-                              }`}
+                              className={`w-full text-left px-3 py-2 hover:bg-green-50 flex items-center gap-2 bg-white ${selectedLanguage === lang.code ? 'bg-green-100 text-green-700' : 'text-gray-700'
+                                }`}
                             >
                               <span>{lang.flag}</span>
                               <span className="text-sm">{lang.name}</span>
@@ -872,15 +867,15 @@ export default function ChatPage() {
                         </div>
                       )}
                     </div>
-                    
+
                     <Input
                       value={message}
                       onChange={(e) => setMessage(e.target.value)}
                       placeholder={
-                        isOnline 
-                          ? selectedLanguage === 'en' 
-                            ? t("typeFarmingQuestion") 
-                            : t("typeQuestionInLanguage", { language: SUPPORTED_LANGUAGES.find(lang => lang.code === selectedLanguage)?.name })
+                        isOnline
+                          ? selectedLanguage === 'en'
+                            ? t("typeFarmingQuestion")
+                            : t("typeQuestionInLanguage", { language: SUPPORTED_LANGUAGES.find(lang => lang.code === selectedLanguage)?.name || selectedLanguage })
                           : t("youreOffline")
                       }
                       disabled={!isOnline}
@@ -897,19 +892,18 @@ export default function ChatPage() {
                       ) : isPlayingAudio ? (
                         <Volume2 className="h-4 w-4 animate-pulse" />
                       ) : (
-                      <Send className="h-4 w-4" />
+                        <Send className="h-4 w-4" />
                       )}
                     </Button>
-                    
+
                     {/* Desktop Live Chat Button */}
                     <Button
                       onClick={isRecording ? stopRecording : startRecording}
                       disabled={isLoading || isPlayingAudio}
-                      className={`rounded-xl transition-all duration-200 ${
-                        isRecording 
-                          ? 'bg-red-500 hover:bg-red-600 text-white shadow-lg scale-105' 
-                          : 'bg-blue-500 hover:bg-blue-600 text-white'
-                      } ${isLoading || isPlayingAudio ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      className={`rounded-xl transition-all duration-200 ${isRecording
+                        ? 'bg-red-500 hover:bg-red-600 text-white shadow-lg scale-105'
+                        : 'bg-blue-500 hover:bg-blue-600 text-white'
+                        } ${isLoading || isPlayingAudio ? 'opacity-50 cursor-not-allowed' : ''}`}
                       size="sm"
                     >
                       <div className="flex items-center gap-2">

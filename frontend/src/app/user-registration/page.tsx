@@ -31,20 +31,20 @@ export default function UserRegistrationPage() {
   const [errors, setErrors] = useState<Record<string, string>>({})
   const router = useRouter()
   const { completeRegistration, isAuthenticated, isLoading } = useAuth()
-  const { t } = useLanguage()
+  const { t, selectedLanguage } = useLanguage()
 
   // Redirect authenticated users to main page (only for existing users, not new registrations)
   useEffect(() => {
     if (!isLoading && isAuthenticated) {
       // Check if this is a new registration by looking for onboarding data
       const authData = sessionStorage.getItem('auth_data')
-      
+
       // If we have onboarding data, continue with onboarding flow
       if (authData) {
         // New user with onboarding data - let them continue the flow
         return
       }
-      
+
       // Existing user - redirect to main page
       router.push("/main-page")
     }
@@ -65,9 +65,9 @@ export default function UserRegistrationPage() {
         name: newCropName.trim(),
         icon: "🌱"
       }
-      
+
       console.log('🌱 Adding crop:', newCrop, 'to section:', activeSection)
-      
+
       if (activeSection === "current") {
         const updatedCrops = [...currentlyGrowingCrops, newCrop]
         console.log('🌾 Updated currently growing crops:', updatedCrops)
@@ -77,7 +77,7 @@ export default function UserRegistrationPage() {
         console.log('🌾 Updated planning to grow crops:', updatedCrops)
         setPlanningToGrowCrops(updatedCrops)
       }
-      
+
       setNewCropName("")
       setShowAddForm(false)
     }
@@ -93,19 +93,19 @@ export default function UserRegistrationPage() {
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {}
-    
+
     if (!formData.user_type) {
       newErrors.user_type = t("selectFarmingExperience")
     }
-    
+
     if (!formData.years_experience) {
       newErrors.years_experience = t("selectYearsExperience")
     }
-    
+
     if (!formData.main_goal) {
       newErrors.main_goal = t("selectMainGoal")
     }
-    
+
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
@@ -116,17 +116,17 @@ export default function UserRegistrationPage() {
         // Get all stored data from session storage
         const authData = JSON.parse(sessionStorage.getItem('auth_data') || '{}')
         const locationData = JSON.parse(sessionStorage.getItem('farmer_location') || '{}')
-        
+
         // Debug: Log crops data
         console.log('🌾 Currently Growing Crops:', currentlyGrowingCrops)
         console.log('🌾 Planning to Grow Crops:', planningToGrowCrops)
-        
+
         // Prepare user data for backend
         const userData = {
           email: authData.email,
           password: authData.password,
           name: authData.name,
-          location: locationData.latitude && locationData.longitude 
+          location: locationData.latitude && locationData.longitude
             ? `${locationData.latitude}, ${locationData.longitude}`
             : "Unknown",
           preferred_language: selectedLanguage,
@@ -138,12 +138,12 @@ export default function UserRegistrationPage() {
             ...planningToGrowCrops.map(crop => `${crop.name}:planned`)
           ]
         }
-        
+
         console.log('📤 Sending userData to backend:', userData)
-        
+
         // Send data to backend using AuthContext
         await completeRegistration(userData)
-        
+
         // Store user data in session storage
         sessionStorage.setItem('user_registration_data', JSON.stringify({
           ...formData,
@@ -153,16 +153,16 @@ export default function UserRegistrationPage() {
             ...planningToGrowCrops.map(crop => `${crop.name}:planned`)
           ]
         }))
-        
+
         // Clear onboarding data since user has completed the full flow
         sessionStorage.removeItem('auth_data')
         sessionStorage.removeItem('farmer_location')
-        
+
         // Navigate to main app
         router.push("/main-page")
       } catch (error: any) {
         console.error('Registration error:', error)
-        
+
         // Handle specific error cases
         if (error.message && error.message.includes('Email already registered')) {
           alert('This email is already registered. Please sign in instead or use a different email address.')
@@ -200,7 +200,7 @@ export default function UserRegistrationPage() {
               </Label>
               <Select
                 value={formData.user_type}
-                onValueChange={(value) => setFormData({...formData, user_type: value})}
+                onValueChange={(value) => setFormData({ ...formData, user_type: value })}
               >
                 <SelectTrigger className="rounded-xl border-green-200 focus:border-green-500">
                   <SelectValue placeholder={t("farmingExperience")} />
@@ -224,7 +224,7 @@ export default function UserRegistrationPage() {
               </Label>
               <Select
                 value={formData.years_experience}
-                onValueChange={(value) => setFormData({...formData, years_experience: value})}
+                onValueChange={(value) => setFormData({ ...formData, years_experience: value })}
               >
                 <SelectTrigger className="rounded-xl border-green-200 focus:border-green-500">
                   <SelectValue placeholder={t("selectYearsExperience")} />
@@ -249,7 +249,7 @@ export default function UserRegistrationPage() {
               </Label>
               <Select
                 value={formData.main_goal}
-                onValueChange={(value) => setFormData({...formData, main_goal: value})}
+                onValueChange={(value) => setFormData({ ...formData, main_goal: value })}
               >
                 <SelectTrigger className="rounded-xl border-green-200 focus:border-green-500">
                   <SelectValue placeholder={t("mainGoal")} />
@@ -270,7 +270,7 @@ export default function UserRegistrationPage() {
             {/* Crop Selection */}
             <div className="space-y-4">
               <h3 className="text-lg font-semibold text-green-800">Your Crops</h3>
-              
+
               {/* Currently Growing Crops */}
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
@@ -424,7 +424,7 @@ export default function UserRegistrationPage() {
             <ArrowLeft className="mr-2 h-4 w-4" />
             {t("back")}
           </Button>
-          
+
           <Button
             onClick={handleSubmit}
             className="flex-1 bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-xl"
