@@ -24,7 +24,8 @@ app = FastAPI()
 
 origins = [
     "http://localhost:3000",
-    "https://agri-smart-pi.vercel.app"
+    "https://agri-smart-pi.vercel.app",
+    "*"
 ]
 
 
