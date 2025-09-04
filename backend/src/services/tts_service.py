@@ -31,8 +31,8 @@ class TTSService:
                 "speaking_rate": 1,
             },
             "no": {
-                "language_code": "no-NO",
-                "voice_name": "no-NO-Standard-A",  # Norwegian voice
+                "language_code": "nb-no",
+                "voice_name":"nb-NO-Chirp3-HD-Achird",  # Norwegian voice
                 "speaking_rate": 1,
             },
             "sw": {
