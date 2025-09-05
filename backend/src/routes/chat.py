@@ -553,7 +553,7 @@ Provide a brief, helpful answer tailored to the farmer's context."""
             )
 
     llm_text = auto_compact_text(llm_text)
-    return llm_text
+    return {"response": llm_text}
 
 
 @router.post("/send-voice-message")
